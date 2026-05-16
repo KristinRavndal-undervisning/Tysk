@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tysk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f4f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+
+    /* ---- hero ---- */
+    .hero { text-align: center; padding: 2rem 1rem 1.75rem; }
+
+    h1 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 42px;
+      background: linear-gradient(to right, #1a1a1a 0%, #DD0000 10%, #FFCE00 20%, #1a1a1a 30%, #DD0000 40%, #FFCE00 50%, #1a1a1a 60%, #DD0000 70%, #FFCE00 80%, #1a1a1a 90%, #DD0000 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      line-height: 1.15;
+    }
+    .hero-sub { font-size: 14px; color: #555; }
+
+    /* ---- oppgaveliste ---- */
+    .section-label {
+      font-size: 11px; font-weight: 600; color: #888;
+      letter-spacing: .08em; text-transform: uppercase;
+      margin: 2rem 0 10px;
+    }
+
+    .task-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    @media (min-width: 768px) { .task-grid { grid-template-columns: 1fr 1fr; } }
+
+    .task-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.1rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: background .15s, border-color .15s;
+    }
+    .task-card:hover { background: #fafaf8; border-color: #ccc; }
+    .task-card.accent-black { border-left: 4px solid #1a1a1a; }
+    .task-card.accent-red   { border-left: 4px solid #DD0000; }
+    .task-card.accent-gold  { border-left: 4px solid #FFCE00; }
+    .task-card.accent-black:hover { border-left-color: #1a1a1a; }
+    .task-card.accent-red:hover   { border-left-color: #DD0000; }
+    .task-card.accent-gold:hover  { border-left-color: #FFCE00; }
+
+    .task-text { flex: 1; min-width: 0; }
+    .task-title { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 3px; }
+    .task-desc  { font-size: 13px; color: #666; line-height: 1.4; }
+    .task-arrow { color: #bbb; font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+    /* ---- footer ---- */
+    footer { text-align: center; margin-top: 2.5rem; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <h1>Tysk</h1>
+    <p class="hero-sub">Interaktiv læring</p>
+  </div>
+
+  <p class="section-label">Oppgaver</p>
+  <div class="task-grid" id="taskGrid"></div>
+
+  <footer></footer>
+
+</div>
+<script>
+  /* ============================================================
+     LEGG TIL ELLER ENDRE OPPGAVER HER
+     ============================================================
+     Hvert objekt har:
+       title  – navn på oppgaven
+       desc   – kort beskrivelse
+       href   – filnavn (IKKE endre etter at undersiden er opprettet)
+
+     Slik legger du til en ny oppgave:
+       1. Kopier én linje og lim inn før ];
+       2. Gi den neste ledige nummer i href
+       3. Endre title og desc
+  ============================================================ */
+  const tasks = [
+    { title: "Oppgave 1", desc: "Beskrivelse av oppgaven", href: "oppgave-01.html" },
+  ];
+  /* ============================================================ */
+
+  const accents = ['accent-black', 'accent-red', 'accent-gold'];
+
+  document.getElementById('taskGrid').innerHTML = tasks.map((t, i) => `
+    <a class="task-card ${accents[i % 3]}" href="${t.href}">
+      <div class="task-text">
+        <p class="task-title">${t.title}</p>
+        <p class="task-desc">${t.desc}</p>
+      </div>
+      <span class="task-arrow">›</span>
+    </a>
+  `).join('');
+</script>
+</body>
+</html>
