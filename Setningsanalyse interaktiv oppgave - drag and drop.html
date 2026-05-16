@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tysk Setningsanalyse</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4ff;
+    --card: #ffffff;
+    --primary: #3b5bdb;
+    --primary-light: #e8edff;
+    --success: #2f9e44;
+    --success-light: #d3f9d8;
+    --error: #c92a2a;
+    --error-light: #ffe3e3;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #d1d5db;
+    --shadow: 0 4px 24px rgba(59,91,219,0.10);
+    --tag-V:    #e64980;
+    --tag-Su:   #1971c2;
+    --tag-dO:   #e67700;
+    --tag-iO:   #2f9e44;
+    --tag-PIV:  #7048e8;
+    --tag-annet:#495057;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 12px 48px;
+    color: var(--text);
+  }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem; font-weight: 800;
+    color: var(--primary); letter-spacing: -0.5px;
+  }
+  header p { color: var(--muted); font-size: 0.95rem; margin-top: 4px; }
+
+  .progress-bar-wrap {
+    width: 100%; max-width: 720px;
+    background: #dbe4ff; border-radius: 99px;
+    height: 10px; margin-bottom: 8px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width 0.5s ease;
+  }
+  .progress-label { font-size: 0.83rem; color: var(--muted); margin-bottom: 20px; text-align: center; }
+
+  .card {
+    background: var(--card); border-radius: 20px;
+    box-shadow: var(--shadow); padding: 28px 28px 24px;
+    width: 100%; max-width: 720px;
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; font-size: 0.78rem; }
+  .legend-item { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  .sentence-row {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: flex-end; margin-bottom: 12px;
+  }
+
+  .phrase-slot { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+
+  .drop-zone {
+    min-width: 72px; height: 34px;
+    border: 2px dashed var(--border); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem; font-weight: 800;
+    color: transparent;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative; padding: 0 8px;
+    cursor: default; white-space: nowrap;
+  }
+  .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+  .drop-zone.filled    { border-style: solid; color: #fff; }
+  .drop-zone .remove-tag {
+    position: absolute; top: -7px; right: -7px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #888; color: white; font-size: 11px;
+    line-height: 18px; text-align: center;
+    cursor: pointer; display: none; font-weight: 900; z-index: 10;
+  }
+  .drop-zone.filled .remove-tag { display: block; }
+
+  .phrase-label { font-size: 1.05rem; font-weight: 700; color: var(--text); text-align: center; white-space: nowrap; }
+  .punct-slot { display: flex; align-items: flex-end; padding-bottom: 4px; }
+  .punct-label { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+
+  .tag-V    { background: var(--tag-V);    border-color: var(--tag-V); }
+  .tag-Su   { background: var(--tag-Su);   border-color: var(--tag-Su); }
+  .tag-dO   { background: var(--tag-dO);   border-color: var(--tag-dO); }
+  .tag-iO   { background: var(--tag-iO);   border-color: var(--tag-iO); }
+  .tag-PIV  { background: var(--tag-PIV);  border-color: var(--tag-PIV); }
+  .tag-annet{ background: var(--tag-annet);border-color: var(--tag-annet); }
+
+  .tags-bank {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 18px; padding-top: 16px;
+    border-top: 1.5px solid var(--border);
+  }
+  .tag-chip {
+    padding: 6px 16px; border-radius: 99px;
+    font-size: 0.85rem; font-weight: 800;
+    cursor: grab; user-select: none; color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+    transition: transform 0.1s; letter-spacing: 0.3px;
+  }
+  .tag-chip:active { cursor: grabbing; transform: scale(1.08); }
+  .chip-V    { background: var(--tag-V); }
+  .chip-Su   { background: var(--tag-Su); }
+  .chip-dO   { background: var(--tag-dO); }
+  .chip-iO   { background: var(--tag-iO); }
+  .chip-PIV  { background: var(--tag-PIV); }
+  .chip-annet{ background: var(--tag-annet); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    padding: 9px 20px; border-radius: 10px; border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
+  .btn:active { transform: translateY(0); }
+  .btn-check { background: var(--primary); color: #fff; flex: 1; }
+  .btn-norsk { background: #e9ecef; color: var(--text); font-size: 0.82rem; padding: 8px 14px; }
+  .btn-next  { background: var(--success); color: #fff; flex: 1; display: none; }
+  .btn-reset { background: #f1f3f5; color: var(--muted); font-size: 0.82rem; padding: 8px 14px; }
+
+  .translation-box {
+    min-height: 26px; font-size: 0.88rem;
+    color: #555; font-style: italic;
+    margin-top: 8px; transition: opacity 0.4s;
+  }
+
+  .feedback-box {
+    margin-top: 14px; border-radius: 12px;
+    padding: 12px 16px; font-size: 0.9rem;
+    font-weight: 600; display: none; line-height: 1.6;
+  }
+  .feedback-box.correct { background: var(--success-light); color: var(--success); border: 1.5px solid #b2f2bb; }
+  .feedback-box.wrong   { background: var(--error-light);   color: var(--error);   border: 1.5px solid #ffc9c9; }
+
+  .result-screen { display: none; text-align: center; padding: 20px 0 8px; }
+  .result-screen h2 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: var(--primary); margin-bottom: 10px; }
+  .result-score { font-size: 3.5rem; font-weight: 900; color: var(--primary); margin: 12px 0 6px; }
+  .result-screen p { color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; }
+  .btn-restart { background: var(--primary); color: #fff; padding: 12px 32px; font-size: 1rem; }
+  .btn-review  { background: #364fc7; color: #fff; padding: 12px 32px; font-size: 1rem; }
+
+  .review-panel { max-width: 720px; }
+
+  .review-item {
+    border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 14px; border: 1.5px solid #e9ecef;
+  }
+  .review-item.review-correct { border-color: #b2f2bb; background: #f8fff9; }
+  .review-item.review-wrong   { border-color: #ffc9c9; background: #fff8f8; }
+
+  .review-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 10px;
+  }
+  .review-num  { font-weight: 800; font-size: 0.82rem; color: var(--muted); }
+  .review-icon { font-size: 1rem; }
+
+  .review-phrase-row {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: flex-end; margin-bottom: 8px;
+  }
+
+  .review-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+  .review-tag {
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 0.72rem; font-weight: 800;
+    color: #fff; white-space: nowrap; position: relative;
+  }
+  .rtag-correct { background: var(--success); }
+  .rtag-wrong   { background: var(--error); }
+  .rtag-missing { background: #adb5bd; }
+
+  .rtag-fix {
+    display: inline-block;
+    margin-left: 5px; padding: 1px 6px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 99px; font-size: 0.68rem;
+  }
+  .rtag-fix::before { content: '→ '; }
+
+  .review-word  { font-size: 0.95rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .review-punct { font-size: 0.95rem; font-weight: 700; color: var(--text); align-self: flex-end; padding-bottom: 2px; }
+  .review-nor   { font-size: 0.82rem; color: var(--muted); font-style: italic; margin-top: 6px; }
+
+  .drop-zone.correct-ans { border-color: var(--success) !important; outline: 2px solid #b2f2bb; }
+  .drop-zone.wrong-ans   { border-color: var(--error)   !important; outline: 2px solid #ffc9c9; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tysk Setningsanalyse</h1>
+  <p>Dra merkelappene til rett setningsledd</p>
+</header>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar" style="width:5%"></div>
+</div>
+<div class="progress-label" id="progressLabel">Setning 1 av 20</div>
+
+<div class="card" id="mainCard">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-V)"></div> V = Verb</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-Su)"></div> Su = Subjekt</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-dO)"></div> dO = Direkte obj.</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-iO)"></div> iO = Indirekte obj.</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-PIV)"></div> PIV = Predikativ</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--tag-annet)"></div> Annet = Adverbial/prep.ledd</div>
+  </div>
+
+  <div class="sentence-row" id="sentenceRow"></div>
+  <div class="translation-box" id="translationBox"></div>
+  <div class="tags-bank" id="tagsBank"></div>
+  <div class="feedback-box" id="feedbackBox"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-norsk" id="btnNorsk">Norsk</button>
+    <button class="btn btn-reset" id="btnReset">↺ Nullstill</button>
+    <button class="btn btn-check" id="btnCheck">Sjekk svar</button>
+    <button class="btn btn-next"  id="btnNext">Neste →</button>
+  </div>
+</div>
+
+<div class="card result-screen" id="resultScreen">
+  <div style="font-size:3rem">🎉</div>
+  <h2>Ferdig!</h2>
+  <div class="result-score" id="resultScore"></div>
+  <p id="resultMsg"></p>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <button class="btn btn-restart" onclick="restart()">Ta øvelsen på nytt</button>
+    <button class="btn btn-review" onclick="showReview()">Se alle svar 📋</button>
+  </div>
+</div>
+
+<div class="card review-panel" id="reviewPanel" style="display:none;margin-top:20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h3 style="font-family:'Baloo 2',cursive;color:var(--primary);font-size:1.2rem;">Gjennomgang av svar</h3>
+    <button class="btn btn-reset" onclick="hideReview()">Lukk ✕</button>
+  </div>
+  <div id="reviewList"></div>
+</div>
+
+<script>
+const sentences = [
+  {
+    no: "Jeg spiller fotball med vennene mine.",
+    phrases: [
+      { text: "Ich",                 tag: "Su" },
+      { text: "spiele",              tag: "V" },
+      { text: "Fußball",             tag: "dO" },
+      { text: "mit meinen Freunden", tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Moren min lager pizza til middag.",
+    phrases: [
+      { text: "Meine Mutter",        tag: "Su" },
+      { text: "kocht",               tag: "V" },
+      { text: "Pizza",               tag: "dO" },
+      { text: "zum Abendessen",      tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Jeg gir lillebroren min et spill.",
+    phrases: [
+      { text: "Ich",                 tag: "Su" },
+      { text: "gebe",                tag: "V" },
+      { text: "meinem Bruder",       tag: "iO" },
+      { text: "ein Spiel",           tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Hun er en god venninne.",
+    phrases: [
+      { text: "Sie",                 tag: "Su" },
+      { text: "ist",                 tag: "V" },
+      { text: "eine gute Freundin",  tag: "PIV" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Vi hører på musikk om kvelden.",
+    phrases: [
+      { text: "Wir",                 tag: "Su" },
+      { text: "hören",               tag: "V" },
+      { text: "abends",              tag: "annet" },
+      { text: "Musik",               tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Læreren gir oss lekser.",
+    phrases: [
+      { text: "Der Lehrer",          tag: "Su" },
+      { text: "gibt",                tag: "V" },
+      { text: "uns",                 tag: "iO" },
+      { text: "Hausaufgaben",        tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Han blir trøtt etter trening.",
+    phrases: [
+      { text: "Er",                  tag: "Su" },
+      { text: "wird",                tag: "V" },
+      { text: "müde",                tag: "PIV" },
+      { text: "nach dem Training",   tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Katten min sover på sofaen.",
+    phrases: [
+      { text: "Meine Katze",         tag: "Su" },
+      { text: "schläft",             tag: "V" },
+      { text: "auf dem Sofa",        tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Jeg kjøper en ny jakke i sentrum.",
+    phrases: [
+      { text: "Ich",                 tag: "Su" },
+      { text: "kaufe",               tag: "V" },
+      { text: "eine neue Jacke",     tag: "dO" },
+      { text: "in der Stadt",        tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Faren min viser meg veien.",
+    phrases: [
+      { text: "Mein Vater",          tag: "Su" },
+      { text: "zeigt",               tag: "V" },
+      { text: "mir",                 tag: "iO" },
+      { text: "den Weg",             tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Vi spiser middag klokka seks.",
+    phrases: [
+      { text: "Wir",                 tag: "Su" },
+      { text: "essen",               tag: "V" },
+      { text: "um sechs Uhr",        tag: "annet" },
+      { text: "zu Abend",            tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Søsteren min er veldig flink i matte.",
+    phrases: [
+      { text: "Meine Schwester",     tag: "Su" },
+      { text: "ist",                 tag: "V" },
+      { text: "sehr gut",            tag: "PIV" },
+      { text: "in Mathe",            tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Jeg sender bestevennen min en melding.",
+    phrases: [
+      { text: "Ich",                 tag: "Su" },
+      { text: "schicke",             tag: "V" },
+      { text: "meinem Freund",       tag: "iO" },
+      { text: "eine Nachricht",      tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Hunden løper i parken.",
+    phrases: [
+      { text: "Der Hund",            tag: "Su" },
+      { text: "läuft",               tag: "V" },
+      { text: "im Park",             tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Klassen vår reiser til Berlin neste uke.",
+    phrases: [
+      { text: "Unsere Klasse",       tag: "Su" },
+      { text: "fährt",               tag: "V" },
+      { text: "nächste Woche",       tag: "annet" },
+      { text: "nach Berlin",         tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Vennen min forblir rolig under prøven.",
+    phrases: [
+      { text: "Mein Freund",         tag: "Su" },
+      { text: "bleibt",              tag: "V" },
+      { text: "ruhig",               tag: "PIV" },
+      { text: "bei der Prüfung",     tag: "annet" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Jeg trenger en ny ryggsekk.",
+    phrases: [
+      { text: "Ich",                 tag: "Su" },
+      { text: "brauche",             tag: "V" },
+      { text: "einen neuen Rucksack",tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Læreren forklarer oss grammatikkreglene.",
+    phrases: [
+      { text: "Die Lehrerin",        tag: "Su" },
+      { text: "erklärt",             tag: "V" },
+      { text: "uns",                 tag: "iO" },
+      { text: "die Grammatikregeln", tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Hunden min er veldig stor.",
+    phrases: [
+      { text: "Mein Hund",           tag: "Su" },
+      { text: "ist",                 tag: "V" },
+      { text: "sehr groß",           tag: "PIV" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Vi ser på en film på fredagen.",
+    phrases: [
+      { text: "Wir",                 tag: "Su" },
+      { text: "sehen",               tag: "V" },
+      { text: "freitags",            tag: "annet" },
+      { text: "einen Film",          tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Om morgenen spiser jeg alltid frokost.",
+    phrases: [
+      { text: "Morgens",             tag: "annet" },
+      { text: "esse",                tag: "V" },
+      { text: "ich",                 tag: "Su" },
+      { text: "immer",               tag: "annet" },
+      { text: "Frühstück",           tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "I dag gir læreren oss en prøve.",
+    phrases: [
+      { text: "Heute",               tag: "annet" },
+      { text: "gibt",                tag: "V" },
+      { text: "die Lehrerin",        tag: "Su" },
+      { text: "uns",                 tag: "iO" },
+      { text: "einen Test",          tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Spiller du fotball etter skolen?",
+    phrases: [
+      { text: "Spielst",             tag: "V" },
+      { text: "du",                  tag: "Su" },
+      { text: "nach der Schule",     tag: "annet" },
+      { text: "Fußball",             tag: "dO" },
+      { text: "?",                   tag: null }
+    ]
+  },
+  {
+    no: "På lørdag besøker vi besteforeldrene våre.",
+    phrases: [
+      { text: "Am Samstag",          tag: "annet" },
+      { text: "besuchen",            tag: "V" },
+      { text: "wir",                 tag: "Su" },
+      { text: "unsere Großeltern",   tag: "dO" },
+      { text: ".",                   tag: null }
+    ]
+  },
+  {
+    no: "Er musikken min for høy?",
+    phrases: [
+      { text: "Ist",                 tag: "V" },
+      { text: "meine Musik",         tag: "Su" },
+      { text: "zu laut",             tag: "PIV" },
+      { text: "?",                   tag: null }
+    ]
+  }
+];
+
+const ALL_TAGS   = ["V","Su","dO","iO","PIV","annet"];
+const TAG_LABELS = { V:"V", Su:"Su", dO:"dO", iO:"iO", PIV:"PIV", annet:"Annet" };
+const TAG_CHIP   = { V:"chip-V", Su:"chip-Su", dO:"chip-dO", iO:"chip-iO", PIV:"chip-PIV", annet:"chip-annet" };
+
+let currentIndex = 0, score = 0, checked = false, draggedTag = null, assignments = {};
+let answerHistory = []; // stores { sentenceNo, german, phrases, givenTags, allCorrect }
+
+function getSentence() { return sentences[currentIndex]; }
+
+function buildSentence() {
+  checked = false;
+  assignments = {};
+  const sent = getSentence();
+  const row  = document.getElementById('sentenceRow');
+  row.innerHTML = '';
+
+  sent.phrases.forEach((phrase, idx) => {
+    if (phrase.tag === null) {
+      const p = document.createElement('div');
+      p.className = 'punct-slot';
+      p.innerHTML = `<span class="punct-label">${phrase.text}</span>`;
+      row.appendChild(p);
+      return;
+    }
+
+    const slot = document.createElement('div');
+    slot.className = 'phrase-slot';
+
+    const dz = document.createElement('div');
+    dz.className = 'drop-zone';
+    dz.dataset.idx = idx;
+    dz.innerHTML = `<span class="remove-tag" onclick="removeTag(${idx})">✕</span>`;
+
+    dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop',      e  => {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      if (draggedTag) applyTag(idx, draggedTag);
+    });
+
+    const lbl = document.createElement('div');
+    lbl.className = 'phrase-label';
+    lbl.textContent = phrase.text;
+
+    slot.appendChild(dz);
+    slot.appendChild(lbl);
+    row.appendChild(slot);
+  });
+
+  const bank = document.getElementById('tagsBank');
+  bank.innerHTML = '';
+  ALL_TAGS.forEach(tag => {
+    const chip = document.createElement('div');
+    chip.className = `tag-chip ${TAG_CHIP[tag]}`;
+    chip.textContent = TAG_LABELS[tag];
+    chip.draggable = true;
+    chip.addEventListener('dragstart', () => { draggedTag = tag; });
+    chip.addEventListener('dragend',   () => { draggedTag = null; });
+    bank.appendChild(chip);
+  });
+
+  document.getElementById('feedbackBox').style.display = 'none';
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('translationBox').textContent = '';
+  document.getElementById('translationBox').style.opacity = '1';
+  document.getElementById('btnNext').style.display  = 'none';
+  document.getElementById('btnCheck').style.display = '';
+  updateProgress();
+}
+
+function applyTag(idx, tag) {
+  if (checked) return;
+  assignments[idx] = tag;
+  const dz = document.querySelector(`.drop-zone[data-idx="${idx}"]`);
+  if (!dz) return;
+  dz.className = `drop-zone filled tag-${tag}`;
+  dz.innerHTML = `<span class="remove-tag" onclick="removeTag(${idx})">✕</span>${TAG_LABELS[tag]}`;
+}
+
+function removeTag(idx) {
+  if (checked) return;
+  delete assignments[idx];
+  const dz = document.querySelector(`.drop-zone[data-idx="${idx}"]`);
+  if (!dz) return;
+  dz.className = 'drop-zone';
+  dz.innerHTML = `<span class="remove-tag" onclick="removeTag(${idx})">✕</span>`;
+}
+
+function checkAnswer() {
+  if (checked) return;
+  checked = true;
+  document.getElementById('btnCheck').disabled = true;
+  const sent = getSentence();
+  let allCorrect = true;
+  const wrongPhrases = [], missingPhrases = [];
+
+  sent.phrases.forEach((phrase, idx) => {
+    if (phrase.tag === null) return;
+    const dz    = document.querySelector(`.drop-zone[data-idx="${idx}"]`);
+    const given = assignments[idx];
+    if (!given) {
+      allCorrect = false;
+      missingPhrases.push(phrase.text);
+    } else if (given === phrase.tag) {
+      dz.classList.add('correct-ans');
+    } else {
+      allCorrect = false;
+      wrongPhrases.push(phrase.text);
+      dz.classList.add('wrong-ans');
+    }
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  fb.style.display = 'block';
+
+  if (allCorrect) {
+    score = Math.min(score + 1, sentences.length);
+    fb.className = 'feedback-box correct';
+    fb.innerHTML = '✅ Riktig! Godt jobbet!';
+  } else {
+    fb.className = 'feedback-box wrong';
+    let msg = '❌ Ikke helt riktig. ';
+    if (missingPhrases.length) msg += `Mangler merkelapp på: <strong>${missingPhrases.join(', ')}</strong>. `;
+    if (wrongPhrases.length)   msg += `Feil merkelapp på: <strong>${wrongPhrases.join(', ')}</strong>. `;
+    msg += '<br><small>Riktige svar: ';
+    const parts = [];
+    sent.phrases.forEach(p => { if (p.tag) parts.push(`<em>${p.text}</em> → <strong>${TAG_LABELS[p.tag]}</strong>`); });
+    msg += parts.join(', ') + '</small>';
+    fb.innerHTML = msg;
+  }
+
+  // Record history
+  const givenSnapshot = {};
+  Object.assign(givenSnapshot, assignments);
+  answerHistory.push({
+    sentenceNo: currentIndex + 1,
+    no: sent.no,
+    phrases: sent.phrases,
+    given: givenSnapshot,
+    allCorrect
+  });
+
+  document.getElementById('btnCheck').style.display = 'none';
+  const nb = document.getElementById('btnNext');
+  nb.style.display = 'block';
+  nb.textContent = currentIndex < sentences.length - 1 ? 'Neste setning →' : 'Se resultater 🎉';
+}
+
+function nextSentence() {
+  currentIndex++;
+  if (currentIndex >= sentences.length) { showResult(); return; }
+  buildSentence();
+}
+
+function showResult() {
+  document.getElementById('mainCard').style.display = 'none';
+  document.getElementById('progressBar').parentElement.style.display = 'none';
+  document.getElementById('progressLabel').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+  document.getElementById('resultScore').textContent = `${score} / ${sentences.length}`;
+  const pct = score / sentences.length;
+  document.getElementById('resultMsg').textContent =
+    pct >= 0.9 ? '🌟 Strålende innsats! Du er en grammatikkmester!' :
+    pct >= 0.7 ? '👍 Bra jobbet! Fortsett å øve!' :
+    pct >= 0.5 ? '📚 Greit resultat – nå vet du hva du skal øve mer på!' :
+                 '💪 Ikke gi opp – øving gjør mester!';
+}
+
+function restart() {
+  currentIndex = 0; score = 0; checked = false; answerHistory = [];
+  document.getElementById('mainCard').style.display = 'block';
+  document.getElementById('progressBar').parentElement.style.display = 'block';
+  document.getElementById('progressLabel').style.display = 'block';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('reviewPanel').style.display = 'none';
+  buildSentence();
+}
+
+function updateProgress() {
+  document.getElementById('progressBar').style.width = Math.min((currentIndex / sentences.length) * 100 + 5, 100) + '%';
+  document.getElementById('progressLabel').textContent = `Setning ${currentIndex + 1} av ${sentences.length}`;
+}
+
+function showNorsk() {
+  const box = document.getElementById('translationBox');
+  box.textContent = getSentence().no;
+  box.style.opacity = '1';
+  setTimeout(() => {
+    box.style.opacity = '0';
+    setTimeout(() => { box.textContent = ''; box.style.opacity = '1'; }, 400);
+  }, 5000);
+}
+
+function showReview() {
+  const panel = document.getElementById('reviewPanel');
+  const list  = document.getElementById('reviewList');
+  list.innerHTML = '';
+
+  answerHistory.forEach(entry => {
+    const item = document.createElement('div');
+    item.className = `review-item ${entry.allCorrect ? 'review-correct' : 'review-wrong'}`;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'review-header';
+    header.innerHTML = `<span class="review-num">Setning ${entry.sentenceNo}</span>
+      <span class="review-icon">${entry.allCorrect ? '✅' : '❌'}</span>`;
+    item.appendChild(header);
+
+    // German sentence with phrase tags
+    const phraseRow = document.createElement('div');
+    phraseRow.className = 'review-phrase-row';
+    entry.phrases.forEach((phrase, idx) => {
+      if (phrase.tag === null) {
+        const s = document.createElement('span');
+        s.className = 'review-punct';
+        s.textContent = phrase.text;
+        phraseRow.appendChild(s);
+        return;
+      }
+      const given   = entry.given[idx];
+      const correct = phrase.tag;
+      const isRight = given === correct;
+
+      const cell = document.createElement('div');
+      cell.className = 'review-cell';
+
+      const tagEl = document.createElement('div');
+      tagEl.className = `review-tag ${isRight ? 'rtag-correct' : (given ? 'rtag-wrong' : 'rtag-missing')}`;
+      tagEl.textContent = given ? TAG_LABELS[given] : '–';
+      if (!isRight) {
+        const fix = document.createElement('span');
+        fix.className = 'rtag-fix';
+        fix.textContent = TAG_LABELS[correct];
+        tagEl.appendChild(fix);
+      }
+
+      const word = document.createElement('div');
+      word.className = 'review-word';
+      word.textContent = phrase.text;
+
+      cell.appendChild(tagEl);
+      cell.appendChild(word);
+      phraseRow.appendChild(cell);
+    });
+    item.appendChild(phraseRow);
+
+    // Norwegian
+    const nor = document.createElement('div');
+    nor.className = 'review-nor';
+    nor.textContent = entry.no;
+    item.appendChild(nor);
+
+    list.appendChild(item);
+  });
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideReview() {
+  document.getElementById('reviewPanel').style.display = 'none';
+}
+
+document.getElementById('btnCheck').addEventListener('click', checkAnswer);
+document.getElementById('btnNext').addEventListener('click', nextSentence);
+document.getElementById('btnReset').addEventListener('click', buildSentence);
+document.getElementById('btnNorsk').addEventListener('click', showNorsk);
+
+buildSentence();
+</script>
+</body>
+</html>

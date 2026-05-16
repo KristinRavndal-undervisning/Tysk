@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fyll honningkrukken!</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --honey: #f9a825;
+  --honey-light: #fff9c4;
+  --green: #43a047;
+  --green-dark: #2e7d32;
+  --green-light: #e8f5e9;
+  --text-dark: #1b5e20;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(180deg, #87CEEB 0%, #d4edda 55%, #a8d5a2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+#app { width: 100%; max-width: 760px; position: relative; }
+
+/* ---- SCENE ---- */
+[id$="_scene"] {
+  background: linear-gradient(180deg, #b3e5fc 0%, #e1f5fe 20%, #f1fdf4 50%, #c8e6c9 100%);
+  border-radius: 22px;
+  padding: 18px 16px 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  min-height: 600px;
+}
+[id$="_scene"].flash-green { background: linear-gradient(180deg,#b9f6ca 0%,#ccff90 30%,#b9f6ca 100%) !important; }
+[id$="_scene"].flash-red   { background: linear-gradient(180deg,#ffcdd2 0%,#ef9a9a 30%,#ffcdd2 100%) !important; }
+
+/* ---- ANIMATED SUN ---- */
+@keyframes sunPulse {
+  0%,100% { r: 14; }
+  50%      { r: 15.5; }
+}
+@keyframes ray1 { 0%,100%{transform:scaleY(1) translateY(0)}  50%{transform:scaleY(1.35) translateY(-2px)} }
+@keyframes ray2 { 0%,100%{transform:scaleY(1) translateY(0)}  50%{transform:scaleY(1.28) translateY(-1px)} }
+@keyframes ray3 { 0%,100%{transform:scaleY(1) translateY(0)}  50%{transform:scaleY(1.4)  translateY(-2px)} }
+@keyframes ray4 { 0%,100%{transform:scaleY(1)}               50%{transform:scaleY(1.3)} }
+@keyframes ray5 { 0%,100%{transform:scaleX(1) translateX(0)} 50%{transform:scaleX(1.35) translateX(2px)} }
+@keyframes ray6 { 0%,100%{transform:scaleX(1) translateX(0)} 50%{transform:scaleX(1.28) translateX(1px)} }
+@keyframes sunGlow {
+  0%,100%{opacity:0.18} 50%{opacity:0.36}
+}
+
+[id$="_sunWrap"] {
+  position:absolute; top:6px; right:38px;
+  pointer-events:none; z-index:0;
+}
+
+/* ---- BEES ---- */
+@keyframes flyBee1 {
+  0%  {transform:translate(0,0) scaleX(1) rotate(0deg);}
+  20% {transform:translate(60px,-35px) scaleX(1) rotate(-8deg);}
+  45% {transform:translate(110px,8px) scaleX(-1) rotate(5deg);}
+  70% {transform:translate(45px,-14px) scaleX(-1) rotate(-3deg);}
+  100%{transform:translate(0,0) scaleX(1) rotate(0deg);}
+}
+@keyframes flyBee2 {
+  0%  {transform:translate(0,0) scaleX(-1) rotate(0deg);}
+  25% {transform:translate(-55px,24px) scaleX(-1) rotate(6deg);}
+  55% {transform:translate(-95px,-14px) scaleX(1) rotate(-5deg);}
+  80% {transform:translate(-32px,10px) scaleX(1) rotate(3deg);}
+  100%{transform:translate(0,0) scaleX(-1) rotate(0deg);}
+}
+.bee1{position:absolute;top:55px;left:18px;animation:flyBee1 11s ease-in-out infinite;pointer-events:none;z-index:1;}
+.bee2{position:absolute;top:220px;right:20px;animation:flyBee2 13s ease-in-out infinite;pointer-events:none;z-index:1;}
+
+/* ---- LAYOUT ---- */
+[id$="_mainLayout"] { display:flex; gap:0; position:relative; z-index:2; flex-direction:column; }
+
+/* Top row: matches midRow column structure */
+[id$="_topRow"] { display:flex; gap:12px; margin-bottom:9px; }
+[id$="_topRow"] .side-spacer { width:116px; flex-shrink:0; }
+[id$="_topRow"] .top-content { flex:1; text-align:center; }
+
+/* Mid row: history left, content centre */
+[id$="_midRow"] { display:flex; gap:12px; align-items:flex-start; }
+[id$="_centerCol"] { flex:1; display:flex; flex-direction:column; align-items:center; gap:9px; }
+[id$="_leftCol"]   { width:116px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:2px; }
+[id$="_rightCol"]  { width:116px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; padding-top:130px; }
+
+/* ---- TIMER ---- */
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.72}}
+[id$="_timerBox"] {
+  background: rgba(255,255,255,0.72);
+  border: 2px solid var(--green);
+  border-radius: 10px;
+  padding: 3px 10px;
+  box-shadow: 0 2px 8px rgba(67,160,71,0.15);
+  align-self: center;
+}
+[id$="_timerDisplay"] {
+  font-family:'Courier New',monospace;
+  font-size:1.15rem;font-weight:700;
+  color:var(--text-dark);letter-spacing:1.5px;
+  animation:timerPulse 1s ease-in-out infinite;
+}
+
+/* ---- BUBBLE ROW (timer + bubble side by side) ---- */
+[id$="_bubbleRow"] { display:flex; align-items:center; gap:10px; width:100%; max-width:420px; }
+[id$="_bubbleWrap"] { position:relative; flex:1; }
+
+/* ---- BUBBLE ---- */
+@keyframes phraseIn{from{opacity:0;transform:scale(0.82) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+[id$="_phraseText"] {
+  position:absolute; top:11px; left:0; right:0;
+  text-align:center;
+  font-family:'Fredoka One',cursive;
+  font-size:1.38rem; color:#c62828;
+  pointer-events:none;
+}
+.phrase-anim{ animation:phraseIn 0.32s cubic-bezier(.4,0,.2,1); }
+
+/* Waiting dots */
+[id$="_waitDots"] { display:none; position:absolute; top:14px; left:0; right:0; text-align:center; }
+.dot {
+  display:inline-block; width:12px; height:12px; border-radius:50%;
+  background:#e65100; margin:0 4px; opacity:0.15;
+}
+@keyframes dotBlink {
+  0%,100%{opacity:0.15;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.3)}
+}
+.dot-1{animation:dotBlink 0.7s 0.0s ease-in-out infinite;}
+.dot-2{animation:dotBlink 0.7s 0.23s ease-in-out infinite;}
+.dot-3{animation:dotBlink 0.7s 0.46s ease-in-out infinite;}
+
+/* ---- SENTENCE ---- */
+@keyframes bobble{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes sentenceGrow{from{transform:scale(1)}to{transform:scale(1.12)}}
+
+[id$="_sentenceWrap"] {
+  background: var(--honey-light);
+  border: 2.5px solid var(--honey);
+  border-radius: 14px;
+  padding: 10px 20px;
+  font-size: 1.1rem; font-weight:700; color:var(--text-dark);
+  text-align:center;
+  animation: bobble 2.2s ease-in-out infinite;
+  box-shadow: 0 2px 12px rgba(249,168,37,0.18);
+  width:100%; max-width:400px;
+  transition: box-shadow 0.4s;
+}
+[id$="_sentenceWrap"].sentence-finale {
+  animation: none;
+  transform: scale(1.12);
+  box-shadow: 0 6px 28px rgba(249,168,37,0.45);
+  border-color: var(--green);
+  background: #f0fff4;
+  transition: transform 0.4s cubic-bezier(.2,1.4,.5,1), box-shadow 0.4s, background 0.4s;
+}
+
+[id$="_blankSpan"] {
+  display:inline-block; min-width:80px;
+  border-bottom: 3px solid var(--honey);
+  color:#b0bec5; font-style:italic;
+  transition: color 0.4s, border-color 0.4s;
+}
+
+/* ---- WIN HINT ---- */
+@keyframes fadeIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+[id$="_winHint"] {
+  display:none;
+  font-family:'Fredoka One',cursive; font-size:0.9rem;
+  color:var(--green-dark); text-align:center;
+  animation:fadeIn .6s;
+}
+
+/* ---- JAR + PUDDLE ROW ---- */
+[id$="_jarRow"] {
+  display:flex; justify-content:center; align-items:flex-start;
+  gap:30px; width:100%; max-width:460px; margin-top:2px;
+}
+
+/* ---- JAR ---- */
+.target-label {
+  font-family:'Fredoka One',cursive; font-size:1rem;
+  color:var(--green-dark); margin-bottom:5px;
+  text-align:center;
+}
+[id$="_jarContainer"] {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer; transition:transform 0.12s; user-select:none;
+}
+[id$="_jarContainer"]:hover { transform:scale(1.04); }
+[id$="_jarContainer"]:active{ transform:scale(0.97); }
+[id$="_jarSvgWrap"] { position:relative; width:160px; height:280px; margin-bottom:26px; }
+
+[id$="_jarPhrasesInner"] {
+  position:absolute;
+  top:57px; bottom:14px;
+  left:16px; right:16px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  gap:4px; overflow:hidden;
+}
+
+.jar-phrase-item {
+  font-size:12px; font-weight:700;
+  color:#1b5e20;
+  background:rgba(255,255,255,0.58);
+  border-radius:6px;
+  padding:3px 6px;
+  text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  cursor:default; pointer-events:none;
+}
+.jar-phrase-item.clickable {
+  cursor:pointer; pointer-events:auto;
+  transition:background 0.15s;
+}
+.jar-phrase-item.clickable:hover { background:rgba(255,255,255,0.92); text-decoration:underline; }
+
+/* ---- PUDDLE ---- */
+.puddle-label {
+  font-family:'Fredoka One',cursive; font-size:1rem;
+  color:#6d4c1f; margin-bottom:5px; text-align:center;
+}
+[id$="_puddleContainer"] {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:space-between;
+  cursor:pointer; transition:transform 0.12s; user-select:none;
+  height:302px;
+}
+[id$="_puddleContainer"]:hover { transform:scale(1.05); }
+[id$="_puddleContainer"]:active{ transform:scale(0.97); }
+[id$="_puddleSvgWrap"] { position:relative; width:140px; height:120px; }
+[id$="_puddlePhrases"] {
+  position:absolute; top:18px; left:8px; right:8px;
+  display:flex; flex-wrap:wrap; gap:2px; justify-content:center;
+  overflow:hidden; max-height:44px;
+}
+.puddle-phrase {
+  font-size:10px; color:#5d3a1a;
+  background:rgba(255,255,255,0.38);
+  border-radius:4px; padding:1px 5px;
+  animation:puddleFade 3.5s ease-in-out forwards;
+}
+@keyframes puddleFade{
+  0%{opacity:0;transform:scale(0.7)}
+  15%{opacity:1;transform:scale(1)}
+  70%{opacity:1}
+  100%{opacity:0;transform:scale(0.8)}
+}
+
+/* ---- TRY AGAIN ---- */
+[id$="_tryAgainDiv"] { display:none; margin-top:8px; text-align:center; }
+[id$="_tryAgainBtn"] {
+  font-family:'Fredoka One',cursive; font-size:1.05rem;
+  background:var(--honey-light); border:2px solid var(--honey);
+  color:#e65100; border-radius:20px; padding:8px 24px;
+  cursor:pointer; transition:background .15s, transform .1s;
+}
+[id$="_tryAgainBtn"]:hover { background:#fff176; transform:scale(1.04); }
+[id$="_tryAgainBtn"]:active{ transform:scale(0.97); }
+
+/* ---- HISTORY (left col) ---- */
+[id$="_historyPanel"] { display:none; flex-direction:column; align-items:center; gap:4px; width:100%; }
+[id$="_historyTitle"] {
+  font-family:'Fredoka One',cursive; font-size:0.8rem;
+  color:var(--text-dark); text-align:center; line-height:1.25; margin-bottom:3px;
+}
+.history-entry {
+  font-size:12px; font-weight:600; padding:4px 8px; border-radius:8px;
+  border:1.5px solid #dcedc8; background:#f9fbe7; color:#33691e;
+  width:100%; text-align:center;
+}
+.history-best { border:2.5px solid var(--green)!important; background:var(--green-light)!important; font-weight:800; }
+
+/* ---- CONFETTI ---- */
+[id$="_confettiContainer"]{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;overflow:hidden;}
+@keyframes confettiDrop{
+  0%  {transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(700px) rotate(720deg);opacity:0;}
+}
+
+
+/* ---- PAGE NAVIGATION ---- */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ---- RESULTS PAGE ---- */
+#resultsScene {
+  background: linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%);
+  border-radius: 22px; padding: 36px 24px 40px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  min-height: 480px; text-align: center;
+}
+#resultsConfetti { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;overflow:hidden; }
+.results-title { font-family:'Fredoka One',cursive; font-size:1.9rem; color:var(--text-dark); margin-bottom:6px; text-shadow:0 2px 6px rgba(249,168,37,0.25); }
+.results-subtitle { font-size:0.9rem; font-weight:600; color:#33691e; margin-bottom:28px; }
+.results-cards { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+.result-card { background:var(--honey-light); border:2px solid var(--honey); border-radius:14px; padding:14px 20px; min-width:155px; text-align:center; }
+.result-card-label { font-family:'Fredoka One',cursive; font-size:0.88rem; color:#33691e; margin-bottom:6px; }
+.result-card-time { font-family:'Courier New',monospace; font-size:1.35rem; font-weight:700; color:var(--text-dark); }
+.result-card-time.no-time { color:#b0bec5; font-size:1rem; font-style:italic; font-family:'Nunito',sans-serif; font-weight:600; }
+.results-total { background:var(--green-light); border:3px solid var(--green); border-radius:18px; padding:16px 36px; display:inline-block; margin-bottom:32px; }
+.results-total-label { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--green-dark); margin-bottom:6px; }
+.results-total-time { font-family:'Courier New',monospace; font-size:2.2rem; font-weight:800; color:var(--green-dark); }
+.results-total-time.no-time { color:#b0bec5; font-size:1rem; font-style:italic; font-family:'Nunito',sans-serif; font-weight:600; }
+.results-nav { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+.result-nav-btn { font-family:'Fredoka One',cursive; font-size:1rem; background:var(--honey-light); border:2px solid var(--honey); color:#e65100; border-radius:20px; padding:9px 22px; cursor:pointer; transition:background .15s,transform .1s; }
+.result-nav-btn:hover { background:#fff176; transform:scale(1.04); }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== PAGE 1 ===== -->
+<div id="page-p1" class="page active">
+<div id="p1_scene">
+
+  <!-- Animated SVG Sun -->
+  <div id="p1_sunWrap">
+    <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+      <!-- glow halo -->
+      <circle cx="35" cy="35" r="26" fill="#ffe082" opacity="0.18" style="animation:sunGlow 2.4s ease-in-out infinite;"/>
+      <!-- rays – each animates independently -->
+      <!-- top -->
+      <line x1="35" y1="4"  x2="35" y2="14" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 1.8s 0.0s ease-in-out infinite;"/>
+      <!-- top-right -->
+      <line x1="52" y1="10" x2="46" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 2.0s 0.2s ease-in-out infinite;"/>
+      <!-- right -->
+      <line x1="66" y1="35" x2="56" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray5 1.9s 0.4s ease-in-out infinite;"/>
+      <!-- bottom-right -->
+      <line x1="60" y1="56" x2="53" y2="50" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray3 2.1s 0.1s ease-in-out infinite;"/>
+      <!-- bottom -->
+      <line x1="35" y1="66" x2="35" y2="56" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 2.0s 0.3s ease-in-out infinite;"/>
+      <!-- bottom-left -->
+      <line x1="10" y1="60" x2="17" y2="53" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray4 1.7s 0.5s ease-in-out infinite;"/>
+      <!-- left -->
+      <line x1="4"  y1="35" x2="14" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray6 2.2s 0.15s ease-in-out infinite;"/>
+      <!-- top-left -->
+      <line x1="18" y1="10" x2="24" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 1.85s 0.35s ease-in-out infinite;"/>
+      <!-- sun body -->
+      <circle cx="35" cy="35" r="15" fill="#ffe082"/>
+      <circle cx="35" cy="35" r="14" fill="#ffd54f"/>
+      <!-- face shine -->
+      <circle cx="30" cy="31" r="3.5" fill="rgba(255,255,255,0.35)"/>
+    </svg>
+  </div>
+
+  <!-- Bee 1 -->
+  <div class="bee1">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+  <!-- Bee 2 -->
+  <div class="bee2">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+
+  <div id="p1_confettiContainer"></div>
+
+  <div id="p1_mainLayout">
+
+    <!-- Mid row: centre content + right history col -->
+    <div id="p1_midRow">
+
+      <!-- Centre content -->
+      <div id="p1_centerCol">
+
+        <!-- Title + instruction, centred with sentence box -->
+        <div style="text-align:center;width:100%;max-width:400px;">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.75rem;color:#1b5e20;letter-spacing:0.5px;text-shadow:0 2px 6px rgba(249,168,37,0.25);">
+            Fyll honningkrukken! <span style="font-size:1.1rem;opacity:0.65;">1/3</span>
+          </div>
+          <div style="font-size:0.88rem;font-weight:600;color:#33691e;margin:4px 0 0;line-height:1.45;">
+            Et ord dukker opp i boblen.<br>
+            Klikk på 🐝 <em>Richtig</em> hvis det passer i luken i setningen,<br>eller på 💧 <em>Falsch</em> hvis det ikke gjør det.<br>
+            Fyll krukken med 8 riktige ord!
+          </div>
+        </div>
+
+        <!-- Phrase bubble + timer side by side -->
+        <div id="p1_bubbleRow">
+          <div id="p1_timerBox">
+            <div id="p1_timerDisplay">00:00.0</div>
+          </div>
+          <div id="p1_bubbleWrap">
+            <svg viewBox="0 0 340 72" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="display:block;width:100%;">
+              <defs><filter id="p1_bs2"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#a5d6a7" flood-opacity="0.45"/></filter></defs>
+              <rect x="4" y="4" width="332" height="52" rx="22" fill="#fffde7" stroke="#f9a825" stroke-width="2.5" filter="url(#p1_bs2)"/>
+              <polygon points="158,56 178,56 168,70" fill="#fffde7" stroke="#f9a825" stroke-width="1.8"/>
+              <rect x="158" y="48" width="20" height="10" fill="#fffde7"/>
+            </svg>
+            <div id="p1_phraseText" class="phrase-anim">Laden...</div>
+            <div id="p1_waitDots">
+              <span class="dot dot-1"></span>
+              <span class="dot dot-2"></span>
+              <span class="dot dot-3"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentence – always static -->
+        <div id="p1_sentenceWrap">
+          Zum Geburtstag gebe ich
+          <span id="p1_blankSpan">___</span>
+          ein kleines Geschenk.
+        </div>
+
+        <!-- Win hint -->
+        <div id="p1_winHint">🐝 Klikk på et ord i krukken for å fullføre setningen!</div>
+
+        <!-- Jar + Puddle -->
+        <div id="p1_jarRow">
+
+          <!-- Honey Jar -->
+          <div id="p1_jarContainer" onclick="p1_handleChoice('jar')">
+            <div class="target-label">🐝 Richtig ✓</div>
+            <div id="p1_jarSvgWrap">
+              <svg width="160" height="280" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <clipPath id="p1_jarBodyClip"><rect x="12" y="55" width="136" height="212" rx="12"/></clipPath>
+                </defs>
+                <rect id="p1_honeyFill" x="12" y="55" width="136" height="212" rx="12"
+                  fill="#f9a825" opacity="0.5"
+                  style="transform:scaleY(0);transform-origin:80px 267px;transition:transform 0.55s cubic-bezier(.4,0,.2,1);"/>
+                <rect x="12" y="55" width="136" height="212" rx="12"
+                  fill="rgba(255,253,235,0.48)" stroke="#f9a825" stroke-width="3"/>
+                <rect x="22" y="38" width="116" height="24" rx="10" fill="#f9a825" stroke="#e65100" stroke-width="2"/>
+                <rect x="38" y="26" width="84" height="16" rx="8" fill="#e65100"/>
+                <rect x="22" y="66" width="11" height="170" rx="5.5" fill="rgba(255,255,255,0.3)" clip-path="url(#p1_jarBodyClip)"/>
+              </svg>
+              <div id="p1_jarPhrasesInner"></div>
+              <div id="p1_jarCount"
+                style="position:absolute;bottom:-22px;right:10px;
+                       font-size:12px;font-weight:800;font-family:'Fredoka One',cursive;
+                       color:#e65100;background:rgba(255,255,255,0.85);
+                       border-radius:6px;padding:2px 8px;pointer-events:none;">0/8</div>
+              <!-- Bee sitting on lid -->
+              <svg width="160" height="30" viewBox="0 0 160 30" xmlns="http://www.w3.org/2000/svg"
+                style="position:absolute;top:10px;left:0;pointer-events:none;">
+                <!-- body -->
+                <ellipse cx="80" cy="20" rx="10" ry="6" fill="#FFD600"/>
+                <rect x="72" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <rect x="77" y="17" width="5" height="6" rx="1.5" fill="#FFD600"/>
+                <rect x="82" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <!-- stinger -->
+                <polygon points="89,19 89,23 93,21" fill="#e6ac00"/>
+                <!-- head -->
+                <ellipse cx="72" cy="20" rx="4" ry="4" fill="#FFD600"/>
+                <circle cx="70.5" cy="18.8" r="1.1" fill="#222"/>
+                <!-- wings -->
+                <ellipse cx="77" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <ellipse cx="84" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <!-- antennae -->
+                <line x1="70" y1="17" x2="66" y2="11" stroke="#222" stroke-width="0.9"/>
+                <line x1="73" y1="16.5" x2="71" y2="10" stroke="#222" stroke-width="0.9"/>
+                <circle cx="66" cy="10.5" r="1.1" fill="#222"/>
+                <circle cx="71" cy="9.5" r="1.1" fill="#222"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Puddle -->
+          <div id="p1_puddleContainer" onclick="p1_handleChoice('puddle')">
+            <div class="puddle-label">💧 Falsch ✗</div>
+            <div id="p1_puddleSvgWrap">
+              <svg width="140" height="120" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <style>
+                    @keyframes drop1{0%{opacity:0;transform:translateY(-18px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop2{0%{opacity:0;transform:translateY(-22px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop3{0%{opacity:0;transform:translateY(-16px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes bubble1{0%{opacity:0;transform:translateY(0px) scale(0.5)}50%{opacity:0.7}100%{opacity:0;transform:translateY(-22px) scale(1)}}
+                    @keyframes bubble2{0%{opacity:0;transform:translateY(0px) scale(0.4)}50%{opacity:0.6}100%{opacity:0;transform:translateY(-18px) scale(1)}}
+                    @keyframes bubble3{0%{opacity:0;transform:translateY(0px) scale(0.6)}50%{opacity:0.5}100%{opacity:0;transform:translateY(-20px) scale(1)}}
+                    @keyframes ripple{0%{r:4;opacity:0.5}100%{r:20;opacity:0}}
+                  </style>
+                </defs>
+                <!-- puddle body -->
+                <ellipse cx="70" cy="96" rx="58" ry="16" fill="#8B6914" opacity="0.5"/>
+                <ellipse cx="70" cy="94" rx="54" ry="13" fill="#c4973a" opacity="0.42"/>
+                <ellipse cx="58" cy="92" rx="18" ry="6" fill="rgba(255,255,255,0.16)"/>
+                <!-- static splashes -->
+                <circle cx="24" cy="82" r="5" fill="#8B6914" opacity="0.36"/>
+                <circle cx="116" cy="84" r="4" fill="#8B6914" opacity="0.32"/>
+                <circle cx="40" cy="74" r="3" fill="#c4973a" opacity="0.45"/>
+                <circle cx="100" cy="76" r="2.5" fill="#c4973a" opacity="0.4"/>
+                <circle cx="70" cy="72" r="2" fill="#c4973a" opacity="0.38"/>
+                <circle cx="55" cy="80" r="1.8" fill="#8B6914" opacity="0.3"/>
+                <circle cx="90" cy="79" r="2.2" fill="#8B6914" opacity="0.3"/>
+                <!-- animated drops falling in -->
+                <ellipse cx="52" cy="62" rx="3" ry="5" fill="#c4973a" opacity="0.7"
+                  style="animation:drop1 1.8s 0.0s ease-in infinite;transform-origin:52px 62px;"/>
+                <ellipse cx="78" cy="55" rx="2.5" ry="4.5" fill="#8B6914" opacity="0.65"
+                  style="animation:drop2 2.2s 0.6s ease-in infinite;transform-origin:78px 55px;"/>
+                <ellipse cx="100" cy="60" rx="2" ry="4" fill="#c4973a" opacity="0.6"
+                  style="animation:drop3 1.6s 1.1s ease-in infinite;transform-origin:100px 60px;"/>
+                <ellipse cx="38" cy="58" rx="2" ry="3.5" fill="#8B6914" opacity="0.55"
+                  style="animation:drop1 2.0s 1.5s ease-in infinite;transform-origin:38px 58px;"/>
+                <ellipse cx="115" cy="65" rx="1.8" ry="3.2" fill="#c4973a" opacity="0.5"
+                  style="animation:drop2 1.9s 0.3s ease-in infinite;transform-origin:115px 65px;"/>
+                <!-- animated bubbles rising -->
+                <circle cx="60" cy="90" r="3.5" fill="none" stroke="#e6ac00" stroke-width="1.2"
+                  style="animation:bubble1 2.0s 0.2s ease-out infinite;transform-origin:60px 90px;"/>
+                <circle cx="82" cy="92" r="2.5" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble2 1.7s 0.9s ease-out infinite;transform-origin:82px 92px;"/>
+                <circle cx="48" cy="91" r="2" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:bubble3 2.3s 0.5s ease-out infinite;transform-origin:48px 91px;"/>
+                <circle cx="95" cy="89" r="3" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble1 1.8s 1.3s ease-out infinite;transform-origin:95px 89px;"/>
+                <circle cx="70" cy="93" r="2" fill="none" stroke="#c4973a" stroke-width="0.8"
+                  style="animation:bubble2 2.1s 0.0s ease-out infinite;transform-origin:70px 93px;"/>
+                <!-- ripple on impact point -->
+                <circle cx="52" cy="88" r="4" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:ripple 1.8s 0.0s ease-out infinite;transform-origin:52px 88px;"/>
+                <circle cx="78" cy="86" r="4" fill="none" stroke="#8B6914" stroke-width="1"
+                  style="animation:ripple 2.2s 0.7s ease-out infinite;transform-origin:78px 86px;"/>
+              </svg>
+              <div id="p1_puddlePhrases"></div>
+            </div>
+          </div>
+
+        </div><!-- /jarRow -->
+
+        <div id="p1_tryAgainDiv">
+          <button id="p1_tryAgainBtn" onclick="p1_restartGame()">🔄 Prøv igjen</button>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="showPage('results')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:rgba(255,255,255,0.75);border:2px solid #f9a825;color:#e65100;border-radius:20px;padding:7px 16px;cursor:pointer;">← Resultater</button>
+          <button onclick="showPage('p2')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:#e8f5e9;border:2px solid #43a047;color:#2e7d32;border-radius:20px;padding:7px 16px;cursor:pointer;">Neste →</button>
+        </div>
+
+      </div><!-- /centerCol -->
+
+      <!-- Right: history panel -->
+      <div id="p1_rightCol">
+        <div id="p1_historyPanel">
+          <div id="p1_historyTitle">Klarer du<br>fortere?</div>
+          <div id="p1_historyList"></div>
+        </div>
+      </div>
+
+    </div><!-- /midRow -->
+  </div><!-- /mainLayout -->
+
+</div><!-- /scene -->
+
+</div>
+
+<!-- ===== PAGE 2 ===== -->
+<div id="page-p2" class="page">
+<div id="p2_scene">
+
+  <!-- Animated SVG Sun -->
+  <div id="p2_sunWrap">
+    <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+      <!-- glow halo -->
+      <circle cx="35" cy="35" r="26" fill="#ffe082" opacity="0.18" style="animation:sunGlow 2.4s ease-in-out infinite;"/>
+      <!-- rays – each animates independently -->
+      <!-- top -->
+      <line x1="35" y1="4"  x2="35" y2="14" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 1.8s 0.0s ease-in-out infinite;"/>
+      <!-- top-right -->
+      <line x1="52" y1="10" x2="46" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 2.0s 0.2s ease-in-out infinite;"/>
+      <!-- right -->
+      <line x1="66" y1="35" x2="56" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray5 1.9s 0.4s ease-in-out infinite;"/>
+      <!-- bottom-right -->
+      <line x1="60" y1="56" x2="53" y2="50" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray3 2.1s 0.1s ease-in-out infinite;"/>
+      <!-- bottom -->
+      <line x1="35" y1="66" x2="35" y2="56" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 2.0s 0.3s ease-in-out infinite;"/>
+      <!-- bottom-left -->
+      <line x1="10" y1="60" x2="17" y2="53" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray4 1.7s 0.5s ease-in-out infinite;"/>
+      <!-- left -->
+      <line x1="4"  y1="35" x2="14" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray6 2.2s 0.15s ease-in-out infinite;"/>
+      <!-- top-left -->
+      <line x1="18" y1="10" x2="24" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 1.85s 0.35s ease-in-out infinite;"/>
+      <!-- sun body -->
+      <circle cx="35" cy="35" r="15" fill="#ffe082"/>
+      <circle cx="35" cy="35" r="14" fill="#ffd54f"/>
+      <!-- face shine -->
+      <circle cx="30" cy="31" r="3.5" fill="rgba(255,255,255,0.35)"/>
+    </svg>
+  </div>
+
+  <!-- Bee 1 -->
+  <div class="bee1">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+  <!-- Bee 2 -->
+  <div class="bee2">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+
+  <div id="p2_confettiContainer"></div>
+
+  <div id="p2_mainLayout">
+
+    <!-- Mid row: centre content + right history col -->
+    <div id="p2_midRow">
+
+      <!-- Centre content -->
+      <div id="p2_centerCol">
+
+        <!-- Title + instruction, centred with sentence box -->
+        <div style="text-align:center;width:100%;max-width:400px;">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.75rem;color:#1b5e20;letter-spacing:0.5px;text-shadow:0 2px 6px rgba(249,168,37,0.25);">
+            Fyll honningkrukken! <span style="font-size:1.1rem;opacity:0.65;">2/3</span>
+          </div>
+          <div style="font-size:0.88rem;font-weight:600;color:#33691e;margin:4px 0 0;line-height:1.45;">
+            Et ord dukker opp i boblen.<br>
+            Klikk på 🐝 <em>Richtig</em> hvis det passer i luken i setningen,<br>eller på 💧 <em>Falsch</em> hvis det ikke gjør det.<br>
+            Fyll krukken med 8 riktige ord!
+          </div>
+        </div>
+
+        <!-- Phrase bubble + timer side by side -->
+        <div id="p2_bubbleRow">
+          <div id="p2_timerBox">
+            <div id="p2_timerDisplay">00:00.0</div>
+          </div>
+          <div id="p2_bubbleWrap">
+            <svg viewBox="0 0 340 72" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="display:block;width:100%;">
+              <defs><filter id="p2_bs2"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#a5d6a7" flood-opacity="0.45"/></filter></defs>
+              <rect x="4" y="4" width="332" height="52" rx="22" fill="#fffde7" stroke="#f9a825" stroke-width="2.5" filter="url(#p2_bs2)"/>
+              <polygon points="158,56 178,56 168,70" fill="#fffde7" stroke="#f9a825" stroke-width="1.8"/>
+              <rect x="158" y="48" width="20" height="10" fill="#fffde7"/>
+            </svg>
+            <div id="p2_phraseText" class="phrase-anim">Laden...</div>
+            <div id="p2_waitDots">
+              <span class="dot dot-1"></span>
+              <span class="dot dot-2"></span>
+              <span class="dot dot-3"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentence – always static -->
+        <div id="p2_sentenceWrap">
+        Petra sieht
+          <span id="p2_blankSpan">___</span>
+          .
+        </div>
+
+        <!-- Win hint -->
+        <div id="p2_winHint">🐝 Klikk på et ord i krukken for å fullføre setningen!</div>
+
+        <!-- Jar + Puddle -->
+        <div id="p2_jarRow">
+
+          <!-- Honey Jar -->
+          <div id="p2_jarContainer" onclick="p2_handleChoice('jar')">
+            <div class="target-label">🐝 Richtig ✓</div>
+            <div id="p2_jarSvgWrap">
+              <svg width="160" height="280" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <clipPath id="p2_jarBodyClip"><rect x="12" y="55" width="136" height="212" rx="12"/></clipPath>
+                </defs>
+                <rect id="p2_honeyFill" x="12" y="55" width="136" height="212" rx="12"
+                  fill="#f9a825" opacity="0.5"
+                  style="transform:scaleY(0);transform-origin:80px 267px;transition:transform 0.55s cubic-bezier(.4,0,.2,1);"/>
+                <rect x="12" y="55" width="136" height="212" rx="12"
+                  fill="rgba(255,253,235,0.48)" stroke="#f9a825" stroke-width="3"/>
+                <rect x="22" y="38" width="116" height="24" rx="10" fill="#f9a825" stroke="#e65100" stroke-width="2"/>
+                <rect x="38" y="26" width="84" height="16" rx="8" fill="#e65100"/>
+                <rect x="22" y="66" width="11" height="170" rx="5.5" fill="rgba(255,255,255,0.3)" clip-path="url(#p2_jarBodyClip)"/>
+              </svg>
+              <div id="p2_jarPhrasesInner"></div>
+              <div id="p2_jarCount"
+                style="position:absolute;bottom:-22px;right:10px;
+                       font-size:12px;font-weight:800;font-family:'Fredoka One',cursive;
+                       color:#e65100;background:rgba(255,255,255,0.85);
+                       border-radius:6px;padding:2px 8px;pointer-events:none;">0/8</div>
+              <!-- Bee sitting on lid -->
+              <svg width="160" height="30" viewBox="0 0 160 30" xmlns="http://www.w3.org/2000/svg"
+                style="position:absolute;top:10px;left:0;pointer-events:none;">
+                <!-- body -->
+                <ellipse cx="80" cy="20" rx="10" ry="6" fill="#FFD600"/>
+                <rect x="72" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <rect x="77" y="17" width="5" height="6" rx="1.5" fill="#FFD600"/>
+                <rect x="82" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <!-- stinger -->
+                <polygon points="89,19 89,23 93,21" fill="#e6ac00"/>
+                <!-- head -->
+                <ellipse cx="72" cy="20" rx="4" ry="4" fill="#FFD600"/>
+                <circle cx="70.5" cy="18.8" r="1.1" fill="#222"/>
+                <!-- wings -->
+                <ellipse cx="77" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <ellipse cx="84" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <!-- antennae -->
+                <line x1="70" y1="17" x2="66" y2="11" stroke="#222" stroke-width="0.9"/>
+                <line x1="73" y1="16.5" x2="71" y2="10" stroke="#222" stroke-width="0.9"/>
+                <circle cx="66" cy="10.5" r="1.1" fill="#222"/>
+                <circle cx="71" cy="9.5" r="1.1" fill="#222"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Puddle -->
+          <div id="p2_puddleContainer" onclick="p2_handleChoice('puddle')">
+            <div class="puddle-label">💧 Falsch ✗</div>
+            <div id="p2_puddleSvgWrap">
+              <svg width="140" height="120" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <style>
+                    @keyframes drop1{0%{opacity:0;transform:translateY(-18px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop2{0%{opacity:0;transform:translateY(-22px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop3{0%{opacity:0;transform:translateY(-16px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes bubble1{0%{opacity:0;transform:translateY(0px) scale(0.5)}50%{opacity:0.7}100%{opacity:0;transform:translateY(-22px) scale(1)}}
+                    @keyframes bubble2{0%{opacity:0;transform:translateY(0px) scale(0.4)}50%{opacity:0.6}100%{opacity:0;transform:translateY(-18px) scale(1)}}
+                    @keyframes bubble3{0%{opacity:0;transform:translateY(0px) scale(0.6)}50%{opacity:0.5}100%{opacity:0;transform:translateY(-20px) scale(1)}}
+                    @keyframes ripple{0%{r:4;opacity:0.5}100%{r:20;opacity:0}}
+                  </style>
+                </defs>
+                <!-- puddle body -->
+                <ellipse cx="70" cy="96" rx="58" ry="16" fill="#8B6914" opacity="0.5"/>
+                <ellipse cx="70" cy="94" rx="54" ry="13" fill="#c4973a" opacity="0.42"/>
+                <ellipse cx="58" cy="92" rx="18" ry="6" fill="rgba(255,255,255,0.16)"/>
+                <!-- static splashes -->
+                <circle cx="24" cy="82" r="5" fill="#8B6914" opacity="0.36"/>
+                <circle cx="116" cy="84" r="4" fill="#8B6914" opacity="0.32"/>
+                <circle cx="40" cy="74" r="3" fill="#c4973a" opacity="0.45"/>
+                <circle cx="100" cy="76" r="2.5" fill="#c4973a" opacity="0.4"/>
+                <circle cx="70" cy="72" r="2" fill="#c4973a" opacity="0.38"/>
+                <circle cx="55" cy="80" r="1.8" fill="#8B6914" opacity="0.3"/>
+                <circle cx="90" cy="79" r="2.2" fill="#8B6914" opacity="0.3"/>
+                <!-- animated drops falling in -->
+                <ellipse cx="52" cy="62" rx="3" ry="5" fill="#c4973a" opacity="0.7"
+                  style="animation:drop1 1.8s 0.0s ease-in infinite;transform-origin:52px 62px;"/>
+                <ellipse cx="78" cy="55" rx="2.5" ry="4.5" fill="#8B6914" opacity="0.65"
+                  style="animation:drop2 2.2s 0.6s ease-in infinite;transform-origin:78px 55px;"/>
+                <ellipse cx="100" cy="60" rx="2" ry="4" fill="#c4973a" opacity="0.6"
+                  style="animation:drop3 1.6s 1.1s ease-in infinite;transform-origin:100px 60px;"/>
+                <ellipse cx="38" cy="58" rx="2" ry="3.5" fill="#8B6914" opacity="0.55"
+                  style="animation:drop1 2.0s 1.5s ease-in infinite;transform-origin:38px 58px;"/>
+                <ellipse cx="115" cy="65" rx="1.8" ry="3.2" fill="#c4973a" opacity="0.5"
+                  style="animation:drop2 1.9s 0.3s ease-in infinite;transform-origin:115px 65px;"/>
+                <!-- animated bubbles rising -->
+                <circle cx="60" cy="90" r="3.5" fill="none" stroke="#e6ac00" stroke-width="1.2"
+                  style="animation:bubble1 2.0s 0.2s ease-out infinite;transform-origin:60px 90px;"/>
+                <circle cx="82" cy="92" r="2.5" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble2 1.7s 0.9s ease-out infinite;transform-origin:82px 92px;"/>
+                <circle cx="48" cy="91" r="2" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:bubble3 2.3s 0.5s ease-out infinite;transform-origin:48px 91px;"/>
+                <circle cx="95" cy="89" r="3" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble1 1.8s 1.3s ease-out infinite;transform-origin:95px 89px;"/>
+                <circle cx="70" cy="93" r="2" fill="none" stroke="#c4973a" stroke-width="0.8"
+                  style="animation:bubble2 2.1s 0.0s ease-out infinite;transform-origin:70px 93px;"/>
+                <!-- ripple on impact point -->
+                <circle cx="52" cy="88" r="4" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:ripple 1.8s 0.0s ease-out infinite;transform-origin:52px 88px;"/>
+                <circle cx="78" cy="86" r="4" fill="none" stroke="#8B6914" stroke-width="1"
+                  style="animation:ripple 2.2s 0.7s ease-out infinite;transform-origin:78px 86px;"/>
+              </svg>
+              <div id="p2_puddlePhrases"></div>
+            </div>
+          </div>
+
+        </div><!-- /jarRow -->
+
+        <div id="p2_tryAgainDiv">
+          <button id="p2_tryAgainBtn" onclick="p2_restartGame()">🔄 Prøv igjen</button>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="showPage('p1')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:rgba(255,255,255,0.75);border:2px solid #f9a825;color:#e65100;border-radius:20px;padding:7px 16px;cursor:pointer;">← Forrige</button>
+          <button onclick="showPage('p3')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:#e8f5e9;border:2px solid #43a047;color:#2e7d32;border-radius:20px;padding:7px 16px;cursor:pointer;">Neste →</button>
+        </div>
+
+      </div><!-- /centerCol -->
+
+      <!-- Right: history panel -->
+      <div id="p2_rightCol">
+        <div id="p2_historyPanel">
+          <div id="p2_historyTitle">Klarer du<br>fortere?</div>
+          <div id="p2_historyList"></div>
+        </div>
+      </div>
+
+    </div><!-- /midRow -->
+  </div><!-- /mainLayout -->
+
+</div><!-- /scene -->
+
+</div>
+
+<!-- ===== PAGE 3 ===== -->
+<div id="page-p3" class="page">
+<div id="p3_scene">
+
+  <!-- Animated SVG Sun -->
+  <div id="p3_sunWrap">
+    <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+      <!-- glow halo -->
+      <circle cx="35" cy="35" r="26" fill="#ffe082" opacity="0.18" style="animation:sunGlow 2.4s ease-in-out infinite;"/>
+      <!-- rays – each animates independently -->
+      <!-- top -->
+      <line x1="35" y1="4"  x2="35" y2="14" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 1.8s 0.0s ease-in-out infinite;"/>
+      <!-- top-right -->
+      <line x1="52" y1="10" x2="46" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 2.0s 0.2s ease-in-out infinite;"/>
+      <!-- right -->
+      <line x1="66" y1="35" x2="56" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray5 1.9s 0.4s ease-in-out infinite;"/>
+      <!-- bottom-right -->
+      <line x1="60" y1="56" x2="53" y2="50" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray3 2.1s 0.1s ease-in-out infinite;"/>
+      <!-- bottom -->
+      <line x1="35" y1="66" x2="35" y2="56" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray1 2.0s 0.3s ease-in-out infinite;"/>
+      <!-- bottom-left -->
+      <line x1="10" y1="60" x2="17" y2="53" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray4 1.7s 0.5s ease-in-out infinite;"/>
+      <!-- left -->
+      <line x1="4"  y1="35" x2="14" y2="35" stroke="#ffca28" stroke-width="3" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray6 2.2s 0.15s ease-in-out infinite;"/>
+      <!-- top-left -->
+      <line x1="18" y1="10" x2="24" y2="18" stroke="#ffca28" stroke-width="2.5" stroke-linecap="round"
+        style="transform-origin:35px 35px;animation:ray2 1.85s 0.35s ease-in-out infinite;"/>
+      <!-- sun body -->
+      <circle cx="35" cy="35" r="15" fill="#ffe082"/>
+      <circle cx="35" cy="35" r="14" fill="#ffd54f"/>
+      <!-- face shine -->
+      <circle cx="30" cy="31" r="3.5" fill="rgba(255,255,255,0.35)"/>
+    </svg>
+  </div>
+
+  <!-- Bee 1 -->
+  <div class="bee1">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+  <!-- Bee 2 -->
+  <div class="bee2">
+    <svg width="52" height="34" viewBox="0 0 52 34" fill="none">
+      <ellipse cx="26" cy="22" rx="13" ry="8.5" fill="#FFD600"/>
+      <rect x="13" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <rect x="20" y="18" width="7" height="8" rx="2" fill="#FFD600"/>
+      <rect x="27" y="18" width="7" height="8" rx="2" fill="#222"/>
+      <ellipse cx="38" cy="22" rx="3.5" ry="4" fill="#FFD600"/>
+      <polygon points="41,20 41,24 45,22" fill="#e6ac00"/>
+      <ellipse cx="14" cy="22" rx="5" ry="5" fill="#FFD600"/>
+      <circle cx="12" cy="20.5" r="1.4" fill="#222"/>
+      <ellipse cx="20" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <ellipse cx="31" cy="14" rx="8.5" ry="4.5" fill="rgba(190,225,255,0.72)" stroke="#aad4f0" stroke-width="0.7"/>
+      <line x1="12" y1="18" x2="7" y2="11" stroke="#222" stroke-width="1.1"/>
+      <line x1="16" y1="17" x2="13" y2="10" stroke="#222" stroke-width="1.1"/>
+      <circle cx="7" cy="10.5" r="1.4" fill="#222"/>
+      <circle cx="13" cy="9.5" r="1.4" fill="#222"/>
+    </svg>
+  </div>
+
+  <div id="p3_confettiContainer"></div>
+
+  <div id="p3_mainLayout">
+
+    <!-- Mid row: centre content + right history col -->
+    <div id="p3_midRow">
+
+      <!-- Centre content -->
+      <div id="p3_centerCol">
+
+        <!-- Title + instruction, centred with sentence box -->
+        <div style="text-align:center;width:100%;max-width:400px;">
+          <div style="font-family:'Fredoka One',cursive;font-size:1.75rem;color:#1b5e20;letter-spacing:0.5px;text-shadow:0 2px 6px rgba(249,168,37,0.25);">
+            Fyll honningkrukken! <span style="font-size:1.1rem;opacity:0.65;">3/3</span>
+          </div>
+          <div style="font-size:0.88rem;font-weight:600;color:#33691e;margin:4px 0 0;line-height:1.45;">
+            Et ord dukker opp i boblen.<br>
+            Klikk på 🐝 <em>Richtig</em> hvis det passer i luken i setningen,<br>eller på 💧 <em>Falsch</em> hvis det ikke gjør det.<br>
+            Fyll krukken med 8 riktige ord!
+          </div>
+        </div>
+
+        <!-- Phrase bubble + timer side by side -->
+        <div id="p3_bubbleRow">
+          <div id="p3_timerBox">
+            <div id="p3_timerDisplay">00:00.0</div>
+          </div>
+          <div id="p3_bubbleWrap">
+            <svg viewBox="0 0 340 72" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="display:block;width:100%;">
+              <defs><filter id="p3_bs2"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#a5d6a7" flood-opacity="0.45"/></filter></defs>
+              <rect x="4" y="4" width="332" height="52" rx="22" fill="#fffde7" stroke="#f9a825" stroke-width="2.5" filter="url(#p3_bs2)"/>
+              <polygon points="158,56 178,56 168,70" fill="#fffde7" stroke="#f9a825" stroke-width="1.8"/>
+              <rect x="158" y="48" width="20" height="10" fill="#fffde7"/>
+            </svg>
+            <div id="p3_phraseText" class="phrase-anim">Laden...</div>
+            <div id="p3_waitDots">
+              <span class="dot dot-1"></span>
+              <span class="dot dot-2"></span>
+              <span class="dot dot-3"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentence – always static -->
+        <div id="p3_sentenceWrap">
+        Herr Bauer erzählt
+          <span id="p3_blankSpan">___</span>
+          einen blöden Witz.
+        </div>
+
+        <!-- Win hint -->
+        <div id="p3_winHint">🐝 Klikk på et ord i krukken for å fullføre setningen!</div>
+
+        <!-- Jar + Puddle -->
+        <div id="p3_jarRow">
+
+          <!-- Honey Jar -->
+          <div id="p3_jarContainer" onclick="p3_handleChoice('jar')">
+            <div class="target-label">🐝 Richtig ✓</div>
+            <div id="p3_jarSvgWrap">
+              <svg width="160" height="280" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <clipPath id="p3_jarBodyClip"><rect x="12" y="55" width="136" height="212" rx="12"/></clipPath>
+                </defs>
+                <rect id="p3_honeyFill" x="12" y="55" width="136" height="212" rx="12"
+                  fill="#f9a825" opacity="0.5"
+                  style="transform:scaleY(0);transform-origin:80px 267px;transition:transform 0.55s cubic-bezier(.4,0,.2,1);"/>
+                <rect x="12" y="55" width="136" height="212" rx="12"
+                  fill="rgba(255,253,235,0.48)" stroke="#f9a825" stroke-width="3"/>
+                <rect x="22" y="38" width="116" height="24" rx="10" fill="#f9a825" stroke="#e65100" stroke-width="2"/>
+                <rect x="38" y="26" width="84" height="16" rx="8" fill="#e65100"/>
+                <rect x="22" y="66" width="11" height="170" rx="5.5" fill="rgba(255,255,255,0.3)" clip-path="url(#p3_jarBodyClip)"/>
+              </svg>
+              <div id="p3_jarPhrasesInner"></div>
+              <div id="p3_jarCount"
+                style="position:absolute;bottom:-22px;right:10px;
+                       font-size:12px;font-weight:800;font-family:'Fredoka One',cursive;
+                       color:#e65100;background:rgba(255,255,255,0.85);
+                       border-radius:6px;padding:2px 8px;pointer-events:none;">0/8</div>
+              <!-- Bee sitting on lid -->
+              <svg width="160" height="30" viewBox="0 0 160 30" xmlns="http://www.w3.org/2000/svg"
+                style="position:absolute;top:10px;left:0;pointer-events:none;">
+                <!-- body -->
+                <ellipse cx="80" cy="20" rx="10" ry="6" fill="#FFD600"/>
+                <rect x="72" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <rect x="77" y="17" width="5" height="6" rx="1.5" fill="#FFD600"/>
+                <rect x="82" y="17" width="5" height="6" rx="1.5" fill="#222"/>
+                <!-- stinger -->
+                <polygon points="89,19 89,23 93,21" fill="#e6ac00"/>
+                <!-- head -->
+                <ellipse cx="72" cy="20" rx="4" ry="4" fill="#FFD600"/>
+                <circle cx="70.5" cy="18.8" r="1.1" fill="#222"/>
+                <!-- wings -->
+                <ellipse cx="77" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <ellipse cx="84" cy="13" rx="7" ry="4" fill="rgba(190,225,255,0.75)" stroke="#aad4f0" stroke-width="0.6"/>
+                <!-- antennae -->
+                <line x1="70" y1="17" x2="66" y2="11" stroke="#222" stroke-width="0.9"/>
+                <line x1="73" y1="16.5" x2="71" y2="10" stroke="#222" stroke-width="0.9"/>
+                <circle cx="66" cy="10.5" r="1.1" fill="#222"/>
+                <circle cx="71" cy="9.5" r="1.1" fill="#222"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Puddle -->
+          <div id="p3_puddleContainer" onclick="p3_handleChoice('puddle')">
+            <div class="puddle-label">💧 Falsch ✗</div>
+            <div id="p3_puddleSvgWrap">
+              <svg width="140" height="120" viewBox="0 0 140 120" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;pointer-events:none;">
+                <defs>
+                  <style>
+                    @keyframes drop1{0%{opacity:0;transform:translateY(-18px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop2{0%{opacity:0;transform:translateY(-22px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes drop3{0%{opacity:0;transform:translateY(-16px)}60%{opacity:1}100%{opacity:0;transform:translateY(0px)}}
+                    @keyframes bubble1{0%{opacity:0;transform:translateY(0px) scale(0.5)}50%{opacity:0.7}100%{opacity:0;transform:translateY(-22px) scale(1)}}
+                    @keyframes bubble2{0%{opacity:0;transform:translateY(0px) scale(0.4)}50%{opacity:0.6}100%{opacity:0;transform:translateY(-18px) scale(1)}}
+                    @keyframes bubble3{0%{opacity:0;transform:translateY(0px) scale(0.6)}50%{opacity:0.5}100%{opacity:0;transform:translateY(-20px) scale(1)}}
+                    @keyframes ripple{0%{r:4;opacity:0.5}100%{r:20;opacity:0}}
+                  </style>
+                </defs>
+                <!-- puddle body -->
+                <ellipse cx="70" cy="96" rx="58" ry="16" fill="#8B6914" opacity="0.5"/>
+                <ellipse cx="70" cy="94" rx="54" ry="13" fill="#c4973a" opacity="0.42"/>
+                <ellipse cx="58" cy="92" rx="18" ry="6" fill="rgba(255,255,255,0.16)"/>
+                <!-- static splashes -->
+                <circle cx="24" cy="82" r="5" fill="#8B6914" opacity="0.36"/>
+                <circle cx="116" cy="84" r="4" fill="#8B6914" opacity="0.32"/>
+                <circle cx="40" cy="74" r="3" fill="#c4973a" opacity="0.45"/>
+                <circle cx="100" cy="76" r="2.5" fill="#c4973a" opacity="0.4"/>
+                <circle cx="70" cy="72" r="2" fill="#c4973a" opacity="0.38"/>
+                <circle cx="55" cy="80" r="1.8" fill="#8B6914" opacity="0.3"/>
+                <circle cx="90" cy="79" r="2.2" fill="#8B6914" opacity="0.3"/>
+                <!-- animated drops falling in -->
+                <ellipse cx="52" cy="62" rx="3" ry="5" fill="#c4973a" opacity="0.7"
+                  style="animation:drop1 1.8s 0.0s ease-in infinite;transform-origin:52px 62px;"/>
+                <ellipse cx="78" cy="55" rx="2.5" ry="4.5" fill="#8B6914" opacity="0.65"
+                  style="animation:drop2 2.2s 0.6s ease-in infinite;transform-origin:78px 55px;"/>
+                <ellipse cx="100" cy="60" rx="2" ry="4" fill="#c4973a" opacity="0.6"
+                  style="animation:drop3 1.6s 1.1s ease-in infinite;transform-origin:100px 60px;"/>
+                <ellipse cx="38" cy="58" rx="2" ry="3.5" fill="#8B6914" opacity="0.55"
+                  style="animation:drop1 2.0s 1.5s ease-in infinite;transform-origin:38px 58px;"/>
+                <ellipse cx="115" cy="65" rx="1.8" ry="3.2" fill="#c4973a" opacity="0.5"
+                  style="animation:drop2 1.9s 0.3s ease-in infinite;transform-origin:115px 65px;"/>
+                <!-- animated bubbles rising -->
+                <circle cx="60" cy="90" r="3.5" fill="none" stroke="#e6ac00" stroke-width="1.2"
+                  style="animation:bubble1 2.0s 0.2s ease-out infinite;transform-origin:60px 90px;"/>
+                <circle cx="82" cy="92" r="2.5" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble2 1.7s 0.9s ease-out infinite;transform-origin:82px 92px;"/>
+                <circle cx="48" cy="91" r="2" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:bubble3 2.3s 0.5s ease-out infinite;transform-origin:48px 91px;"/>
+                <circle cx="95" cy="89" r="3" fill="none" stroke="#e6ac00" stroke-width="1"
+                  style="animation:bubble1 1.8s 1.3s ease-out infinite;transform-origin:95px 89px;"/>
+                <circle cx="70" cy="93" r="2" fill="none" stroke="#c4973a" stroke-width="0.8"
+                  style="animation:bubble2 2.1s 0.0s ease-out infinite;transform-origin:70px 93px;"/>
+                <!-- ripple on impact point -->
+                <circle cx="52" cy="88" r="4" fill="none" stroke="#c4973a" stroke-width="1"
+                  style="animation:ripple 1.8s 0.0s ease-out infinite;transform-origin:52px 88px;"/>
+                <circle cx="78" cy="86" r="4" fill="none" stroke="#8B6914" stroke-width="1"
+                  style="animation:ripple 2.2s 0.7s ease-out infinite;transform-origin:78px 86px;"/>
+              </svg>
+              <div id="p3_puddlePhrases"></div>
+            </div>
+          </div>
+
+        </div><!-- /jarRow -->
+
+        <div id="p3_tryAgainDiv">
+          <button id="p3_tryAgainBtn" onclick="p3_restartGame()">🔄 Prøv igjen</button>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">
+          <button onclick="showPage('p2')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:rgba(255,255,255,0.75);border:2px solid #f9a825;color:#e65100;border-radius:20px;padding:7px 16px;cursor:pointer;">← Forrige</button>
+          <button onclick="showPage('results')" style="font-family:'Fredoka One',cursive;font-size:0.95rem;background:#e8f5e9;border:2px solid #43a047;color:#2e7d32;border-radius:20px;padding:7px 16px;cursor:pointer;">Resultater →</button>
+        </div>
+
+      </div><!-- /centerCol -->
+
+      <!-- Right: history panel -->
+      <div id="p3_rightCol">
+        <div id="p3_historyPanel">
+          <div id="p3_historyTitle">Klarer du<br>fortere?</div>
+          <div id="p3_historyList"></div>
+        </div>
+      </div>
+
+    </div><!-- /midRow -->
+  </div><!-- /mainLayout -->
+
+</div><!-- /scene -->
+
+</div>
+
+<!-- ===== RESULTS PAGE ===== -->
+<div id="page-results" class="page">
+<div id="resultsScene">
+  <div id="resultsConfetti"></div>
+  <div style="position:relative;z-index:2;">
+    <div class="results-title">🐝 Resultater</div>
+    <div class="results-subtitle">Beste tid fra hver oppgave</div>
+    <div class="results-cards">
+      <div class="result-card"><div class="result-card-label">Oppgave 1/3</div><div id="resT1" class="result-card-time no-time">–</div></div>
+      <div class="result-card"><div class="result-card-label">Oppgave 2/3</div><div id="resT2" class="result-card-time no-time">–</div></div>
+      <div class="result-card"><div class="result-card-label">Oppgave 3/3</div><div id="resT3" class="result-card-time no-time">–</div></div>
+    </div>
+    <div class="results-total">
+      <div class="results-total-label">⏱ Samlet tid</div>
+      <div id="resTotal" class="results-total-time no-time">Fullfør alle 3 oppgavene</div>
+    </div>
+    <div class="results-nav">
+      <button class="result-nav-btn" onclick="showPage('p1')">🐝 Oppgave 1</button>
+      <button class="result-nav-btn" onclick="showPage('p2')">🐝 Oppgave 2</button>
+      <button class="result-nav-btn" onclick="showPage('p3')">🐝 Oppgave 3</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script>
+// ---- SHARED STATE ----
+const bestTimes = [null, null, null];
+
+function formatTime(ms){
+  let s=Math.floor(ms/1000),m=Math.floor(s/60),ds=Math.floor((ms%1000)/100);
+  return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+ds;
+}
+
+// ---- NAVIGATION ----
+function showPage(key) {
+  // Stop all timers first
+  if (window.p1_stopTimer) window.p1_stopTimer();
+  if (window.p2_stopTimer) window.p2_stopTimer();
+  if (window.p3_stopTimer) window.p3_stopTimer();
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + key).classList.add('active');
+
+  // Start timer for the active game page if game is still running
+  if (key === 'p1' && window._p1_isActive && window._p1_isActive()) window.p1_startTimer();
+  if (key === 'p2' && window._p2_isActive && window._p2_isActive()) window.p2_startTimer();
+  if (key === 'p3' && window._p3_isActive && window._p3_isActive()) window.p3_startTimer();
+
+  if (key === 'results') updateResults();
+  window.scrollTo(0,0);
+}
+
+function updateResults() {
+  let allDone = true, total = 0;
+  for (let i = 0; i < 3; i++) {
+    let el = document.getElementById('resT' + (i+1));
+    if (bestTimes[i] !== null) {
+      el.textContent = formatTime(bestTimes[i]);
+      el.classList.remove('no-time');
+      total += bestTimes[i];
+    } else {
+      el.textContent = '–'; el.classList.add('no-time');
+      allDone = false;
+    }
+  }
+  let tot = document.getElementById('resTotal');
+  if (allDone) {
+    tot.textContent = formatTime(total); tot.classList.remove('no-time');
+    launchResultsConfetti();
+  } else {
+    tot.textContent = 'Fullfør alle 3 oppgavene'; tot.classList.add('no-time');
+  }
+}
+
+function launchResultsConfetti() {
+  let c = document.getElementById('resultsConfetti'); c.innerHTML='';
+  let flowers=['🌸','🌼','🌺','🌻','🍀','🌷','🌈'];
+  let colors=['#f9a825','#43a047','#e53935','#1e88e5','#8e24aa','#ff7043','#ffee58'];
+  for(let i=0;i<65;i++){
+    let el=document.createElement('div'),delay=Math.random()*1.8,dur=1.6+Math.random()*2.2;
+    if(Math.random()>0.38){
+      el.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-30-Math.random()*30)+'px;font-size:'+(13+Math.random()*13)+'px;animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    } else {
+      let sz=7+Math.random()*9,fl=Math.random()>.5;
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-20-Math.random()*40)+'px;width:'+sz+'px;height:'+sz+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(fl?'50% 0 50% 0':'50%')+';animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    }
+    c.appendChild(el);
+  }
+  setTimeout(()=>{c.innerHTML='';},5500);
+}
+
+// ---- PAGE 1 GAME ----
+(function(){
+const correctPhrases = ["dir","ihm","ihr","euch","meiner Schwester","deinem Bruder","unserer Freundin","unserem Hund","euren Eltern","einem guten Freund","einem alten Mann","den Zwillingen","dem Kind","dem Hund","der alten Tante"];
+const wrongPhrases   = ["dich","ihn","sie","wir","meine Freundin","deinen Bruder","meine Schwester","meine Eltern","die Freundin","das kleine Kind","der Junge","das Mädchen","unser Freund","den Onkel","die Oma"];
+
+let allPhrases=[], currentIdx=0, jarCount=0;
+let timerInterval=null, startTime=null, elapsedMs=0;
+let gameActive=false, waitingAfterWrong=false;
+let history=[];
+
+function shuffle(arr){let a=arr.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function formatTime(ms){let s=Math.floor(ms/1000),m=Math.floor(s/60),ds=Math.floor((ms%1000)/100);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+ds;}
+function buildPool(){return shuffle([...correctPhrases.map(p=>({text:p,correct:true})),...wrongPhrases.map(p=>({text:p,correct:false}))]);}
+
+function startTimer(){
+  startTime=Date.now()-elapsedMs;
+  timerInterval=setInterval(()=>{
+    if(!gameActive)return;
+    elapsedMs=Date.now()-startTime;
+    document.getElementById('p1_timerDisplay').textContent=formatTime(elapsedMs);
+  },100);
+}
+function stopTimer(){clearInterval(timerInterval);}
+
+function p1_initGame(){
+  allPhrases=buildPool(); currentIdx=0; jarCount=0; elapsedMs=0;
+  gameActive=true; waitingAfterWrong=false;
+
+  document.getElementById('p1_honeyFill').style.transform='scaleY(0)';
+  document.getElementById('p1_jarPhrasesInner').innerHTML='';
+  document.getElementById('p1_puddlePhrases').innerHTML='';
+  document.getElementById('p1_jarCount').textContent='0/8';
+  document.getElementById('p1_timerDisplay').textContent='00:00.0';
+  document.getElementById('p1_blankSpan').textContent='___';
+  document.getElementById('p1_blankSpan').style.color='#b0bec5';
+  document.getElementById('p1_blankSpan').style.borderBottom='3px solid var(--honey)';
+  document.getElementById('p1_blankSpan').style.fontStyle='italic';
+  document.getElementById('p1_tryAgainDiv').style.display='none';
+  document.getElementById('p1_winHint').style.display='none';
+  document.getElementById('p1_waitDots').style.display='none';
+  document.getElementById('p1_phraseText').style.display='block';
+
+  // Reset sentence box
+  let sw=document.getElementById('p1_sentenceWrap');
+  sw.classList.remove('sentence-finale');
+  sw.style.animation='bobble 2.2s ease-in-out infinite';
+
+  // Restore jar click
+  document.getElementById('p1_jarContainer').onclick=()=>p1_handleChoice('jar');
+  document.getElementById('p1_jarContainer').style.cursor='pointer';
+
+  p1_resetSceneBg();
+  p1_showNextPhrase();
+}
+
+function p1_showNextPhrase(){
+  if(currentIdx>=allPhrases.length){ allPhrases=buildPool(); currentIdx=0; }
+  let pt=document.getElementById('p1_phraseText');
+  let wd=document.getElementById('p1_waitDots');
+  wd.style.display='none';
+  pt.style.display='block';
+  pt.style.fontSize='';
+  pt.style.lineHeight='';
+  pt.className=''; void pt.offsetWidth; pt.className='phrase-anim';
+  pt.textContent=allPhrases[currentIdx].text;
+}
+
+function p1_showWaitDots(){
+  let pt=document.getElementById('p1_phraseText');
+  let wd=document.getElementById('p1_waitDots');
+  pt.style.display='none';
+  wd.style.display='block';
+}
+
+function p1_handleChoice(target){
+  if(!gameActive||waitingAfterWrong)return;
+  let phrase=allPhrases[currentIdx];
+  let wantsJar=(target==='jar');
+  let isCorrect=(wantsJar===phrase.correct);
+
+  if(isCorrect){
+    p1_flashScene('green');
+    if(phrase.correct){
+      jarCount++;
+      p1_addToJar(phrase.text);
+      document.getElementById('p1_jarCount').textContent=jarCount+'/8';
+      document.getElementById('p1_honeyFill').style.transform='scaleY('+Math.min(jarCount/8,1)+')';
+      if(jarCount>=8){ p1_endGame(true); return; }
+    } else {
+      p1_addToPuddle(phrase.text);
+    }
+    currentIdx++; p1_showNextPhrase();
+  } else {
+    p1_flashScene('red');
+    p1_addToPuddle(phrase.text);
+    waitingAfterWrong=true;
+    currentIdx++;
+    p1_showWaitDots();
+    setTimeout(()=>{
+      waitingAfterWrong=false;
+      p1_showNextPhrase();
+    },3000);
+  }
+}
+
+function p1_addToJar(text){
+  let list=document.getElementById('p1_jarPhrasesInner');
+  let el=document.createElement('div');
+  el.className='jar-phrase-item';
+  el.textContent=text; el.dataset.phrase=text;
+  list.appendChild(el);
+}
+
+function p1_addToPuddle(text){
+  let puddle=document.getElementById('p1_puddlePhrases');
+  let el=document.createElement('div');
+  el.className='puddle-phrase'; el.textContent=text;
+  puddle.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode)el.parentNode.removeChild(el); },3600);
+}
+
+function p1_enableJarPhrases(){
+  document.getElementById('p1_jarContainer').onclick=null;
+  document.getElementById('p1_jarContainer').style.cursor='default';
+  document.getElementById('p1_jarPhrasesInner').querySelectorAll('.jar-phrase-item').forEach(el=>{
+    el.classList.add('clickable');
+    el.onclick=(e)=>{ e.stopPropagation(); p1_revealSentence(el.dataset.phrase); };
+  });
+}
+
+function p1_revealSentence(phrase){
+  // Stop timer NOW (this is the true finish)
+  stopTimer();
+  // Record final time
+  history.unshift(elapsedMs);
+  p1_updateHistory();
+  // Save best time for results page
+  if(bestTimes[0]===null||elapsedMs<bestTimes[0]){bestTimes[0]=elapsedMs;}
+
+  let blank=document.getElementById('p1_blankSpan');
+  blank.textContent=phrase;
+  blank.style.color='#2e7d32';
+  blank.style.borderBottom='3px solid var(--green)';
+  blank.style.fontStyle='normal';
+
+  // Grow sentence box
+  let sw=document.getElementById('p1_sentenceWrap');
+  sw.style.animation='none';
+  void sw.offsetWidth;
+  sw.classList.add('sentence-finale');
+
+  document.getElementById('p1_winHint').style.display='none';
+  p1_launchConfetti();
+}
+
+function p1_resetSceneBg(){
+  let s=document.getElementById('p1_scene');
+  s.classList.remove('flash-green','flash-red');
+  s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+}
+
+function p1_flashScene(color){
+  let s=document.getElementById('p1_scene');
+  s.style.background='';
+  s.classList.remove('flash-green','flash-red');
+  void s.offsetWidth;
+  s.classList.add(color==='green'?'flash-green':'flash-red');
+  setTimeout(()=>{
+    s.classList.remove('flash-green','flash-red');
+    s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+  }, color==='green'?500:700);
+}
+
+function p1_endGame(won){
+  // Don't stop timer yet – wait for word selection
+  gameActive=false;
+  document.getElementById('p1_tryAgainDiv').style.display='block';
+  if(won){
+    document.getElementById('p1_phraseText').innerHTML='Supert! Velg et alternativ<br>fra krukken for å stoppe tiden!';
+    document.getElementById('p1_phraseText').style.fontSize='0.88rem';
+    document.getElementById('p1_phraseText').style.lineHeight='1.3';
+    document.getElementById('p1_phraseText').style.display='block';
+    document.getElementById('p1_waitDots').style.display='none';
+    p1_enableJarPhrases();
+    document.getElementById('p1_winHint').style.display='block';
+    p1_flashScene('green');
+    setTimeout(p1_resetSceneBg,1100);
+  }
+}
+
+function p1_updateHistory(){
+  let panel=document.getElementById('p1_historyPanel'), list=document.getElementById('p1_historyList');
+  panel.style.display='flex'; list.innerHTML='';
+  let bestIdx=history.indexOf(Math.min(...history));
+  history.forEach((t,i)=>{
+    let el=document.createElement('div');
+    el.className='history-entry'+(i===bestIdx?' history-best':'');
+    el.textContent=formatTime(t);
+    list.appendChild(el);
+  });
+}
+
+function p1_restartGame(){
+  stopTimer();
+  p1_initGame();
+  startTimer();
+}
+
+function p1_launchConfetti(){
+  let c=document.getElementById('p1_confettiContainer'); c.innerHTML='';
+  let flowers=['🌸','🌼','🌺','🌻','🍀','🌷','🌈'];
+  let colors=['#f9a825','#43a047','#e53935','#1e88e5','#8e24aa','#ff7043','#ffee58'];
+  for(let i=0;i<65;i++){
+    let el=document.createElement('div'), delay=Math.random()*1.8, dur=1.6+Math.random()*2.2;
+    if(Math.random()>0.38){
+      el.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-30-Math.random()*30)+'px;font-size:'+(13+Math.random()*13)+'px;animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    } else {
+      let sz=7+Math.random()*9,fl=Math.random()>.5;
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-20-Math.random()*40)+'px;width:'+sz+'px;height:'+sz+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(fl?'50% 0 50% 0':'50%')+';animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    }
+    c.appendChild(el);
+  }
+  setTimeout(()=>{ c.innerHTML=''; },5500);
+}
+
+p1_initGame();
+  startTimer();
+
+  // Expose to global scope for onclick handlers
+  window.p1_handleChoice = p1_handleChoice;
+  window.p1_restartGame  = p1_restartGame;
+  window.p1_stopTimer    = stopTimer;
+  window.p1_startTimer   = startTimer;
+  window._p1_isActive    = () => gameActive;
+
+})();
+
+// ---- PAGE 2 GAME ----
+(function(){
+const correctPhrases = ["dich","ihn","euch","uns","einen Film","einen Vogel","eine gute Freundin","das Handy","das Auto","ihre Schlüssel","ein schnelles Auto","ihren Vater","unsere Freunde","meine Perspektive","die Sonne"];
+const wrongPhrases   = ["dir","ihm","ihr","einem Film","einer alten Freundin","dem Hund","ihrem Handy","ihren Freunden","meinem Problem","dem Auto","meinen Schlüsseln","der Freund","der Sonne","der Schulbus","einem Vogel"];
+
+let allPhrases=[], currentIdx=0, jarCount=0;
+let timerInterval=null, startTime=null, elapsedMs=0;
+let gameActive=false, waitingAfterWrong=false;
+let history=[];
+
+function shuffle(arr){let a=arr.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function formatTime(ms){let s=Math.floor(ms/1000),m=Math.floor(s/60),ds=Math.floor((ms%1000)/100);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+ds;}
+function buildPool(){return shuffle([...correctPhrases.map(p=>({text:p,correct:true})),...wrongPhrases.map(p=>({text:p,correct:false}))]);}
+
+function startTimer(){
+  startTime=Date.now()-elapsedMs;
+  timerInterval=setInterval(()=>{
+    if(!gameActive)return;
+    elapsedMs=Date.now()-startTime;
+    document.getElementById('p2_timerDisplay').textContent=formatTime(elapsedMs);
+  },100);
+}
+function stopTimer(){clearInterval(timerInterval);}
+
+function p2_initGame(){
+  allPhrases=buildPool(); currentIdx=0; jarCount=0; elapsedMs=0;
+  gameActive=true; waitingAfterWrong=false;
+
+  document.getElementById('p2_honeyFill').style.transform='scaleY(0)';
+  document.getElementById('p2_jarPhrasesInner').innerHTML='';
+  document.getElementById('p2_puddlePhrases').innerHTML='';
+  document.getElementById('p2_jarCount').textContent='0/8';
+  document.getElementById('p2_timerDisplay').textContent='00:00.0';
+  document.getElementById('p2_blankSpan').textContent='___';
+  document.getElementById('p2_blankSpan').style.color='#b0bec5';
+  document.getElementById('p2_blankSpan').style.borderBottom='3px solid var(--honey)';
+  document.getElementById('p2_blankSpan').style.fontStyle='italic';
+  document.getElementById('p2_tryAgainDiv').style.display='none';
+  document.getElementById('p2_winHint').style.display='none';
+  document.getElementById('p2_waitDots').style.display='none';
+  document.getElementById('p2_phraseText').style.display='block';
+
+  // Reset sentence box
+  let sw=document.getElementById('p2_sentenceWrap');
+  sw.classList.remove('sentence-finale');
+  sw.style.animation='bobble 2.2s ease-in-out infinite';
+
+  // Restore jar click
+  document.getElementById('p2_jarContainer').onclick=()=>p2_handleChoice('jar');
+  document.getElementById('p2_jarContainer').style.cursor='pointer';
+
+  p2_resetSceneBg();
+  p2_showNextPhrase();
+}
+
+function p2_showNextPhrase(){
+  if(currentIdx>=allPhrases.length){ allPhrases=buildPool(); currentIdx=0; }
+  let pt=document.getElementById('p2_phraseText');
+  let wd=document.getElementById('p2_waitDots');
+  wd.style.display='none';
+  pt.style.display='block';
+  pt.style.fontSize='';
+  pt.style.lineHeight='';
+  pt.className=''; void pt.offsetWidth; pt.className='phrase-anim';
+  pt.textContent=allPhrases[currentIdx].text;
+}
+
+function p2_showWaitDots(){
+  let pt=document.getElementById('p2_phraseText');
+  let wd=document.getElementById('p2_waitDots');
+  pt.style.display='none';
+  wd.style.display='block';
+}
+
+function p2_handleChoice(target){
+  if(!gameActive||waitingAfterWrong)return;
+  let phrase=allPhrases[currentIdx];
+  let wantsJar=(target==='jar');
+  let isCorrect=(wantsJar===phrase.correct);
+
+  if(isCorrect){
+    p2_flashScene('green');
+    if(phrase.correct){
+      jarCount++;
+      p2_addToJar(phrase.text);
+      document.getElementById('p2_jarCount').textContent=jarCount+'/8';
+      document.getElementById('p2_honeyFill').style.transform='scaleY('+Math.min(jarCount/8,1)+')';
+      if(jarCount>=8){ p2_endGame(true); return; }
+    } else {
+      p2_addToPuddle(phrase.text);
+    }
+    currentIdx++; p2_showNextPhrase();
+  } else {
+    p2_flashScene('red');
+    p2_addToPuddle(phrase.text);
+    waitingAfterWrong=true;
+    currentIdx++;
+    p2_showWaitDots();
+    setTimeout(()=>{
+      waitingAfterWrong=false;
+      p2_showNextPhrase();
+    },3000);
+  }
+}
+
+function p2_addToJar(text){
+  let list=document.getElementById('p2_jarPhrasesInner');
+  let el=document.createElement('div');
+  el.className='jar-phrase-item';
+  el.textContent=text; el.dataset.phrase=text;
+  list.appendChild(el);
+}
+
+function p2_addToPuddle(text){
+  let puddle=document.getElementById('p2_puddlePhrases');
+  let el=document.createElement('div');
+  el.className='puddle-phrase'; el.textContent=text;
+  puddle.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode)el.parentNode.removeChild(el); },3600);
+}
+
+function p2_enableJarPhrases(){
+  document.getElementById('p2_jarContainer').onclick=null;
+  document.getElementById('p2_jarContainer').style.cursor='default';
+  document.getElementById('p2_jarPhrasesInner').querySelectorAll('.jar-phrase-item').forEach(el=>{
+    el.classList.add('clickable');
+    el.onclick=(e)=>{ e.stopPropagation(); p2_revealSentence(el.dataset.phrase); };
+  });
+}
+
+function p2_revealSentence(phrase){
+  // Stop timer NOW (this is the true finish)
+  stopTimer();
+  // Record final time
+  history.unshift(elapsedMs);
+  p2_updateHistory();
+  // Save best time for results page
+  if(bestTimes[1]===null||elapsedMs<bestTimes[1]){bestTimes[1]=elapsedMs;}
+
+  let blank=document.getElementById('p2_blankSpan');
+  blank.textContent=phrase;
+  blank.style.color='#2e7d32';
+  blank.style.borderBottom='3px solid var(--green)';
+  blank.style.fontStyle='normal';
+
+  // Grow sentence box
+  let sw=document.getElementById('p2_sentenceWrap');
+  sw.style.animation='none';
+  void sw.offsetWidth;
+  sw.classList.add('sentence-finale');
+
+  document.getElementById('p2_winHint').style.display='none';
+  p2_launchConfetti();
+}
+
+function p2_resetSceneBg(){
+  let s=document.getElementById('p2_scene');
+  s.classList.remove('flash-green','flash-red');
+  s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+}
+
+function p2_flashScene(color){
+  let s=document.getElementById('p2_scene');
+  s.style.background='';
+  s.classList.remove('flash-green','flash-red');
+  void s.offsetWidth;
+  s.classList.add(color==='green'?'flash-green':'flash-red');
+  setTimeout(()=>{
+    s.classList.remove('flash-green','flash-red');
+    s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+  }, color==='green'?500:700);
+}
+
+function p2_endGame(won){
+  // Don't stop timer yet – wait for word selection
+  gameActive=false;
+  document.getElementById('p2_tryAgainDiv').style.display='block';
+  if(won){
+    document.getElementById('p2_phraseText').innerHTML='Supert! Velg et alternativ<br>fra krukken for å stoppe tiden!';
+    document.getElementById('p2_phraseText').style.fontSize='0.88rem';
+    document.getElementById('p2_phraseText').style.lineHeight='1.3';
+    document.getElementById('p2_phraseText').style.display='block';
+    document.getElementById('p2_waitDots').style.display='none';
+    p2_enableJarPhrases();
+    document.getElementById('p2_winHint').style.display='block';
+    p2_flashScene('green');
+    setTimeout(p2_resetSceneBg,1100);
+  }
+}
+
+function p2_updateHistory(){
+  let panel=document.getElementById('p2_historyPanel'), list=document.getElementById('p2_historyList');
+  panel.style.display='flex'; list.innerHTML='';
+  let bestIdx=history.indexOf(Math.min(...history));
+  history.forEach((t,i)=>{
+    let el=document.createElement('div');
+    el.className='history-entry'+(i===bestIdx?' history-best':'');
+    el.textContent=formatTime(t);
+    list.appendChild(el);
+  });
+}
+
+function p2_restartGame(){
+  stopTimer();
+  p2_initGame();
+  startTimer();
+}
+
+function p2_launchConfetti(){
+  let c=document.getElementById('p2_confettiContainer'); c.innerHTML='';
+  let flowers=['🌸','🌼','🌺','🌻','🍀','🌷','🌈'];
+  let colors=['#f9a825','#43a047','#e53935','#1e88e5','#8e24aa','#ff7043','#ffee58'];
+  for(let i=0;i<65;i++){
+    let el=document.createElement('div'), delay=Math.random()*1.8, dur=1.6+Math.random()*2.2;
+    if(Math.random()>0.38){
+      el.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-30-Math.random()*30)+'px;font-size:'+(13+Math.random()*13)+'px;animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    } else {
+      let sz=7+Math.random()*9,fl=Math.random()>.5;
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-20-Math.random()*40)+'px;width:'+sz+'px;height:'+sz+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(fl?'50% 0 50% 0':'50%')+';animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    }
+    c.appendChild(el);
+  }
+  setTimeout(()=>{ c.innerHTML=''; },5500);
+}
+
+p2_initGame();
+
+  // Expose to global scope for onclick handlers
+  window.p2_handleChoice = p2_handleChoice;
+  window.p2_restartGame  = p2_restartGame;
+  window.p2_stopTimer    = stopTimer;
+  window.p2_startTimer   = startTimer;
+  window._p2_isActive    = () => gameActive;
+
+})();
+
+// ---- PAGE 3 GAME ----
+(function(){
+const correctPhrases = ["mir","uns","ihr","ihnen","den Kindern","dem jungen Mann","der Freundin","seiner Familie","seinem Bruder","seinem alten Freund","seinen Freunden","meinem Freund","unserer Klasse","einer fremden Person","einem Kind"];
+const wrongPhrases   = ["wir","ich","mich","ihn","sie","der Freund","das Kind","die Kinder","die Frau","seine Schüler","meine Klasse","seine Schwester","seine Kinder","unseren Freund","eine alte Freundin"];
+
+let allPhrases=[], currentIdx=0, jarCount=0;
+let timerInterval=null, startTime=null, elapsedMs=0;
+let gameActive=false, waitingAfterWrong=false;
+let history=[];
+
+function shuffle(arr){let a=arr.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function formatTime(ms){let s=Math.floor(ms/1000),m=Math.floor(s/60),ds=Math.floor((ms%1000)/100);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+ds;}
+function buildPool(){return shuffle([...correctPhrases.map(p=>({text:p,correct:true})),...wrongPhrases.map(p=>({text:p,correct:false}))]);}
+
+function startTimer(){
+  startTime=Date.now()-elapsedMs;
+  timerInterval=setInterval(()=>{
+    if(!gameActive)return;
+    elapsedMs=Date.now()-startTime;
+    document.getElementById('p3_timerDisplay').textContent=formatTime(elapsedMs);
+  },100);
+}
+function stopTimer(){clearInterval(timerInterval);}
+
+function p3_initGame(){
+  allPhrases=buildPool(); currentIdx=0; jarCount=0; elapsedMs=0;
+  gameActive=true; waitingAfterWrong=false;
+
+  document.getElementById('p3_honeyFill').style.transform='scaleY(0)';
+  document.getElementById('p3_jarPhrasesInner').innerHTML='';
+  document.getElementById('p3_puddlePhrases').innerHTML='';
+  document.getElementById('p3_jarCount').textContent='0/8';
+  document.getElementById('p3_timerDisplay').textContent='00:00.0';
+  document.getElementById('p3_blankSpan').textContent='___';
+  document.getElementById('p3_blankSpan').style.color='#b0bec5';
+  document.getElementById('p3_blankSpan').style.borderBottom='3px solid var(--honey)';
+  document.getElementById('p3_blankSpan').style.fontStyle='italic';
+  document.getElementById('p3_tryAgainDiv').style.display='none';
+  document.getElementById('p3_winHint').style.display='none';
+  document.getElementById('p3_waitDots').style.display='none';
+  document.getElementById('p3_phraseText').style.display='block';
+
+  // Reset sentence box
+  let sw=document.getElementById('p3_sentenceWrap');
+  sw.classList.remove('sentence-finale');
+  sw.style.animation='bobble 2.2s ease-in-out infinite';
+
+  // Restore jar click
+  document.getElementById('p3_jarContainer').onclick=()=>p3_handleChoice('jar');
+  document.getElementById('p3_jarContainer').style.cursor='pointer';
+
+  p3_resetSceneBg();
+  p3_showNextPhrase();
+}
+
+function p3_showNextPhrase(){
+  if(currentIdx>=allPhrases.length){ allPhrases=buildPool(); currentIdx=0; }
+  let pt=document.getElementById('p3_phraseText');
+  let wd=document.getElementById('p3_waitDots');
+  wd.style.display='none';
+  pt.style.display='block';
+  pt.style.fontSize='';
+  pt.style.lineHeight='';
+  pt.className=''; void pt.offsetWidth; pt.className='phrase-anim';
+  pt.textContent=allPhrases[currentIdx].text;
+}
+
+function p3_showWaitDots(){
+  let pt=document.getElementById('p3_phraseText');
+  let wd=document.getElementById('p3_waitDots');
+  pt.style.display='none';
+  wd.style.display='block';
+}
+
+function p3_handleChoice(target){
+  if(!gameActive||waitingAfterWrong)return;
+  let phrase=allPhrases[currentIdx];
+  let wantsJar=(target==='jar');
+  let isCorrect=(wantsJar===phrase.correct);
+
+  if(isCorrect){
+    p3_flashScene('green');
+    if(phrase.correct){
+      jarCount++;
+      p3_addToJar(phrase.text);
+      document.getElementById('p3_jarCount').textContent=jarCount+'/8';
+      document.getElementById('p3_honeyFill').style.transform='scaleY('+Math.min(jarCount/8,1)+')';
+      if(jarCount>=8){ p3_endGame(true); return; }
+    } else {
+      p3_addToPuddle(phrase.text);
+    }
+    currentIdx++; p3_showNextPhrase();
+  } else {
+    p3_flashScene('red');
+    p3_addToPuddle(phrase.text);
+    waitingAfterWrong=true;
+    currentIdx++;
+    p3_showWaitDots();
+    setTimeout(()=>{
+      waitingAfterWrong=false;
+      p3_showNextPhrase();
+    },3000);
+  }
+}
+
+function p3_addToJar(text){
+  let list=document.getElementById('p3_jarPhrasesInner');
+  let el=document.createElement('div');
+  el.className='jar-phrase-item';
+  el.textContent=text; el.dataset.phrase=text;
+  list.appendChild(el);
+}
+
+function p3_addToPuddle(text){
+  let puddle=document.getElementById('p3_puddlePhrases');
+  let el=document.createElement('div');
+  el.className='puddle-phrase'; el.textContent=text;
+  puddle.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode)el.parentNode.removeChild(el); },3600);
+}
+
+function p3_enableJarPhrases(){
+  document.getElementById('p3_jarContainer').onclick=null;
+  document.getElementById('p3_jarContainer').style.cursor='default';
+  document.getElementById('p3_jarPhrasesInner').querySelectorAll('.jar-phrase-item').forEach(el=>{
+    el.classList.add('clickable');
+    el.onclick=(e)=>{ e.stopPropagation(); p3_revealSentence(el.dataset.phrase); };
+  });
+}
+
+function p3_revealSentence(phrase){
+  // Stop timer NOW (this is the true finish)
+  stopTimer();
+  // Record final time
+  history.unshift(elapsedMs);
+  p3_updateHistory();
+  // Save best time for results page
+  if(bestTimes[2]===null||elapsedMs<bestTimes[2]){bestTimes[2]=elapsedMs;}
+
+  let blank=document.getElementById('p3_blankSpan');
+  blank.textContent=phrase;
+  blank.style.color='#2e7d32';
+  blank.style.borderBottom='3px solid var(--green)';
+  blank.style.fontStyle='normal';
+
+  // Grow sentence box
+  let sw=document.getElementById('p3_sentenceWrap');
+  sw.style.animation='none';
+  void sw.offsetWidth;
+  sw.classList.add('sentence-finale');
+
+  document.getElementById('p3_winHint').style.display='none';
+  p3_launchConfetti();
+}
+
+function p3_resetSceneBg(){
+  let s=document.getElementById('p3_scene');
+  s.classList.remove('flash-green','flash-red');
+  s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+}
+
+function p3_flashScene(color){
+  let s=document.getElementById('p3_scene');
+  s.style.background='';
+  s.classList.remove('flash-green','flash-red');
+  void s.offsetWidth;
+  s.classList.add(color==='green'?'flash-green':'flash-red');
+  setTimeout(()=>{
+    s.classList.remove('flash-green','flash-red');
+    s.style.background='linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 20%,#f1fdf4 50%,#c8e6c9 100%)';
+  }, color==='green'?500:700);
+}
+
+function p3_endGame(won){
+  // Don't stop timer yet – wait for word selection
+  gameActive=false;
+  document.getElementById('p3_tryAgainDiv').style.display='block';
+  if(won){
+    document.getElementById('p3_phraseText').innerHTML='Supert! Velg et alternativ<br>fra krukken for å stoppe tiden!';
+    document.getElementById('p3_phraseText').style.fontSize='0.88rem';
+    document.getElementById('p3_phraseText').style.lineHeight='1.3';
+    document.getElementById('p3_phraseText').style.display='block';
+    document.getElementById('p3_waitDots').style.display='none';
+    p3_enableJarPhrases();
+    document.getElementById('p3_winHint').style.display='block';
+    p3_flashScene('green');
+    setTimeout(p3_resetSceneBg,1100);
+  }
+}
+
+function p3_updateHistory(){
+  let panel=document.getElementById('p3_historyPanel'), list=document.getElementById('p3_historyList');
+  panel.style.display='flex'; list.innerHTML='';
+  let bestIdx=history.indexOf(Math.min(...history));
+  history.forEach((t,i)=>{
+    let el=document.createElement('div');
+    el.className='history-entry'+(i===bestIdx?' history-best':'');
+    el.textContent=formatTime(t);
+    list.appendChild(el);
+  });
+}
+
+function p3_restartGame(){
+  stopTimer();
+  p3_initGame();
+  startTimer();
+}
+
+function p3_launchConfetti(){
+  let c=document.getElementById('p3_confettiContainer'); c.innerHTML='';
+  let flowers=['🌸','🌼','🌺','🌻','🍀','🌷','🌈'];
+  let colors=['#f9a825','#43a047','#e53935','#1e88e5','#8e24aa','#ff7043','#ffee58'];
+  for(let i=0;i<65;i++){
+    let el=document.createElement('div'), delay=Math.random()*1.8, dur=1.6+Math.random()*2.2;
+    if(Math.random()>0.38){
+      el.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-30-Math.random()*30)+'px;font-size:'+(13+Math.random()*13)+'px;animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    } else {
+      let sz=7+Math.random()*9,fl=Math.random()>.5;
+      el.style.cssText='position:absolute;left:'+Math.random()*100+'%;top:'+(-20-Math.random()*40)+'px;width:'+sz+'px;height:'+sz+'px;background:'+colors[Math.floor(Math.random()*colors.length)]+';border-radius:'+(fl?'50% 0 50% 0':'50%')+';animation:confettiDrop '+dur+'s '+delay+'s ease-in forwards;';
+    }
+    c.appendChild(el);
+  }
+  setTimeout(()=>{ c.innerHTML=''; },5500);
+}
+
+p3_initGame();
+
+  // Expose to global scope for onclick handlers
+  window.p3_handleChoice = p3_handleChoice;
+  window.p3_restartGame  = p3_restartGame;
+  window.p3_stopTimer    = stopTimer;
+  window.p3_startTimer   = startTimer;
+  window._p3_isActive    = () => gameActive;
+
+})();
+
+</script>
+</div><!-- /app -->
+</body>
+</html>

@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tysk grammatikk – Artikler og pronomen</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #7C9E8A;
+    --sage-light: #EAF2ED;
+    --sage-mid: #C4DDD0;
+    --sage-dark: #3E6650;
+    --sage-deep: #1F3D2B;
+    --rose: #D4857A;
+    --rose-light: #F7EDEB;
+    --rose-dark: #8B3D34;
+    --sand: #F5F0E8;
+    --sand-dark: #E8E0D0;
+    --ink: #000000;
+    --ink-mid: #111111;
+    --ink-light: #333333;
+    --white: #FEFEFE;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 17px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--sage-deep);
+    color: var(--white);
+    padding: 1.5rem 2rem 1.2rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 2rem;
+    letter-spacing: -0.01em;
+    color: #D8EDE2;
+  }
+  header span {
+    font-size: 15px;
+    color: #7FB89A;
+    font-weight: 300;
+  }
+
+  /* ── NAV TABS ── */
+  .nav-outer {
+    background: var(--sage-deep);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-bottom: 2px solid rgba(255,255,255,0.08);
+  }
+  .nav-outer::-webkit-scrollbar { height: 3px; }
+  .nav-outer::-webkit-scrollbar-thumb { background: var(--sage); border-radius: 2px; }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: #7FB89A;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+    letter-spacing: 0.01em;
+  }
+  .tab-btn:hover { color: #D8EDE2; }
+  .tab-btn.active {
+    color: var(--white);
+    border-bottom-color: #7FC8A0;
+    font-weight: 500;
+  }
+  .tab-btn.done { color: #5FAD7A; }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── PAGE TITLE ── */
+  .page-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .page-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.7rem;
+    font-weight: 300;
+    color: var(--sage-deep);
+    letter-spacing: -0.01em;
+  }
+  .page-sub {
+    font-size: 15px;
+    color: var(--ink-light);
+    margin-top: 3px;
+    font-weight: 300;
+  }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid #CCC;
+    border-radius: var(--radius);
+    padding: 7px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .reset-btn:hover { border-color: var(--rose); color: var(--rose-dark); background: var(--rose-light); }
+
+  /* ── PROGRESS ── */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+  .progress-track {
+    flex: 1;
+    height: 5px;
+    background: var(--sand-dark);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage) 0%, var(--sage-dark) 100%);
+    border-radius: 3px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    font-size: 14px;
+    color: var(--ink-light);
+    min-width: 100px;
+    text-align: right;
+  }
+
+  /* ── GRAMMAR TABLE ── */
+  .gram-wrap {
+    background: var(--white);
+    border: 1px solid var(--sand-dark);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .gram-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .gram-table th {
+    background: var(--sage-deep);
+    color: #C4DDD0;
+    font-weight: 400;
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .gram-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--sand-dark);
+    color: var(--ink);
+  }
+  .gram-table tr:last-child td { border-bottom: none; }
+  .gram-table td:first-child {
+    color: var(--ink-light);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: #F9F5EE;
+    width: 90px;
+  }
+  .gram-table td.form {
+    color: var(--sage-dark);
+    font-weight: 500;
+    cursor: default;
+  }
+  .gram-table td.form:hover { color: var(--sage-deep); }
+
+  /* ── SENTENCES ── */
+  .sentences { display: flex; flex-direction: column; gap: 9px; }
+
+  .s-item {
+    background: var(--white);
+    border: 1px solid var(--sand-dark);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    transition: border-color .2s, background .2s;
+    box-shadow: var(--shadow);
+  }
+  .s-item.correct { border-color: var(--sage); background: var(--sage-light); }
+  .s-item.wrong { border-color: var(--rose); background: var(--rose-light); }
+
+  .s-num {
+    font-size: 13px;
+    color: var(--ink-light);
+    font-weight: 500;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .s-body {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .s-trans {
+    font-size: 14px;
+    color: var(--ink-light);
+    font-style: italic;
+    margin-top: 5px;
+    font-weight: 300;
+  }
+  .s-pos {
+    font-size: 13px;
+    color: var(--sage-dark);
+    font-weight: 400;
+  }
+
+  .de-word {
+    cursor: default;
+  }
+
+  /* blank placeholder */
+  .blank {
+    display: inline-block;
+    min-width: 44px;
+    border-bottom: 2px solid var(--sage);
+    color: transparent;
+    vertical-align: baseline;
+    margin: 0 2px;
+  }
+
+  /* click target */
+  .target {
+    display: inline-block;
+    background: var(--sage-mid);
+    color: var(--sage-deep);
+    border: 1px solid var(--sage);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .target:hover { background: var(--sage); color: var(--white); }
+  .target.answered-correct { background: var(--sage-dark); color: var(--white); border-color: var(--sage-deep); cursor: default; }
+  .target.answered-wrong { background: var(--rose); color: var(--white); border-color: var(--rose-dark); cursor: default; }
+
+  /* radio group */
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 7px;
+  }
+  .r-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border: 1px solid #DDD;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink-mid);
+    transition: all .15s;
+    user-select: none;
+  }
+  .r-label:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--sage-light); }
+  .r-label input { accent-color: var(--sage-dark); width: 14px; height: 14px; }
+  .r-label.correct-opt { border-color: var(--sage-dark); background: var(--sage-light); color: var(--sage-deep); }
+  .r-label.wrong-opt { border-color: var(--rose); background: var(--rose-light); color: var(--rose-dark); }
+
+  /* dropdown */
+  .s-select {
+    border: 1px solid #CCC;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--sage-dark);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .s-select:focus { outline: none; border-color: var(--sage); }
+  .s-select.sel-correct { border-color: var(--sage-dark); background: var(--sage-light); color: var(--sage-deep); }
+  .s-select.sel-wrong { border-color: var(--rose); background: var(--rose-light); color: var(--rose-dark); }
+
+  /* feedback */
+  .feedback {
+    display: inline-block;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+  .feedback.ok { color: var(--sage-dark); }
+  .feedback.no { color: var(--rose-dark); }
+
+  /* ── PREV/NEXT ── */
+  .pn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+  .pn-btn {
+    background: none;
+    border: 1px solid #CCC;
+    border-radius: var(--radius);
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink-mid);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .pn-btn:hover { border-color: var(--sage); color: var(--sage-dark); background: var(--sage-light); }
+  .pn-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .pn-btn.next {
+    margin-left: auto;
+    background: var(--sage-deep);
+    border-color: var(--sage-deep);
+    color: var(--white);
+    font-weight: 500;
+  }
+  .pn-btn.next:hover:not(:disabled) { background: var(--sage-dark); border-color: var(--sage-dark); }
+
+  /* ── VICTORY ANIMATIONS ── */
+  @keyframes popIn {
+    0%{opacity:0;transform:scale(.5)} 100%{opacity:1;transform:scale(1)}
+  }
+  @keyframes dogeJump {
+    0%,100%{transform:translateX(-50%) translateY(0) rotate(-3deg)}
+    50%{transform:translateX(-50%) translateY(-22px) rotate(3deg)}
+  }
+  @keyframes sunPulse {
+    0%,100%{box-shadow:0 0 20px #FFD94A66} 50%{box-shadow:0 0 45px #FFD94Acc}
+  }
+  @keyframes cloudDrift {
+    0%{transform:translateX(-120px)} 100%{transform:translateX(600px)}
+  }
+  @keyframes floatText {
+    0%,100%{transform:translateY(0) rotate(-4deg);opacity:.9}
+    50%{transform:translateY(-10px) rotate(4deg);opacity:1}
+  }
+  @keyframes starSpin {
+    0%{transform:rotate(0deg) scale(1)} 50%{transform:rotate(180deg) scale(1.3)} 100%{transform:rotate(360deg) scale(1)}
+  }
+  @keyframes confettiFall {
+    0%{top:-20px;opacity:1} 100%{top:110vh;opacity:.3}
+  }
+  .cloud::before, .cloud::after {
+    content:''; position:absolute; background:rgba(255,255,255,.9); border-radius:50%;
+  }
+  .cloud::before { width:60px;height:35px;top:10px;left:10px; }
+  .cloud::after  { width:40px;height:28px;top:18px;left:30px; }
+  .cloud { width:90px;height:45px; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Artikler og pronomen i nominativ, akkusativ og dativ</h1>
+</header>
+
+<nav class="nav-outer" id="nav-bar"></nav>
+
+<main>
+  <div id="page-root"></div>
+</main>
+
+<script>
+const T = {
+  "der":"den (mask. nom.)","die":"den/de (fem./pl.)","das":"det (nøyt.)",
+  "den":"den (mask. akk. / dat. pl.)","dem":"den/det (mask./nøyt. dat.)","der":"den (fem. dat.)",
+  "ein":"en/et","eine":"en (fem.)","einen":"en (mask. akk.)",
+  "einem":"en (mask./nøyt. dat.)","einer":"en (fem. dat.)",
+  "kein":"ingen (mask./nøyt. nom.)","keine":"ingen (fem./pl.)",
+  "keinen":"ingen (mask. akk.)","keinem":"ingen (dat. mask./nøyt.)","keiner":"ingen (fem. dat.)",
+  "ich":"jeg","du":"du","er":"han","sie":"hun/de","es":"det","wir":"vi","ihr":"dere",
+  "mich":"meg (akk.)","dich":"deg (akk.)","ihn":"ham (akk.)","uns":"oss",
+  "euch":"dere (akk./dat.)","mir":"meg (dat.)","dir":"deg (dat.)",
+  "ihm":"ham/det (dat.)","ihnen":"dem (dat.)",
+  "Mann":"mann","Frau":"kvinne","Kind":"barn","Buch":"bok","Hund":"hund",
+  "Katze":"katt","Lehrer":"lærer","Schüler":"elev","Mutter":"mor","Vater":"far",
+  "Freund":"venn","Freundin":"venninne","Apfel":"eple","Kuchen":"kake",
+  "Kaffee":"kaffe","Wasser":"vann","Schule":"skole","Haus":"hus","Auto":"bil",
+  "Brief":"brev","Ball":"ball","Zeitung":"avis","Tasche":"veske","Blume":"blomst",
+  "Stuhl":"stol","Tisch":"bord","Lehrerin":"lærerinne","Schüler":"elev",
+  "gibt":"gir","kauft":"kjøper","sieht":"ser","liest":"leser","trinkt":"drikker",
+  "bringt":"bringer","zeigt":"viser","hilft":"hjelper","schreibt":"skriver",
+  "hat":"har","ist":"er","schenkt":"gir (gave)","erklärt":"forklarer",
+  "schickt":"sender","schicke":"sender","liebt":"elsker","ruft":"ringer",
+  "fragt":"spør","kenne":"kjenner","gibt":"gir","gebe":"gir","gibst":"gir",
+  "gibt":"gir","geben":"gir","zeigt":"viser","kauft":"kjøper","sieht":"ser",
+  "liest":"leser","trinkt":"drikker","bringt":"bringer","schreibt":"skriver",
+  "Kinder":"barn (pl.)","Bücher":"bøker","Hunde":"hunder","Autos":"biler","Schüler":"elever","Schülern":"elevene (dat.)","Kindern":"barna (dat.)","Taschen":"vesker","Blumen":"blomster","Äpfel":"epler",
+  "Stift":"penn","Karte":"kort","Geschenk":"gave"
+};
+
+function tip(w){return T[w]||T[w.toLowerCase()]||null}
+function span(w,cls=""){return `<span class="de-word ${cls}">${w}</span>`}
+function radioLabel(o){ return `<label class="r-label"><input type="radio" name="r${p_cur}_${si_cur}" value="${o}" onchange="handleClick(${si_cur},'${o}')">${o}</label>`; }
+let p_cur=null,si_cur=null;
+
+const PAGES = [
+  // 0 – bestemt art, klikk
+  { id:0, title:"Bestemt artikkel", sub:"Klikk og velg", type:"click", topic:"bestemt_artikkel",
+    table:{ h:["","Mask.","Fem.","Nøyt.","Pl."], r:[["Nominativ","der","die","das","die"],["Akkusativ","den","die","das","die"],["Dativ","dem","der","dem","den"]] },
+    sents:[
+      {t:["Jeg kjenner ikke mannen."],parts:["Ich kenne","den","Mann","nicht."],ti:1,g:"m",ans:"den",opts:["der","den","dem"],pos:"akk. mask."},
+      {t:["Det er Annas mor."],parts:["Das ist","die","Mutter","von Anna."],ti:1,g:"f",ans:"die",opts:["die","der","den"],pos:"nom. fem."},
+      {t:["Han gir blomster til kvinnen."],parts:["Er gibt","der","Frau","Blumen."],ti:1,g:"f",ans:"der",opts:["die","der","dem"],pos:"dat. fem."},
+      {t:["Barna leker i hagen."],parts:["Die","Kinder","spielen im Garten."],ti:0,g:"pl",ans:"Die",opts:["Die","Den","Dem"],pos:"nom. pl."},
+      {t:["Jeg ser barnet i parken."],parts:["Ich sehe","das","Kind","im Park."],ti:1,g:"n",ans:"das",opts:["das","dem","den"],pos:"akk. nøyt."},
+      {t:["Læreren forklarer oppgaven."],parts:["Der","Lehrer","erklärt die Aufgabe."],ti:0,g:"m",ans:"Der",opts:["Der","Den","Dem"],pos:"nom. mask."},
+      {t:["Hun gir eleven boken."],parts:["Sie gibt","dem","Schüler","das Buch."],ti:1,g:"m",ans:"dem",opts:["den","dem","der"],pos:"dat. mask."},
+      {t:["Vi kjøper kaken til bestemor."],parts:["Wir kaufen","den","Kuchen","für Oma."],ti:1,g:"m",ans:"den",opts:["der","den","dem"],pos:"akk. mask."},
+      {t:["Katten sover på sofaen."],parts:["Die","Katze","schläft auf dem Sofa."],ti:0,g:"f",ans:"Die",opts:["Die","Der","Den"],pos:"nom. fem."},
+      {t:["Han sender et kort til moren."],parts:["Er schickt","der","Mutter","eine Karte."],ti:1,g:"f",ans:"der",opts:["die","der","dem"],pos:"dat. fem."},
+      {t:["Kjenner du Lenas venn?"],parts:["Kennst du","den","Freund","von Lena?"],ti:1,g:"m",ans:"den",opts:["der","den","dem"],pos:"akk. mask."},
+      {t:["Huset er veldig stort."],parts:["Das","Haus","ist sehr groß."],ti:0,g:"n",ans:"Das",opts:["Das","Dem","Den"],pos:"nom. nøyt."},
+      {t:["Han gir elevene bøkene."],parts:["Er gibt","den","Schülern","die Bücher."],ti:1,g:"pl",ans:"den",opts:["die","den","dem"],pos:"dat. pl."},
+      {t:["Han gir barnet et leketøy."],parts:["Er schenkt","dem","Kind","ein Spielzeug."],ti:1,g:"n",ans:"dem",opts:["den","dem","der"],pos:"dat. nøyt."},
+      {t:["Jeg leser avisen hver morgen."],parts:["Ich lese","die","Zeitung","jeden Morgen."],ti:1,g:"f",ans:"die",opts:["die","der","den"],pos:"akk. fem."},
+      {t:["Hunden bjeffer høyt."],parts:["Der","Hund","bellt laut."],ti:0,g:"m",ans:"Der",opts:["Der","Den","Dem"],pos:"nom. mask."},
+      {t:["Hun gir læreren et brev."],parts:["Sie gibt","dem","Lehrer","einen Brief."],ti:1,g:"m",ans:"dem",opts:["den","dem","der"],pos:"dat. mask."}
+    ]
+  },
+  // 1 – bestemt art, dropdown
+  { id:1, title:"Bestemt artikkel", sub:"Flervalg – rullegardin", type:"drop", topic:"bestemt_artikkel",
+    table:{ h:["","Mask.","Fem.","Nøyt.","Pl."], r:[["Nominativ","der","die","das","die"],["Akkusativ","den","die","das","die"],["Dativ","dem","der","dem","den"]] },
+    sents:[
+      {t:["Jeg ser kvinnen der."],parts:["Ich sehe","?","Frau","dort."],ti:1,g:"f",ans:"die",opts:["die","der","den"],pos:"akk. fem."},
+      {t:["Mannen kjøper en bok."],parts:["","?","Mann","kauft ein Buch."],ti:1,g:"m",ans:"Der",opts:["Der","Den","Dem"],pos:"nom. mask."},
+      {t:["Han gir barnet vann."],parts:["Er gibt","?","Kind","Wasser."],ti:1,g:"n",ans:"dem",opts:["den","dem","der"],pos:"dat. nøyt."},
+      {t:["Hun elsker hunden veldig."],parts:["Sie liebt","?","Hund","sehr."],ti:1,g:"m",ans:"den",opts:["der","den","dem"],pos:"akk. mask."},
+      {t:["Hundene leker i parken."],parts:["","?","Hunde","spielen im Park."],ti:1,g:"pl",ans:"Die",opts:["Die","Den","Dem"],pos:"nom. pl."},
+      {t:["Vi gir blomster til moren."],parts:["Wir geben","?","Mutter","Blumen."],ti:1,g:"f",ans:"der",opts:["die","der","dem"],pos:"dat. fem."},
+      {t:["Boken ligger på bordet."],parts:["","?","Buch","liegt auf dem Tisch."],ti:1,g:"n",ans:"Das",opts:["Das","Dem","Den"],pos:"nom. nøyt."},
+      {t:["Han gir en blomst til venninnen."],parts:["Er gibt","?","Freundin","eine Blume."],ti:1,g:"f",ans:"der",opts:["die","der","den"],pos:"dat. fem."},
+      {t:["Jeg kjenner læreren godt."],parts:["Ich kenne","?","Lehrer","gut."],ti:1,g:"m",ans:"den",opts:["der","den","dem"],pos:"akk. mask."},
+      {t:["Hun gir eleven en bok."],parts:["Sie gibt","?","Schüler","ein Buch."],ti:1,g:"m",ans:"dem",opts:["den","dem","der"],pos:"dat. mask."},
+      {t:["Katten sover lenge."],parts:["","?","Katze","schläft lange."],ti:1,g:"f",ans:"Die",opts:["Die","Der","Den"],pos:"nom. fem."},
+      {t:["Ser du bilen der?"],parts:["Siehst du","?","Auto","da?"],ti:1,g:"n",ans:"das",opts:["das","dem","den"],pos:"akk. nøyt."},
+      {t:["Han forklarer barnet oppgaven."],parts:["Er erklärt","?","Kind","die Aufgabe."],ti:1,g:"n",ans:"dem",opts:["den","dem","der"],pos:"dat. nøyt."},
+      {t:["Han gir barna bøkene."],parts:["Er gibt","?","Kindern","die Bücher."],ti:1,g:"pl",ans:"den",opts:["die","den","dem"],pos:"dat. pl."},
+      {t:["Hun kjøper vesken i butikken."],parts:["Sie kauft","?","Tasche","im Laden."],ti:1,g:"f",ans:"die",opts:["die","der","den"],pos:"akk. fem."},
+      {t:["Faren leser avisen."],parts:["","?","Vater","liest die Zeitung."],ti:1,g:"m",ans:"Der",opts:["Der","Den","Dem"],pos:"nom. mask."},
+      {t:["Jeg gir vennen en ball."],parts:["Ich gebe","?","Freund","einen Ball."],ti:1,g:"m",ans:"dem",opts:["den","dem","der"],pos:"dat. mask."}
+    ]
+  },
+  // 2 – ubestemt art, klikk
+  { id:2, title:"Ubestemt artikkel", sub:"Klikk og velg", type:"click", topic:"ubestemt_artikkel",
+    table:{ h:["","Mask.","Fem.","Nøyt."], r:[["Nominativ","ein","eine","ein"],["Akkusativ","einen","eine","ein"],["Dativ","einem","einer","einem"]] },
+    sents:[
+      {t:["Dette er en mann fra Berlin."],parts:["Das ist","ein","Mann","aus Berlin."],ti:1,g:"m",ans:"ein",opts:["ein","einen","einem"],pos:"nom. mask."},
+      {t:["Jeg har en katt hjemme."],parts:["Ich habe","eine","Katze","zu Hause."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"akk. fem."},
+      {t:["Han gir et barn godteri."],parts:["Er gibt","einem","Kind","Süßigkeiten."],ti:1,g:"n",ans:"einem",opts:["einen","einem","einer"],pos:"dat. nøyt."},
+      {t:["Hun kjøper et eple på markedet."],parts:["Sie kauft","einen","Apfel","auf dem Markt."],ti:1,g:"m",ans:"einen",opts:["ein","einen","einem"],pos:"akk. mask."},
+      {t:["Dette er en skole i München."],parts:["Das ist","eine","Schule","in München."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"nom. fem."},
+      {t:["Han gir en kvinne et kart."],parts:["Er gibt","einer","Frau","eine Karte."],ti:1,g:"f",ans:"einer",opts:["eine","einer","einem"],pos:"dat. fem."},
+      {t:["Jeg ser en bil på gaten."],parts:["Ich sehe","ein","Auto","auf der Straße."],ti:1,g:"n",ans:"ein",opts:["ein","einen","einem"],pos:"akk. nøyt."},
+      {t:["Dette er en bok av Goethe."],parts:["Das ist","ein","Buch","von Goethe."],ti:1,g:"n",ans:"ein",opts:["ein","einen","einem"],pos:"nom. nøyt."},
+      {t:["Hun sender en venn et postkort."],parts:["Sie schickt","einem","Freund","eine Postkarte."],ti:1,g:"m",ans:"einem",opts:["einen","einem","einer"],pos:"dat. mask."},
+      {t:["Jeg drikker en kaffe om morgenen."],parts:["Ich trinke","einen","Kaffee","am Morgen."],ti:1,g:"m",ans:"einen",opts:["ein","einen","einem"],pos:"akk. mask."},
+      {t:["Dette er en blomst til deg."],parts:["Das ist","eine","Blume","für dich."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"nom. fem."},
+      {t:["Han viser en elev oppgaven."],parts:["Er zeigt","einem","Schüler","die Aufgabe."],ti:1,g:"m",ans:"einem",opts:["einen","einem","einer"],pos:"dat. mask."},
+      {t:["Hun har en hund og en katt."],parts:["Sie hat","einen","Hund","und eine Katze."],ti:1,g:"m",ans:"einen",opts:["ein","einen","einem"],pos:"akk. mask."},
+      {t:["Dette er en stol av tre."],parts:["Das ist","ein","Stuhl","aus Holz."],ti:1,g:"m",ans:"ein",opts:["ein","einen","einem"],pos:"nom. mask."},
+      {t:["Han gir en lærerinne et eple."],parts:["Er gibt","einer","Lehrerin","einen Apfel."],ti:1,g:"f",ans:"einer",opts:["eine","einer","einem"],pos:"dat. fem."}
+    ]
+  },
+  // 3 – ubestemt art, dropdown
+  { id:3, title:"Ubestemt artikkel", sub:"Flervalg – rullegardin", type:"drop", topic:"ubestemt_artikkel",
+    table:{ h:["","Mask.","Fem.","Nøyt."], r:[["Nominativ","ein","eine","ein"],["Akkusativ","einen","eine","ein"],["Dativ","einem","einer","einem"]] },
+    sents:[
+      {t:["Dette er et hus med hage."],parts:["Das ist","?","Haus","mit Garten."],ti:1,g:"n",ans:"ein",opts:["ein","einen","einem"],pos:"nom. nøyt."},
+      {t:["Jeg ser en mann der."],parts:["Ich sehe","?","Mann","dort."],ti:1,g:"m",ans:"einen",opts:["ein","einen","einem"],pos:"akk. mask."},
+      {t:["Han gir en kvinne en blomsterbukett."],parts:["Er gibt","?","Frau","einen Blumenstrauß."],ti:1,g:"f",ans:"einer",opts:["eine","einer","einem"],pos:"dat. fem."},
+      {t:["Dette er en katt fra dyrehjemmet."],parts:["Das ist","?","Katze","aus dem Tierheim."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"nom. fem."},
+      {t:["Jeg kjøper en bok til skolen."],parts:["Ich kaufe","?","Buch","für die Schule."],ti:1,g:"n",ans:"ein",opts:["ein","einen","einem"],pos:"akk. nøyt."},
+      {t:["Hun gir et barn et eple."],parts:["Sie gibt","?","Kind","einen Apfel."],ti:1,g:"n",ans:"einem",opts:["einen","einem","einer"],pos:"dat. nøyt."},
+      {t:["Han drikker en kaffe om ettermiddagen."],parts:["Er trinkt","?","Kaffee","am Nachmittag."],ti:1,g:"m",ans:"einen",opts:["ein","einen","einem"],pos:"akk. mask."},
+      {t:["Dette er en venninne av meg."],parts:["Das ist","?","Freundin","von mir."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"nom. fem."},
+      {t:["Hun gir en elev en penn."],parts:["Sie gibt","?","Schüler","einen Stift."],ti:1,g:"m",ans:"einem",opts:["einen","einem","einer"],pos:"dat. mask."},
+      {t:["Dette er et eple fra treet."],parts:["Das ist","?","Apfel","vom Baum."],ti:1,g:"m",ans:"ein",opts:["ein","einen","einem"],pos:"nom. mask."},
+      {t:["Jeg viser en venn byen."],parts:["Ich zeige","?","Freund","die Stadt."],ti:1,g:"m",ans:"einem",opts:["einen","einem","einer"],pos:"dat. mask."},
+      {t:["Hun kjøper en veske i butikken."],parts:["Sie kauft","?","Tasche","im Geschäft."],ti:1,g:"f",ans:"eine",opts:["eine","einer","einen"],pos:"akk. fem."},
+      {t:["Dette er et bord av tre."],parts:["Das ist","?","Tisch","aus Holz."],ti:1,g:"m",ans:"ein",opts:["ein","einen","einem"],pos:"nom. mask."},
+      {t:["Han gir en lærerinne et kort."],parts:["Er gibt","?","Lehrerin","eine Karte."],ti:1,g:"f",ans:"einer",opts:["eine","einer","einem"],pos:"dat. fem."},
+      {t:["Jeg ser en bil på parkeringsplassen."],parts:["Ich sehe","?","Auto","auf dem Parkplatz."],ti:1,g:"n",ans:"ein",opts:["ein","einen","einem"],pos:"akk. nøyt."}
+    ]
+  },
+  // 4 – kein, klikk
+  { id:4, title:"kein", sub:"Klikk og velg", type:"click", topic:"kein",
+    table:{ h:["","Mask.","Fem.","Nøyt.","Pl."], r:[["Nominativ","kein","keine","kein","keine"],["Akkusativ","keinen","keine","kein","keine"],["Dativ","keinem","keiner","keinem","keinen"]] },
+    sents:[
+      {t:["Det er ingen hund, det er en katt."],parts:["Das ist","kein","Hund,","das ist eine Katze."],ti:1,g:"m",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. mask."},
+      {t:["Jeg har ikke tid i dag."],parts:["Ich habe","keine","Zeit","heute."],ti:1,g:"f",ans:"keine",opts:["keine","keiner","keinen"],pos:"akk. fem."},
+      {t:["Han gir ikke sukker til noe barn."],parts:["Er gibt","keinem","Kind","Zucker."],ti:1,g:"n",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. nøyt."},
+      {t:["Hun kjøper ingen kake."],parts:["Sie kauft","keinen","Kuchen."],ti:1,g:"m",ans:"keinen",opts:["kein","keinen","keinem"],pos:"akk. mask."},
+      {t:["Det er ingen skole, det er et kontor."],parts:["Das ist","keine","Schule,","das ist ein Büro."],ti:1,g:"f",ans:"keine",opts:["keine","keiner","keinen"],pos:"nom. fem."},
+      {t:["Det er ingen biler på parkeringsplassen."],parts:["Es gibt","keine","Autos","auf dem Parkplatz."],ti:1,g:"pl",ans:"keine",opts:["keine","keinen","keinem"],pos:"akk. pl."},
+      {t:["Han gir ikke blomster til noen kvinne."],parts:["Er gibt","keiner","Frau","Blumen."],ti:1,g:"f",ans:"keiner",opts:["keine","keiner","keinem"],pos:"dat. fem."},
+      {t:["Jeg ser ingen bil på gaten."],parts:["Ich sehe","kein","Auto","auf der Straße."],ti:1,g:"n",ans:"kein",opts:["kein","keinen","keinem"],pos:"akk. nøyt."},
+      {t:["Dette er ingen bok for barn."],parts:["Das ist","kein","Buch","für Kinder."],ti:1,g:"n",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. nøyt."},
+      {t:["Hun sender ikke noe kort til noen venn."],parts:["Sie schickt","keinem","Freund","eine Karte."],ti:1,g:"m",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. mask."},
+      {t:["Jeg drikker ingen kaffe om kvelden."],parts:["Ich trinke","keinen","Kaffee","abends."],ti:1,g:"m",ans:"keinen",opts:["kein","keinen","keinem"],pos:"akk. mask."},
+      {t:["Det er ingen blomst, det er et tre."],parts:["Das ist","keine","Blume,","das ist ein Baum."],ti:1,g:"f",ans:"keine",opts:["keine","keiner","keinen"],pos:"nom. fem."},
+      {t:["Han viser ikke resultatet til noen elev."],parts:["Er zeigt","keinem","Schüler","das Ergebnis."],ti:1,g:"m",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. mask."},
+      {t:["Hun har ingen hund hjemme."],parts:["Sie hat","keinen","Hund","zu Hause."],ti:1,g:"m",ans:"keinen",opts:["kein","keinen","keinem"],pos:"akk. mask."},
+      {t:["Det er ingen barn i parken i dag."],parts:["Es gibt","keine","Kinder","im Park heute."],ti:1,g:"pl",ans:"keine",opts:["keine","keinen","keinem"],pos:"nom./akk. pl."},
+      {t:["Det er ingen stol, det er et bord."],parts:["Das ist","kein","Stuhl,","das ist ein Tisch."],ti:1,g:"m",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. mask."},
+      {t:["Han gir ikke noe eple til noen lærerinne."],parts:["Er gibt","keiner","Lehrerin","Äpfel."],ti:1,g:"f",ans:"keiner",opts:["keine","keiner","keinem"],pos:"dat. fem."}
+    ]
+  },
+  // 5 – kein, dropdown
+  { id:5, title:"kein", sub:"Flervalg – rullegardin", type:"drop", topic:"kein",
+    table:{ h:["","Mask.","Fem.","Nøyt.","Pl."], r:[["Nominativ","kein","keine","kein","keine"],["Akkusativ","keinen","keine","kein","keine"],["Dativ","keinem","keiner","keinem","keinen"]] },
+    sents:[
+      {t:["Dette er ikke noe hus med hage."],parts:["Das ist","?","Haus","mit Garten."],ti:1,g:"n",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. nøyt."},
+      {t:["Jeg ser ingen mann der."],parts:["Ich sehe","?","Mann","dort."],ti:1,g:"m",ans:"keinen",opts:["kein","keinen","keinem"],pos:"akk. mask."},
+      {t:["Han gir ikke svar til noen kvinne."],parts:["Er gibt","?","Frau","Antwort."],ti:1,g:"f",ans:"keiner",opts:["keine","keiner","keinem"],pos:"dat. fem."},
+      {t:["Det er ingen katt, det er en hare."],parts:["Das ist","?","Katze,","das ist ein Hase."],ti:1,g:"f",ans:"keine",opts:["keine","keiner","keinen"],pos:"nom. fem."},
+      {t:["Det er ingen hunder i hagen."],parts:["Es gibt","?","Hunde","im Garten."],ti:1,g:"pl",ans:"keine",opts:["keine","keinen","keinem"],pos:"akk. pl."},
+      {t:["Jeg kjøper ingen bok i dag."],parts:["Ich kaufe","?","Buch","heute."],ti:1,g:"n",ans:"kein",opts:["kein","keinen","keinem"],pos:"akk. nøyt."},
+      {t:["Hun gir ikke godteri til noe barn."],parts:["Sie gibt","?","Kind","Bonbons."],ti:1,g:"n",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. nøyt."},
+      {t:["Han drikker ingen kaffe lenger."],parts:["Er trinkt","?","Kaffee","mehr."],ti:1,g:"m",ans:"keinen",opts:["kein","keinen","keinem"],pos:"akk. mask."},
+      {t:["Dette er ingen venninne av meg."],parts:["Das ist","?","Freundin","von mir."],ti:1,g:"f",ans:"keine",opts:["keine","keiner","keinen"],pos:"nom. fem."},
+      {t:["Hun gir ingen penn til noen elev."],parts:["Sie gibt","?","Schüler","einen Stift."],ti:1,g:"m",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. mask."},
+      {t:["Det er ikke et eple, det er en pære."],parts:["Das ist","?","Apfel,","das ist eine Birne."],ti:1,g:"m",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. mask."},
+      {t:["Jeg viser ikke bildet til noen venn."],parts:["Ich zeige","?","Freund","das Foto."],ti:1,g:"m",ans:"keinem",opts:["keinen","keinem","keiner"],pos:"dat. mask."},
+      {t:["Hun kjøper vesker i butikken."],parts:["Sie kauft","?","Taschen","im Geschäft."],ti:1,g:"pl",ans:"keine",opts:["keine","keiner","keinen"],pos:"akk. pl."},
+      {t:["Det er ingen bøker på bordet."],parts:["Es gibt","?","Bücher","auf dem Tisch."],ti:1,g:"pl",ans:"keine",opts:["keine","keinen","keinem"],pos:"nom. pl."},
+      {t:["Dette er ikke et bord av tre."],parts:["Das ist","?","Tisch","aus Holz."],ti:1,g:"m",ans:"kein",opts:["kein","keinen","keinem"],pos:"nom. mask."},
+      {t:["Han gir ikke blomster til noen lærerinne."],parts:["Er bringt","?","Lehrerin","Blumen."],ti:1,g:"f",ans:"keiner",opts:["keine","keiner","keinem"],pos:"dat. fem."},
+      {t:["Jeg ser ingen bil her."],parts:["Ich sehe","?","Auto","hier."],ti:1,g:"n",ans:"kein",opts:["kein","keinen","keinem"],pos:"akk. nøyt."}
+    ]
+  },
+  // 6 – pronomen, klikk
+  { id:6, title:"Personlige pronomen", sub:"Klikk og velg", type:"click", topic:"pronomen",
+    table:{ h:["","1.sg","2.sg","3.sg m","3.sg f","3.sg n","1.pl","2.pl","3.pl"],
+      r:[["Nominativ","ich","du","er","sie","es","wir","ihr","sie"],
+         ["Akkusativ","mich","dich","ihn","sie","es","uns","euch","sie"],
+         ["Dativ","mir","dir","ihm","ihr","ihm","uns","euch","ihnen"]] },
+    sents:[
+      {t:["Jeg ser ham hver dag."],parts:["Ich sehe","ihn","jeden Tag."],ti:1,ans:"ihn",opts:["er","ihn","ihm"],pos:"akk. 3.sg mask."},
+      {t:["Hun gir meg boken."],parts:["Sie gibt","mir","das Buch."],ti:1,ans:"mir",opts:["ich","mich","mir"],pos:"dat. 1.sg"},
+      {t:["Vi spør deg om veien."],parts:["Wir fragen","dich","nach dem Weg."],ti:1,ans:"dich",opts:["du","dich","dir"],pos:"akk. 2.sg"},
+      {t:["Han gir henne boken."],parts:["Er gibt","ihr","das Buch."],ti:1,ans:"ihr",opts:["sie","sie","ihr"],pos:"dat. 3.sg fem."},
+      {t:["Jeg har kjent ham lenge."],parts:["Ich kenne","ihn","schon lange."],ti:1,ans:"ihn",opts:["er","ihn","ihm"],pos:"akk. 3.sg mask."},
+      {t:["Hun skriver en e-post til oss."],parts:["Sie schreibt","uns","eine E-Mail."],ti:1,ans:"uns",opts:["wir","uns","uns"],pos:"dat. 1.pl"},
+      {t:["Han spør meg om navnet mitt."],parts:["Er fragt","mich","nach meinem Namen."],ti:1,ans:"mich",opts:["ich","mich","mir"],pos:"akk. 1.sg"},
+      {t:["Jeg sender deg et kort."],parts:["Ich schicke","dir","eine Karte."],ti:1,ans:"dir",opts:["du","dich","dir"],pos:"dat. 2.sg"},
+      {t:["Vi gir ham en gave."],parts:["Wir geben","ihm","ein Geschenk."],ti:1,ans:"ihm",opts:["er","ihn","ihm"],pos:"dat. 3.sg mask."},
+      {t:["Hun ser dere i parken."],parts:["Sie sieht","euch","im Park."],ti:1,ans:"euch",opts:["ihr","euch","euch"],pos:"akk. 2.pl"},
+      {t:["Han viser dem veien."],parts:["Er zeigt","ihnen","den Weg."],ti:1,ans:"ihnen",opts:["sie","sie","ihnen"],pos:"dat. 3.pl"},
+      {t:["Jeg elsker henne veldig."],parts:["Ich liebe","sie","sehr."],ti:1,ans:"sie",opts:["sie","sie","ihr"],pos:"akk. 3.sg fem."},
+      {t:["Du spør meg om avtalen."],parts:["Du fragst","mich","nach dem Termin."],ti:1,ans:"mich",opts:["ich","mich","mir"],pos:"akk. 1.sg"},
+      {t:["Han forklarer oss grammatikken."],parts:["Er erklärt","uns","die Grammatik."],ti:1,ans:"uns",opts:["wir","uns","uns"],pos:"dat. 1.pl"},
+      {t:["Hun gir ham et eple."],parts:["Sie gibt","ihm","einen Apfel."],ti:1,ans:"ihm",opts:["er","ihn","ihm"],pos:"dat. 3.sg mask."}
+    ]
+  },
+  // 7 – pronomen, dropdown
+  { id:7, title:"Personlige pronomen", sub:"Flervalg – rullegardin", type:"drop", topic:"pronomen",
+    table:{ h:["","1.sg","2.sg","3.sg m","3.sg f","3.sg n","1.pl","2.pl","3.pl"],
+      r:[["Nominativ","ich","du","er","sie","es","wir","ihr","sie"],
+         ["Akkusativ","mich","dich","ihn","sie","es","uns","euch","sie"],
+         ["Dativ","mir","dir","ihm","ihr","ihm","uns","euch","ihnen"]] },
+    sents:[
+      {t:["Jeg ser ham i morgen."],parts:["Ich sehe","?","morgen."],ti:1,ans:"ihn",opts:["er","ihn","ihm"],pos:"akk."},
+      {t:["Hun gir meg en bok."],parts:["Sie gibt","?","ein Buch."],ti:1,ans:"mir",opts:["ich","mich","mir"],pos:"dat."},
+      {t:["Han spør deg om tiden."],parts:["Er fragt","?","nach der Zeit."],ti:1,ans:"dich",opts:["du","dich","dir"],pos:"akk."},
+      {t:["Vi gir henne gaven."],parts:["Wir geben","?","das Geschenk."],ti:1,ans:"ihr",opts:["sie","sie","ihr"],pos:"dat."},
+      {t:["Kjenner du ham godt?"],parts:["Kennst du","?","gut?"],ti:1,ans:"ihn",opts:["er","ihn","ihm"],pos:"akk."},
+      {t:["Han skriver et brev til oss."],parts:["Er schreibt","?","einen Brief."],ti:1,ans:"uns",opts:["wir","uns","uns"],pos:"dat."},
+      {t:["Hun ringer meg."],parts:["Sie ruft","?","an."],ti:1,ans:"mich",opts:["ich","mich","mir"],pos:"akk."},
+      {t:["Jeg sender deg et brev."],parts:["Ich schicke","?","einen Brief."],ti:1,ans:"dir",opts:["du","dich","dir"],pos:"dat."},
+      {t:["Du gir ham en ball."],parts:["Du gibst","?","einen Ball."],ti:1,ans:"ihm",opts:["er","ihn","ihm"],pos:"dat."},
+      {t:["Jeg ser dere der borte."],parts:["Ich sehe","?","dort drüben."],ti:1,ans:"euch",opts:["ihr","euch","euch"],pos:"akk."},
+      {t:["Hun forklarer dem oppgaven."],parts:["Sie erklärt","?","die Aufgabe."],ti:1,ans:"ihnen",opts:["sie","sie","ihnen"],pos:"dat."},
+      {t:["Han elsker henne veldig."],parts:["Er liebt","?","sehr."],ti:1,ans:"sie",opts:["sie","sie","ihr"],pos:"akk."},
+      {t:["Vi spør deg om navnet."],parts:["Wir fragen","?","nach dem Namen."],ti:1,ans:"dich",opts:["du","dich","dir"],pos:"akk."},
+      {t:["Hun gir oss et kart."],parts:["Sie gibt","?","eine Karte."],ti:1,ans:"uns",opts:["wir","uns","uns"],pos:"dat."},
+      {t:["Jeg gir ham boken."],parts:["Ich gebe","?","das Buch."],ti:1,ans:"ihm",opts:["er","ihn","ihm"],pos:"dat."}
+    ]
+  }
+];
+
+const TAB_LABELS = [
+  "1a · Best.art. klikk","1b · Best.art. valg",
+  "2a · Ubest.art. klikk","2b · Ubest.art. valg",
+  "3a · kein klikk","3b · kein valg",
+  "4a · Pronomen klikk","4b · Pronomen valg"
+];
+
+let cur = 0;
+let answers = PAGES.map(p => new Array(p.sents.length).fill(null));
+
+function score(pi){
+  let ok=0,done=0;
+  answers[pi].forEach((a,i)=>{if(a!==null){done++;if(a===PAGES[pi].sents[i].ans)ok++;}});
+  return {ok,done,total:PAGES[pi].sents.length};
+}
+
+function buildNav(){
+  const nav = document.getElementById('nav-bar');
+  nav.innerHTML='';
+  PAGES.forEach((p,i)=>{
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(i===cur?' active':'');
+    const sc=score(i);
+    if(sc.done>0&&i!==cur) btn.classList.add('done');
+    btn.textContent=TAB_LABELS[i];
+    btn.onclick=()=>{cur=i;render();};
+    nav.appendChild(btn);
+  });
+}
+
+function gramTable(data){
+  let h=`<div class="gram-wrap"><table class="gram-table"><thead><tr>`;
+  data.h.forEach(c=>h+=`<th>${c}</th>`);
+  h+=`</tr></thead><tbody>`;
+  data.r.forEach(row=>{
+    h+=`<tr>`;
+    row.forEach((cell,ci)=>{
+      if(ci===0) h+=`<td>${cell}</td>`;
+      else{ h+=`<td class="form">${cell}</td>`; }    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  return h;
+}
+
+function sentHTML(p,si){
+  const s=p.sents[si];
+  const a=answers[p.id][si];
+  const done=a!==null;
+  const ok=done&&a===s.ans;
+  let cls='s-item'+(done?(ok?' correct':' wrong'):'');
+  const nounIdx = s.ti+1;
+
+  let opts = [...s.opts];
+  // Fixed pseudo-random sequences per page - no repeating cycle
+  // Pronomen pages (6-7) keep fixed nom-akk-dat order
+  if(p.id <= 5){
+    const POS = [
+      [1,0,2,0,2,1,2,0,1,2,0,1,0,2,1,0,2], // side 0
+      [2,1,0,2,0,1,0,2,1,0,2,0,1,0,2,1,0], // side 1
+      [0,2,1,0,1,2,1,0,2,1,0,2,0,1,2,0,1], // side 2
+      [1,2,0,1,0,2,0,1,2,0,1,0,2,0,1,2,0], // side 3
+      [2,0,1,2,1,0,1,2,0,1,2,1,0,1,2,0,1], // side 4
+      [0,1,2,0,2,1,2,0,1,2,0,2,1,2,0,1,2], // side 5
+    ];
+    const targetPos = POS[p.id][si % POS[p.id].length];
+    const correctIdx = opts.indexOf(s.ans);
+    if(correctIdx !== -1 && correctIdx !== targetPos){
+      opts.splice(correctIdx, 1);
+      opts.splice(targetPos, 0, s.ans);
+    }
+  }
+
+  let body='';
+  s.parts.forEach((part,pi)=>{
+    if(pi===s.ti){
+      if(p.type==='click'){
+        if(!done){
+          body+=` <span class="blank">___</span>`;
+        } else {
+          const tcls='target '+(ok?'answered-correct':'answered-wrong');
+          body+=` <span class="${tcls}">${a}</span>`;
+        }
+      } else {
+        body+=` <select class="s-select${done?(ok?' sel-correct':' sel-wrong'):''}" onchange="handleDrop(${si},this.value)">`;
+        body+=`<option value="">— wähle —</option>`;
+        opts.forEach(o=>{ body+=`<option value="${o}" ${a===o?'selected':''}>${o}</option>`; });
+        body+=`</select>`;
+      }
+    } else if(part){
+      let w = span(part);
+      if(pi===nounIdx && s.g && p.id<=5){
+        w += `<em style="font-size:11px;color:var(--ink-light);font-style:italic;margin-left:1px;">(${s.g})</em>`;
+      }
+      body+=' '+w;
+    }
+  });
+
+  let extra='';
+  if(p.type==='click'&&!done){
+    extra=`<div class="radio-group">`;
+    opts.forEach(o=>{ extra+=`<label class="r-label"><input type="radio" name="r${p.id}_${si}" value="${o}" onchange="handleClick(${si},'${o}')">${o}</label>`; });
+    extra+=`</div>`;
+  }
+  if(done){
+    const kasusMap = {'nom':'nominativ','akk':'akkusativ','dat':'dativ'};
+    let kasus = '';
+    if(s.pos){
+      const first = s.pos.split(/[\s.]/)[0].trim().toLowerCase();
+      kasus = kasusMap[first] || '';
+    }
+    const kasusSpan = kasus ? ` <span style="font-size:11px;color:var(--ink-light);font-weight:400;">(${kasus})</span>` : '';
+    if(ok) extra+=`<span class="feedback ok">✓ Riktig${kasusSpan}</span>`;
+    else extra+=`<span class="feedback no">✗ Feil — riktig: <strong>${s.ans}</strong>${kasusSpan}</span>`;
+  }
+
+  return `<div class="${cls}">
+    <div class="s-num">Setning ${si+1}</div>
+    <div class="s-body">${body}${extra?'  '+extra:''}</div>
+    <div class="s-trans">${s.t[0]}</div>
+  </div>`;
+}
+
+const TOTAL_PAGES = PAGES.length + 1; // +1 for victory page
+const VICTORY_IDX = PAGES.length;
+const WELCOME_IDX = -1;
+
+function renderWelcome(){
+  document.getElementById('page-root').innerHTML = `
+  <div style="text-align:center;padding:2rem 1rem 3rem;">
+    <div style="font-family:'Fraunces',serif;font-size:2.2rem;font-weight:300;color:var(--sage-deep);margin-bottom:.3rem;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both;">
+      Willkommen! 👋
+    </div>
+    <div style="font-size:.95rem;color:var(--ink-light);margin-bottom:2rem;font-weight:300;">Gjør deg klar til å øve på tyske artikler og pronomen</div>
+
+    <div style="max-width:480px;margin:0 auto 1.75rem;display:flex;flex-direction:column;gap:12px;text-align:left;">
+
+      <div style="background:var(--white);border:1px solid var(--sand-dark);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;box-shadow:var(--shadow);">
+        <div style="font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--sage-dark);margin-bottom:.6rem;">Analyser setningene</div>
+        <div style="font-size:14px;color:var(--ink-mid);line-height:1.6;">Finn alltid setningsleddet som artikkelen eller pronomenet tilhører — det avgjør kasuset.</div>
+        <div style="margin-top:.75rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div style="background:var(--sage-light);border-radius:8px;padding:8px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:500;color:var(--sage-dark);letter-spacing:.03em;text-transform:uppercase;margin-bottom:3px;">Nominativ</div>
+            <div style="font-size:12px;color:var(--sage-deep);">Subjekt</div>
+            <div style="font-size:12px;color:var(--sage-deep);">Predikativ</div>
+          </div>
+          <div style="background:#F7EDEB;border-radius:8px;padding:8px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:500;color:#8B3D34;letter-spacing:.03em;text-transform:uppercase;margin-bottom:3px;">Akkusativ</div>
+            <div style="font-size:12px;color:#5a2a22;">Direkte objekt</div>
+          </div>
+          <div style="background:#EEF0FB;border-radius:8px;padding:8px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:500;color:#3a3a8a;letter-spacing:.03em;text-transform:uppercase;margin-bottom:3px;">Dativ</div>
+            <div style="font-size:12px;color:#2a2a6a;">Indirekte objekt</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--white);border:1px solid var(--sand-dark);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;box-shadow:var(--shadow);">
+        <div style="font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--sage-dark);margin-bottom:.5rem;">Slik fungerer øvelsene</div>
+        <div style="font-size:14px;color:var(--ink-mid);line-height:1.7;">Jobb deg gjennom alle 8 sider i ditt eget tempo. Du kan nullstille en side og prøve om igjen så mange ganger du vil — sikt alltid mot full score før du går videre!</div>
+      </div>
+
+      <div style="background:var(--white);border:1px solid var(--sand-dark);border-radius:var(--border-radius-lg);padding:.9rem 1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.8rem;line-height:1;">🌱</div>
+        <div style="font-size:14px;color:var(--ink-mid);font-style:italic;font-weight:300;line-height:1.5;">Øvelse gjør mester — <em>Übung macht den Meister!</em></div>
+      </div>
+
+    </div>
+
+    <button class="pn-btn next" onclick="go(1)" style="font-size:15px;padding:10px 32px;">Start øvelsene →</button>
+  </div>`;
+}
+
+function renderPage(){
+  if(cur===WELCOME_IDX){ renderWelcome(); return; }
+  if(cur===VICTORY_IDX){ renderVictory(); return; }
+  const p=PAGES[cur];
+  const sc=score(cur);
+  const pct=Math.round(sc.done/sc.total*100);
+  let html=`<div class="page-title-row">
+    <div><div class="page-title">${p.title}</div><div class="page-sub">${p.sub}</div></div>
+    <button class="reset-btn" onclick="resetPage()">Nullstill side</button>
+  </div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="progress-label">Svart ${sc.done}/${sc.total}${sc.done?` · Riktige ${sc.ok}`:''}</div>
+  </div>`;
+  html+=gramTable(p.table);
+  html+=`<div class="sentences">`;
+  p.sents.forEach((_,i)=>html+=sentHTML(p,i));
+  html+=`</div>`;
+  html+=`<div class="pn-row">
+    ${cur>0?`<button class="pn-btn" onclick="go(-1)">← Forrige</button>`:''}
+    <button class="pn-btn next" onclick="go(1)">${cur===PAGES.length-1?'Se resultatet 🎉':'Neste →'}</button>
+  </div>`;
+  document.getElementById('page-root').innerHTML=html;
+}
+
+function buildNav(){
+  const nav = document.getElementById('nav-bar');
+  nav.innerHTML='';
+  // welcome tab
+  const wbtn=document.createElement('button');
+  wbtn.className='tab-btn'+(cur===WELCOME_IDX?' active':'');
+  wbtn.textContent='👋 Start';
+  wbtn.onclick=()=>{cur=WELCOME_IDX;render();};
+  nav.appendChild(wbtn);
+  PAGES.forEach((p,i)=>{
+    const btn=document.createElement('button');
+    btn.className='tab-btn'+(i===cur?' active':'');
+    const sc=score(i);
+    if(sc.done>0&&i!==cur) btn.classList.add('done');
+    btn.textContent=TAB_LABELS[i];
+    btn.onclick=()=>{cur=i;render();};
+    nav.appendChild(btn);
+  });
+  // victory tab
+  const vbtn=document.createElement('button');
+  vbtn.className='tab-btn'+(cur===VICTORY_IDX?' active':'');
+  vbtn.textContent='🏆 Resultat';
+  vbtn.onclick=()=>{cur=VICTORY_IDX;render();};
+  nav.appendChild(vbtn);
+}
+
+function render(){ buildNav(); renderPage(); }
+function handleClick(si,val){ answers[cur][si]=val; render(); }
+function handleDrop(si,val){ if(!val)return; answers[cur][si]=val; render(); }
+function go(d){ cur=Math.max(WELCOME_IDX,Math.min(VICTORY_IDX,cur+d)); render(); }
+function resetPage(){ if(cur===VICTORY_IDX||cur===WELCOME_IDX)return; answers[cur]=new Array(PAGES[cur].sents.length).fill(null); render(); }
+function restartAll(){ answers=PAGES.map(p=>new Array(p.sents.length).fill(null)); cur=WELCOME_IDX; render(); }
+
+function renderVictory(){
+  let totalOk=0, totalDone=0, totalQ=0;
+  PAGES.forEach((_,i)=>{const s=score(i);totalOk+=s.ok;totalDone+=s.done;totalQ+=s.total;});
+  const pct=totalQ>0?Math.round(totalOk/totalQ*100):0;
+  const msg = pct===100 ? "Perfekt! Du er en grammatikkmester! 🏆" :
+               pct>=80  ? "Veldig bra jobbet! Nesten perfekt!" :
+               pct>=60  ? "Bra innsats! Fortsett å øve!" :
+                          "Godt forsøk! Prøv igjen — du klarer det!";
+
+  document.getElementById('page-root').innerHTML = `
+  <div id="victory-page" style="text-align:center;padding:2rem 1rem 3rem;">
+
+    <div id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></div>
+
+    <div style="position:relative;z-index:1;">
+      <div style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:300;color:var(--sage-deep);margin-bottom:.25rem;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both;">
+        Wunderbar! 🎉
+      </div>
+      <div style="font-size:1rem;color:var(--ink-light);margin-bottom:2rem;font-weight:300;">${msg}</div>
+
+      <div style="display:inline-block;background:var(--white);border:1px solid var(--sand-dark);border-radius:16px;padding:1rem 2rem;margin-bottom:2rem;box-shadow:0 2px 12px rgba(0,0,0,.07);">
+        <div style="font-size:13px;color:var(--ink-light);margin-bottom:4px;">Totalresultat</div>
+        <div style="font-size:2.8rem;font-weight:500;color:var(--sage-dark);line-height:1;">${pct}%</div>
+        <div style="font-size:13px;color:var(--ink-light);margin-top:4px;">${totalOk} av ${totalQ} riktige</div>
+      </div>
+
+      <!-- Meme doge scene -->
+      <div style="margin:0 auto 2rem;max-width:480px;">
+        <div id="meme-wrap" style="position:relative;background:#fffdf7;border:2px solid var(--sand-dark);border-radius:16px;overflow:hidden;aspect-ratio:4/3;box-shadow:0 4px 24px rgba(0,0,0,.1);">
+
+          <!-- sky gradient -->
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,#b8e4f9 0%,#e8f6ff 55%,#c8e6a0 55%,#7ab648 100%);"></div>
+
+          <!-- sun -->
+          <div id="sun" style="position:absolute;top:8%;left:75%;width:60px;height:60px;background:#FFD94A;border-radius:50%;box-shadow:0 0 30px #FFD94A88;animation:sunPulse 2s ease-in-out infinite;"></div>
+
+          <!-- clouds -->
+          <div class="cloud" style="position:absolute;top:12%;left:5%;animation:cloudDrift 8s linear infinite;"></div>
+          <div class="cloud" style="position:absolute;top:20%;left:40%;animation:cloudDrift 11s linear infinite 2s;transform:scale(.7);"></div>
+
+          <!-- Doge SVG (shibe face) -->
+          <div id="doge" style="position:absolute;bottom:28%;left:50%;transform:translateX(-50%);animation:dogeJump 1.2s ease-in-out infinite;">
+            <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+              <!-- body -->
+              <ellipse cx="45" cy="62" rx="28" ry="20" fill="#C8934A"/>
+              <!-- head -->
+              <ellipse cx="45" cy="38" rx="26" ry="24" fill="#D9A55A"/>
+              <!-- ears -->
+              <ellipse cx="22" cy="22" rx="10" ry="14" fill="#C8934A" transform="rotate(-15 22 22)"/>
+              <ellipse cx="68" cy="22" rx="10" ry="14" fill="#C8934A" transform="rotate(15 68 22)"/>
+              <ellipse cx="22" cy="22" rx="6" ry="9" fill="#e8a070" transform="rotate(-15 22 22)"/>
+              <ellipse cx="68" cy="22" rx="6" ry="9" fill="#e8a070" transform="rotate(15 68 22)"/>
+              <!-- eyes -->
+              <ellipse cx="34" cy="34" rx="7" ry="7" fill="white"/>
+              <ellipse cx="56" cy="34" rx="7" ry="7" fill="white"/>
+              <circle cx="36" cy="34" r="4" fill="#1a1a1a"/>
+              <circle cx="58" cy="34" r="4" fill="#1a1a1a"/>
+              <circle cx="37" cy="32" r="1.5" fill="white"/>
+              <circle cx="59" cy="32" r="1.5" fill="white"/>
+              <!-- nose -->
+              <ellipse cx="45" cy="44" rx="5" ry="3.5" fill="#a06030"/>
+              <!-- smile -->
+              <path d="M37 50 Q45 57 53 50" stroke="#a06030" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- tongue -->
+              <ellipse cx="45" cy="55" rx="5" ry="4" fill="#e06060"/>
+              <!-- legs -->
+              <rect x="24" y="76" width="10" height="10" rx="5" fill="#C8934A"/>
+              <rect x="56" y="76" width="10" height="10" rx="5" fill="#C8934A"/>
+            </svg>
+          </div>
+
+          <!-- Floating wow texts -->
+          <div class="wow-text" style="position:absolute;top:10%;left:5%;color:#e05a5a;font-size:1.1rem;font-weight:700;animation:floatText 3s ease-in-out infinite 0s;">wow</div>
+          <div class="wow-text" style="position:absolute;top:25%;right:6%;color:#5a7ae0;font-size:.9rem;font-weight:700;animation:floatText 3s ease-in-out infinite .6s;">such Deutsch</div>
+          <div class="wow-text" style="position:absolute;top:8%;left:32%;color:#5ab870;font-size:.85rem;font-weight:700;animation:floatText 3s ease-in-out infinite 1s;">very grammar</div>
+          <div class="wow-text" style="position:absolute;bottom:38%;left:4%;color:#e0a030;font-size:.8rem;font-weight:700;animation:floatText 3s ease-in-out infinite 1.8s;">much kasus</div>
+          <div class="wow-text" style="position:absolute;bottom:38%;right:4%;color:#9b5ae0;font-size:.95rem;font-weight:700;animation:floatText 3s ease-in-out infinite 2.4s;">so nominativ</div>
+
+          <!-- ground stars -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:28%;background:linear-gradient(180deg,#7ab648,#5a8c30);display:flex;align-items:center;justify-content:center;gap:8px;padding-bottom:4px;">
+            <span style="font-size:1.4rem;animation:starSpin 2s linear infinite;">⭐</span>
+            <span style="font-size:1.2rem;animation:starSpin 2.5s linear infinite reverse;">⭐</span>
+            <span style="font-size:1.6rem;animation:starSpin 1.8s linear infinite;">⭐</span>
+            <span style="font-size:1.2rem;animation:starSpin 2.2s linear infinite reverse;">⭐</span>
+            <span style="font-size:1.4rem;animation:starSpin 2s linear infinite .5s;">⭐</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="pn-btn" onclick="go(-1)">← Tilbake</button>
+        <button class="pn-btn next" onclick="restartAll()">Prøv igjen fra start 🔄</button>
+      </div>
+    </div>
+  </div>`;
+
+  startConfetti();
+}
+
+function startConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  if(!canvas) return;
+  const W=window.innerWidth, H=window.innerHeight;
+  canvas.innerHTML='';
+  const colors=['#7C9E8A','#D4857A','#FFD94A','#5a7ae0','#9b5ae0','#5ab870','#e0a030'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    const size=Math.random()*10+6;
+    const x=Math.random()*100;
+    const delay=Math.random()*3;
+    const dur=Math.random()*3+3;
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const rotate=Math.random()*360;
+    el.style.cssText=`position:absolute;left:${x}%;top:-20px;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random()>0.5?'50%':'2px'};animation:confettiFall ${dur}s linear ${delay}s infinite;transform:rotate(${rotate}deg);opacity:.85;`;
+    canvas.appendChild(el);
+  }
+}
+
+cur=WELCOME_IDX;
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Im Gemüseladen – Tysk vokabular</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --paper: #FAF7F2;
+    --green-dark: #2C4A2E;
+    --green-mid: #4A7C59;
+    --green-light: #8BBF8E;
+    --green-pale: #D4E8D6;
+    --orange: #D4622A;
+    --orange-pale: #F5D9CC;
+    --brown: #6B4C3B;
+    --ink: #1A1A18;
+    --muted: #6B6B60;
+    --border: rgba(44,74,46,0.15);
+    --border-strong: rgba(44,74,46,0.3);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 10% 20%, rgba(139,191,142,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 90% 80%, rgba(212,98,42,0.08) 0%, transparent 50%);
+  }
+  /* ---- HEADER ---- */
+  header {
+    background: var(--green-dark);
+    color: var(--cream);
+    padding: 1.5rem 2rem 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '🥦🍅🥕🍎🍌';
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    letter-spacing: 4px;
+    opacity: 0.4;
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(22px, 4vw, 32px);
+    letter-spacing: -0.5px;
+  }
+  header p {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-top: 3px;
+    font-weight: 300;
+  }
+  /* ---- NAV ---- */
+  nav {
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    white-space: nowrap;
+    transition: all .2s;
+    font-weight: 400;
+  }
+  .nav-btn:hover { color: var(--green-dark); }
+  .nav-btn.active {
+    color: var(--green-dark);
+    border-bottom-color: var(--green-mid);
+    font-weight: 500;
+  }
+  /* ---- MAIN ---- */
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .page { display: none; animation: fadeIn .3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---- PROGRESS ---- */
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 5px; background: var(--green-pale); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-mid), var(--green-light)); border-radius: 3px; transition: width .4s ease; }
+
+  /* ---- PAGE TITLE ---- */
+  .page-header { margin-bottom: 1.5rem; }
+  .page-header h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(20px, 3vw, 26px);
+    color: var(--green-dark);
+    line-height: 1.2;
+  }
+  .page-header .sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 5px;
+    font-weight: 300;
+  }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    margin-bottom: .75rem;
+  }
+
+  /* ---- WORD GRID ---- */
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .word-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .9rem 1rem;
+    text-align: center;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .word-card:hover { border-color: var(--green-light); box-shadow: 0 2px 10px rgba(44,74,46,0.08); }
+  .word-de { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; color: var(--green-dark); }
+  .word-no { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .word-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 6px;
+    display: inline-block;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .tag-verb { background: var(--orange-pale); color: var(--orange); }
+  .tag-noun { background: var(--green-pale); color: var(--green-dark); }
+
+  /* ---- TABLE ---- */
+  .styled-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .styled-table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-strong);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .styled-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table td:first-child { color: var(--muted); font-size: 13px; }
+  .styled-table .highlight-cell { font-weight: 500; color: var(--green-dark); }
+
+  /* ---- DIALOG ---- */
+  .dialog-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .av-v { background: var(--green-pale); }
+  .av-k { background: var(--orange-pale); }
+  .bubble {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 0 10px 10px 10px;
+    padding: .65rem 1rem;
+    flex: 1;
+  }
+  .bubble-k {
+    border-radius: 10px 0 10px 10px;
+    background: #FFF9F5;
+  }
+  .bubble-speaker { font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .bubble-text { font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .bubble-text .key { font-weight: 500; color: var(--green-dark); border-bottom: 1.5px solid var(--green-light); }
+  .dialog-item.flip { flex-direction: row-reverse; }
+  .dialog-item.flip .bubble { border-radius: 10px 0 10px 10px; }
+
+  /* ---- DRAG & DROP ---- */
+  .drag-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 1rem;
+    background: var(--green-pale);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    min-height: 52px;
+  }
+  .drag-token {
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 6px 13px;
+    font-size: 14px;
+    cursor: grab;
+    user-select: none;
+    color: var(--green-dark);
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    transition: box-shadow .15s, opacity .15s;
+  }
+  .drag-token:hover { box-shadow: 0 2px 8px rgba(44,74,46,0.15); }
+  .drag-token:active { cursor: grabbing; opacity: .7; }
+  .drag-token.used { opacity: .35; cursor: default; pointer-events: none; }
+
+  .drop-zone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    min-height: 34px;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 7px;
+    padding: 3px 8px;
+    vertical-align: middle;
+    transition: background .15s, border-color .15s;
+    background: rgba(255,255,255,0.5);
+    cursor: default;
+  }
+  .drop-zone.drag-over { background: var(--green-pale); border-color: var(--green-mid); }
+  .drop-zone.correct { background: #D4EDDA; border-color: #4A7C59; border-style: solid; }
+  .drop-zone.wrong { background: #FDDEDE; border-color: #C0392B; border-style: solid; }
+  .drop-zone .drag-token { margin: 0; cursor: default; font-size: 13px; padding: 3px 8px; }
+
+  .pair-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pair-row:last-child { border-bottom: none; }
+  .pair-no { font-size: 14px; color: var(--muted); min-width: 130px; font-style: italic; }
+
+  .sent-row { margin-bottom: 1.1rem; }
+  .sent-text {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 2.2;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .sent-hint { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+
+  /* ---- GAP FILL ---- */
+  .gap-row { margin-bottom: 1.1rem; }
+  .gap-line {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 2;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .gap-input {
+    border: none;
+    border-bottom: 2px solid var(--green-mid);
+    background: transparent;
+    font-size: 15px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    padding: 0 6px 2px;
+    width: 130px;
+    color: var(--green-dark);
+    outline: none;
+    text-align: center;
+    transition: border-color .2s;
+  }
+  .gap-input:focus { border-bottom-color: var(--green-dark); }
+  .gap-input.ok { border-bottom-color: #2D7A4F; color: #2D7A4F; }
+  .gap-input.no { border-bottom-color: #C0392B; color: #C0392B; }
+  .gap-hint { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+
+  /* ---- MC ---- */
+  .mc-block { margin-bottom: 1.5rem; }
+  .mc-q { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: .6rem; }
+  .mc-q .qnum { color: var(--green-mid); font-family: 'Fraunces', serif; margin-right: 4px; }
+  .mc-opts { display: flex; flex-direction: column; gap: 6px; }
+  .mc-opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all .15s;
+  }
+  .mc-opt:hover:not(:disabled) { background: var(--green-pale); border-color: var(--green-light); }
+  .mc-opt.ok { background: #D4EDDA; border-color: #4A7C59; color: #2C4A2E; font-weight: 500; }
+  .mc-opt.no { background: #FDDEDE; border-color: #C0392B; color: #7B1818; }
+  .mc-opt:disabled { cursor: default; }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    background: var(--green-dark);
+    color: var(--cream);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    margin-top: .5rem;
+  }
+  .btn:hover { background: var(--green-mid); }
+  .btn:active { transform: scale(.98); }
+  .btn-outline {
+    background: transparent;
+    color: var(--green-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background .15s;
+    margin-top: .5rem;
+  }
+  .btn-outline:hover { background: var(--green-pale); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+
+  /* ---- FEEDBACK ---- */
+  .feedback {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: .6rem;
+    min-height: 20px;
+    padding: 0 2px;
+    transition: all .2s;
+  }
+  .fb-ok { color: #2D7A4F; }
+  .fb-no { color: #C0392B; }
+
+  /* ---- RESET BUTTON ---- */
+  .reset-link { font-size: 12px; color: var(--muted); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+  .reset-link:hover { color: var(--green-dark); }
+
+  /* ---- SECTION DIVIDER ---- */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.5rem 0 1rem;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Im Gemüseladen</h1>
+  <p>Tysk vokabular &mdash; kaufen · verkaufen · Verkäufer/in · Kunde/Kundin</p>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="goto(0)">1 · Ordoversikt</button>
+  <button class="nav-btn" onclick="goto(1)">2 · Dialog</button>
+  <button class="nav-btn" onclick="goto(2)">3 · Match ord</button>
+  <button class="nav-btn" onclick="goto(3)">4 · Verbform</button>
+  <button class="nav-btn" onclick="goto(4)">5 · Skriv inn</button>
+  <button class="nav-btn" onclick="goto(5)">6 · Memory</button>
+</nav>
+
+<main>
+
+<!-- ===================== PAGE 0: ORDOVERSIKT ===================== -->
+<div class="page active" id="p0">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 1 av 5</span><span>Oversikt</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>Ordoversikt</h2>
+    <p class="sub">Studer alle ordformene nøye. Du kan gå tilbake hit når som helst.</p>
+  </div>
+
+  <div class="word-grid">
+    <div class="word-card"><div class="word-de">kaufen</div><div class="word-no">å kjøpe</div><span class="word-tag tag-verb">verb</span></div>
+    <div class="word-card"><div class="word-de">verkaufen</div><div class="word-no">å selge</div><span class="word-tag tag-verb">verb</span></div>
+    <div class="word-card"><div class="word-de">der Verkäufer</div><div class="word-no">selgeren (m)</div><span class="word-tag tag-noun">substantiv</span></div>
+    <div class="word-card"><div class="word-de">die Verkäuferin</div><div class="word-no">selgeren (f)</div><span class="word-tag tag-noun">substantiv</span></div>
+    <div class="word-card"><div class="word-de">der Kunde</div><div class="word-no">kunden (m)</div><span class="word-tag tag-noun">substantiv</span></div>
+    <div class="word-card"><div class="word-de">die Kundin</div><div class="word-no">kunden (f)</div><span class="word-tag tag-noun">substantiv</span></div>
+  </div>
+
+  <div class="section-divider">Bøyning av verbene i presens</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+    <div class="card">
+      <div class="card-title">kaufen – å kjøpe</div>
+      <table class="styled-table">
+        <thead><tr><th>Person</th><th>Form</th></tr></thead>
+        <tbody>
+          <tr><td>ich</td><td class="highlight-cell">kaufe</td></tr>
+          <tr><td>du</td><td class="highlight-cell">kaufst</td></tr>
+          <tr><td>er/sie/es</td><td class="highlight-cell">kauft</td></tr>
+          <tr><td>wir</td><td class="highlight-cell">kaufen</td></tr>
+          <tr><td>ihr</td><td class="highlight-cell">kauft</td></tr>
+          <tr><td>sie / Sie</td><td class="highlight-cell">kaufen</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">verkaufen – å selge</div>
+      <table class="styled-table">
+        <thead><tr><th>Person</th><th>Form</th></tr></thead>
+        <tbody>
+          <tr><td>ich</td><td class="highlight-cell">verkaufe</td></tr>
+          <tr><td>du</td><td class="highlight-cell">verkaufst</td></tr>
+          <tr><td>er/sie/es</td><td class="highlight-cell">verkauft</td></tr>
+          <tr><td>wir</td><td class="highlight-cell">verkaufen</td></tr>
+          <tr><td>ihr</td><td class="highlight-cell">verkauft</td></tr>
+          <tr><td>sie / Sie</td><td class="highlight-cell">verkaufen</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-divider">Flertallsformer</div>
+  <div class="card">
+    <table class="styled-table">
+      <thead><tr><th>Entall</th><th>Flertall</th></tr></thead>
+      <tbody>
+        <tr><td>der Verkäufer</td><td class="highlight-cell">die Verkäufer</td></tr>
+        <tr><td>die Verkäuferin</td><td class="highlight-cell">die Verkäuferinnen</td></tr>
+        <tr><td>der Kunde</td><td class="highlight-cell">die Kunden</td></tr>
+        <tr><td>die Kundin</td><td class="highlight-cell">die Kundinnen</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="goto(1)">Neste: Les dialogen →</button>
+  </div>
+</div>
+
+
+<!-- ===================== PAGE 1: DIALOG ===================== -->
+<div class="page" id="p1">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 2 av 5</span><span>Leseforståelse</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>En samtale i grønnsaksbutikken</h2>
+    <p class="sub">Les dialogen og legg merke til de uthevede ordene.</p>
+  </div>
+
+  <div class="card" style="padding:1.5rem">
+    <div class="dialog-item">
+      <div class="avatar av-v">🧑‍🌾</div>
+      <div class="bubble">
+        <div class="bubble-speaker">Verkäuferin – Maria</div>
+        <div class="bubble-text">Guten Morgen! Was möchten Sie <span class="key">kaufen</span>?</div>
+      </div>
+    </div>
+    <div class="dialog-item flip">
+      <div class="avatar av-k">👤</div>
+      <div class="bubble bubble-k">
+        <div class="bubble-speaker">Kunde – Herr Weber</div>
+        <div class="bubble-text">Guten Morgen! Ich möchte Äpfel <span class="key">kaufen</span>. Was <span class="key">verkaufen</span> Sie heute?</div>
+      </div>
+    </div>
+    <div class="dialog-item">
+      <div class="avatar av-v">🧑‍🌾</div>
+      <div class="bubble">
+        <div class="bubble-speaker">Verkäuferin</div>
+        <div class="bubble-text">Wir <span class="key">verkaufen</span> heute frische Äpfel, Bananen und Karotten. Die Äpfel <span class="key">kauft</span> jeder <span class="key">Kunde</span> gerne!</div>
+      </div>
+    </div>
+    <div class="dialog-item flip">
+      <div class="avatar av-k">👤</div>
+      <div class="bubble bubble-k">
+        <div class="bubble-speaker">Kunde</div>
+        <div class="bubble-text">Gut! Ich <span class="key">kaufe</span> ein Kilo Äpfel. Gibt es auch eine andere <span class="key">Verkäuferin</span>?</div>
+      </div>
+    </div>
+    <div class="dialog-item">
+      <div class="avatar av-v">🧑‍🌾</div>
+      <div class="bubble">
+        <div class="bubble-speaker">Verkäuferin</div>
+        <div class="bubble-text">Ja, meine Kollegin Anna arbeitet auch heute.</div>
+      </div>
+    </div>
+    <div class="dialog-item flip">
+      <div class="avatar av-k">👤</div>
+      <div class="bubble bubble-k">
+        <div class="bubble-speaker">Kunde</div>
+        <div class="bubble-text">Ah, schön! Ich bin auch ein treuer <span class="key">Kunde</span>!</div>
+      </div>
+    </div>
+    <div class="dialog-item">
+      <div class="avatar av-v">🧑‍🌾</div>
+      <div class="bubble">
+        <div class="bubble-speaker">Verkäuferin</div>
+        <div class="bubble-text">Ja, alle unsere <span class="key">Kunden</span> sind sehr nett! So – das macht drei Euro, bitte.</div>
+      </div>
+    </div>
+    <div class="dialog-item flip">
+      <div class="avatar av-k">👤</div>
+      <div class="bubble bubble-k">
+        <div class="bubble-speaker">Kunde</div>
+        <div class="bubble-text">Bitte sehr. Danke! Auf Wiedersehen!</div>
+      </div>
+    </div>
+    <div class="dialog-item">
+      <div class="avatar av-v">🧑‍🌾</div>
+      <div class="bubble">
+        <div class="bubble-speaker">Verkäuferin</div>
+        <div class="bubble-text">Auf Wiedersehen! Tschüss!</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-outline" onclick="goto(0)">← Forrige: Ordoversikt</button>
+    <button class="btn" onclick="goto(2)">Neste: Match ord →</button>
+  </div>
+</div>
+
+
+<!-- ===================== PAGE 2: DRAG PAIRS ===================== -->
+<div class="page" id="p2">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 3 av 5</span><span>Dra og slipp</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>Match de tyske ordene</h2>
+    <p class="sub">Dra hvert tyske ord til riktig norsk betydning.</p>
+  </div>
+
+  <div class="card-title" style="margin-bottom:.5rem">Ordbank – dra herfra:</div>
+  <div class="drag-bank" id="bank2"></div>
+
+  <div class="card">
+    <div id="pairs2"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="checkPairs()">Sjekk svarene</button>
+    <button class="btn-outline" onclick="resetPairs()">Tilbakestill</button>
+  </div>
+  <div class="feedback" id="fb2"></div>
+  <div class="btn-row" style="margin-top:.5rem">
+    <button class="btn-outline" onclick="goto(1)">← Forrige: Dialog</button>
+    <button class="btn" onclick="goto(3)">Neste: Verbform →</button>
+  </div>
+</div>
+
+
+<!-- ===================== PAGE 3: DRAG SENTENCES ===================== -->
+<div class="page" id="p3">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 4 av 6</span><span>Dra og slipp II</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>Riktig verbform i setningen</h2>
+    <p class="sub">Dra riktig form inn i setningen. Ordbanken har ekstra ord – ikke alle skal brukes!</p>
+  </div>
+
+  <div class="card-title" style="margin-bottom:.5rem">Ordbank:</div>
+  <div class="drag-bank" id="bank3"></div>
+
+  <div class="card">
+    <div id="sentences3"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="checkSents()">Sjekk svarene</button>
+    <button class="btn-outline" onclick="resetSents()">Tilbakestill</button>
+  </div>
+  <div class="feedback" id="fb3"></div>
+  <div class="btn-row" style="margin-top:.5rem">
+    <button class="btn-outline" onclick="goto(2)">← Forrige: Match ord</button>
+    <button class="btn" onclick="goto(4)">Neste: Skriv inn →</button>
+  </div>
+</div>
+
+
+<!-- ===================== PAGE 4: GAP FILL ===================== -->
+<div class="page" id="p4">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 5 av 5</span><span>Skriv inn</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>Fyll inn riktig form</h2>
+    <p class="sub">Skriv den riktige formen av kaufen, verkaufen, Verkäufer/in eller Kunde/Kundin. Hint vises under hver setning.</p>
+  </div>
+
+  <div class="card">
+    <div id="gaps4"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="checkGaps()">Sjekk svarene</button>
+    <button class="btn-outline" onclick="resetGaps()">Tilbakestill</button>
+  </div>
+  <div class="feedback" id="fb4"></div>
+  <div class="btn-row" style="margin-top:.5rem">
+    <button class="btn-outline" onclick="goto(3)">← Forrige: Verbform</button>
+    <button class="btn" onclick="goto(5)">Neste: Memory →</button>
+  </div>
+  <div class="btn-row" id="done-row" style="display:none;margin-top:.5rem">
+    <div style="background:var(--green-pale);border-radius:10px;padding:1rem 1.25rem;font-size:14px;color:var(--green-dark);font-weight:500;width:100%">
+      🎉 Gratulerer! Du har fullført alle øvelsene. Gå tilbake til ordoversikten for å repetere, eller ta øvelsene på nytt!
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE 5: MEMORY ===================== -->
+<div class="page" id="p5">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Side 6 av 6</span><span>Memory</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  </div>
+  <div class="page-header">
+    <h2>Memory – finn parene</h2>
+    <p class="sub">Snu to kort. Matcher ett norsk og ett tysk ord, beholder du dem! Finn alle 8 par så fort som mulig.</p>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem">
+    <div class="card" style="margin:0;padding:.75rem 1.25rem;display:flex;align-items:center;gap:1.5rem;flex:1;min-width:220px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Tid</div>
+        <div id="mem-timer" style="font-family:'Fraunces',serif;font-size:28px;font-weight:500;color:var(--green-dark);letter-spacing:-1px">0.0s</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--border)"></div>
+      <div>
+        <div style="font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Beste tid</div>
+        <div id="mem-best" style="font-family:'Fraunces',serif;font-size:28px;font-weight:500;color:var(--orange);letter-spacing:-1px">–</div>
+      </div>
+      <div style="width:1px;height:40px;background:var(--border)"></div>
+      <div>
+        <div style="font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Par funnet</div>
+        <div id="mem-pairs" style="font-family:'Fraunces',serif;font-size:28px;font-weight:500;color:var(--ink);letter-spacing:-1px">0 / 8</div>
+      </div>
+    </div>
+    <button class="btn" onclick="startMemory()">Start nytt spill</button>
+  </div>
+
+  <div id="mem-board" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem"></div>
+
+  <div id="mem-win" style="display:none;background:var(--green-pale);border-radius:12px;padding:1.25rem 1.5rem;text-align:center">
+    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--green-dark);margin-bottom:.25rem">🎉 Alle par funnet!</div>
+    <div id="mem-win-msg" style="font-size:14px;color:var(--green-mid)"></div>
+    <button class="btn" style="margin-top:.75rem" onclick="startMemory()">Spill igjen</button>
+  </div>
+  <div class="btn-row" style="margin-top:1rem">
+    <button class="btn-outline" onclick="goto(4)">← Forrige: Skriv inn</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ---- navigation ---- */
+const pages = document.querySelectorAll('.page');
+const navBtns = document.querySelectorAll('.nav-btn');
+const inited = {};
+
+function goto(n) {
+  pages.forEach((p, i) => p.classList.toggle('active', i === n));
+  navBtns.forEach((b, i) => b.classList.toggle('active', i === n));
+  if (!inited[n]) { inited[n] = true; initPage(n); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initPage(n) {
+  if (n === 2) initPairs();
+  if (n === 3) initSents();
+  if (n === 4) initGaps();
+  if (n === 5) initBingoPage();
+}
+
+/* ==============================
+   PAGE 2 – DRAG PAIRS
+   ============================== */
+const pairsData = [
+  { de: 'kaufen',          no: 'å kjøpe' },
+  { de: 'verkaufen',       no: 'å selge' },
+  { de: 'der Verkäufer',   no: 'selgeren (m)' },
+  { de: 'die Verkäuferin', no: 'selgeren (f)' },
+  { de: 'der Kunde',       no: 'kunden (m)' },
+  { de: 'die Kundin',      no: 'kunden (f)' },
+];
+
+let dragItem = null;
+
+function makeDragToken(word, bank) {
+  const el = document.createElement('div');
+  el.className = 'drag-token';
+  el.textContent = word;
+  el.dataset.word = word;
+  el.draggable = true;
+  el.addEventListener('dragstart', e => { dragItem = el; e.dataTransfer.effectAllowed = 'move'; });
+  bank.appendChild(el);
+  return el;
+}
+
+function initPairs() {
+  const bank = document.getElementById('bank2');
+  const pairsDiv = document.getElementById('pairs2');
+  bank.innerHTML = ''; pairsDiv.innerHTML = '';
+  document.getElementById('fb2').textContent = '';
+  
+
+  const shuffledBank = [...pairsData].sort(() => Math.random() - .5);
+  shuffledBank.forEach(p => makeDragToken(p.de, bank));
+
+  const shuffledRows = [...pairsData].sort(() => Math.random() - .5);
+  shuffledRows.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'pair-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'pair-no';
+    lbl.textContent = p.no;
+    const dz = document.createElement('div');
+    dz.className = 'drop-zone';
+    dz.dataset.ans = p.de;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (!dragItem) return;
+      // return previous occupant to bank
+      const old = dz.querySelector('.drag-token');
+      if (old) { old.classList.remove('used'); bank.appendChild(old); }
+      dz.appendChild(dragItem);
+      dragItem.classList.add('used');
+      dragItem = null;
+      dz.classList.remove('correct', 'wrong');
+    });
+    row.appendChild(lbl); row.appendChild(dz);
+    pairsDiv.appendChild(row);
+  });
+}
+
+function checkPairs() {
+  const dzones = document.querySelectorAll('#pairs2 .drop-zone');
+  let ok = 0;
+  dzones.forEach(dz => {
+    const placed = dz.querySelector('.drag-token');
+    if (placed && placed.dataset.word === dz.dataset.ans) { ok++; dz.classList.add('correct'); dz.classList.remove('wrong'); }
+    else if (placed) { dz.classList.add('wrong'); dz.classList.remove('correct'); }
+    else { dz.classList.remove('correct', 'wrong'); }
+  });
+  const fb = document.getElementById('fb2');
+  if (ok === pairsData.length) {
+    fb.textContent = '✓ Perfekt! Alle ' + ok + ' riktige!';
+    fb.className = 'feedback fb-ok';
+    
+  } else {
+    fb.textContent = ok + ' av ' + pairsData.length + ' riktige. De røde er feil – prøv igjen!';
+    fb.className = 'feedback fb-no';
+  }
+}
+
+function resetPairs() { inited[2] = false; initPairs(); }
+
+
+/* ==============================
+   PAGE 3 – DRAG SENTENCES
+   ============================== */
+const sentsData = [
+  { pre: 'Ich ', blank: 'kaufe',       post: ' Tomaten.',           hint: 'ich + kaufen' },
+  { pre: 'Der Verkäufer ', blank: 'verkauft', post: ' frische Äpfel.',   hint: 'er/sie/es + verkaufen' },
+  { pre: 'Wir ', blank: 'kaufen',      post: ' Bananen.',           hint: 'wir + kaufen' },
+  { pre: 'Du ',  blank: 'kaufst',      post: ' Karotten.',          hint: 'du + kaufen' },
+  { pre: 'Die Verkäuferinnen ', blank: 'verkaufen', post: ' Gemüse.', hint: 'sie/Sie + verkaufen' },
+  { pre: 'Ihr ', blank: 'kauft',       post: ' Erdbeeren.',         hint: 'ihr + kaufen' },
+];
+const sentsExtra = ['kaufe', 'verkaufe', 'kaufst', 'verkaufst', 'kauft', 'verkauft'];
+
+let dragItem3 = null;
+
+function initSents() {
+  const bank = document.getElementById('bank3');
+  const sDiv = document.getElementById('sentences3');
+  bank.innerHTML = ''; sDiv.innerHTML = '';
+  document.getElementById('fb3').textContent = '';
+  
+
+  let allWords = sentsData.map(s => s.blank).concat(sentsExtra);
+  allWords.sort(() => Math.random() - .5);
+
+  allWords.forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'drag-token';
+    el.textContent = w;
+    el.dataset.word = w;
+    el.draggable = true;
+    el.addEventListener('dragstart', e => { dragItem3 = el; e.dataTransfer.effectAllowed = 'move'; });
+    bank.appendChild(el);
+  });
+
+  sentsData.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'sent-row';
+    const line = document.createElement('div');
+    line.className = 'sent-text';
+    const pre = document.createElement('span'); pre.textContent = s.pre;
+    const dz = document.createElement('div');
+    dz.className = 'drop-zone';
+    dz.dataset.idx = i;
+    dz.dataset.ans = s.blank;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (!dragItem3) return;
+      const old = dz.querySelector('.drag-token');
+      if (old) { old.classList.remove('used'); bank.appendChild(old); }
+      dz.appendChild(dragItem3);
+      dragItem3.classList.add('used');
+      dragItem3 = null;
+      dz.classList.remove('correct', 'wrong');
+    });
+    const post = document.createElement('span'); post.textContent = s.post;
+    line.appendChild(pre); line.appendChild(dz); line.appendChild(post);
+    const hint = document.createElement('div');
+    hint.className = 'sent-hint';
+    hint.textContent = 'Hint: ' + s.hint;
+    row.appendChild(line); row.appendChild(hint);
+    sDiv.appendChild(row);
+  });
+}
+
+function checkSents() {
+  const dzones = document.querySelectorAll('#sentences3 .drop-zone');
+  let ok = 0;
+  dzones.forEach(dz => {
+    const placed = dz.querySelector('.drag-token');
+    if (placed && placed.dataset.word === dz.dataset.ans) { ok++; dz.classList.add('correct'); dz.classList.remove('wrong'); }
+    else if (placed) { dz.classList.add('wrong'); dz.classList.remove('correct'); }
+    else { dz.classList.remove('correct', 'wrong'); }
+  });
+  const fb = document.getElementById('fb3');
+  if (ok === sentsData.length) {
+    fb.textContent = '✓ Utmerket! Alle ' + ok + ' setninger er riktige!';
+    fb.className = 'feedback fb-ok';
+    
+  } else {
+    fb.textContent = ok + ' av ' + sentsData.length + ' riktige. Sjekk de røde!';
+    fb.className = 'feedback fb-no';
+  }
+}
+
+function resetSents() { inited[3] = false; initSents(); }
+
+
+/* ==============================
+   PAGE 4 – GAP FILL
+   ============================== */
+const gapsData = [
+  { pre: 'Der ',  blank: 'Verkäufer',      post: ' heißt Klaus.',            hint: 'selger, mann, entall',           accept: ['Verkäufer'] },
+  { pre: 'Die ',  blank: 'Kundin',          post: ' kauft Orangen.',           hint: 'kunde, dame, entall',            accept: ['Kundin'] },
+  { pre: 'Ich ',  blank: 'verkaufe',        post: ' Erdbeeren.',              hint: 'ich + verkaufen',                accept: ['verkaufe'] },
+  { pre: 'Die ',  blank: 'Kunden',          post: ' kommen jeden Samstag.',   hint: 'kunder, flertall',               accept: ['Kunden'] },
+  { pre: 'Was ',  blank: 'kaufst',          post: ' du heute?',               hint: 'du + kaufen',                    accept: ['kaufst'] },
+  { pre: 'Die ',  blank: 'Verkäuferinnen',  post: ' sind sehr freundlich.',   hint: 'selgere, damer, flertall',       accept: ['Verkäuferinnen'] },
+  { pre: 'Er ',   blank: 'kauft',           post: ' Kartoffeln.',             hint: 'er + kaufen',                    accept: ['kauft'] },
+  { pre: 'Wir ',  blank: 'verkaufen',       post: ' frisches Obst.',          hint: 'wir + verkaufen',                accept: ['verkaufen'] },
+  { pre: 'Die ',  blank: 'Verkäuferin',     post: ' heißt Anna.',             hint: 'selger, dame, entall',           accept: ['Verkäuferin'] },
+  { pre: 'Ihr ',  blank: 'verkauft',        post: ' Tomaten und Karotten.',   hint: 'ihr + verkaufen',                accept: ['verkauft'] },
+];
+
+function initGaps() {
+  const div = document.getElementById('gaps4'); div.innerHTML = '';
+  document.getElementById('fb4').textContent = '';
+  document.getElementById('done-row').style.display = 'none';
+  gapsData.forEach((g, i) => {
+    const row = document.createElement('div'); row.className = 'gap-row';
+    const line = document.createElement('div'); line.className = 'gap-line';
+    const pre = document.createElement('span'); pre.textContent = g.pre;
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'gap-input'; inp.id = 'g' + i;
+    inp.autocomplete = 'off'; inp.spellcheck = false;
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') checkGaps(); });
+    const post = document.createElement('span'); post.textContent = g.post;
+    const hint = document.createElement('div'); hint.className = 'gap-hint';
+    hint.textContent = 'Hint: ' + g.hint;
+    line.appendChild(pre); line.appendChild(inp); line.appendChild(post);
+    row.appendChild(line); row.appendChild(hint);
+    div.appendChild(row);
+  });
+}
+
+function checkGaps() {
+  let ok = 0;
+  gapsData.forEach((g, i) => {
+    const inp = document.getElementById('g' + i);
+    if (!inp) return;
+    const val = inp.value.trim();
+    if (g.accept.map(a => a.toLowerCase()).includes(val.toLowerCase())) {
+      ok++; inp.className = 'gap-input ok';
+    } else {
+      inp.className = 'gap-input no';
+    }
+  });
+  const fb = document.getElementById('fb4');
+  if (ok === gapsData.length) {
+    fb.textContent = '✓ Fantastisk! Alle ' + ok + ' svar er riktige!';
+    fb.className = 'feedback fb-ok';
+    document.getElementById('done-row').style.display = 'block';
+  } else {
+    fb.textContent = ok + ' av ' + gapsData.length + ' riktige. De røde feltene har feil.';
+    fb.className = 'feedback fb-no';
+  }
+}
+
+function resetGaps() {
+  gapsData.forEach((g, i) => {
+    const inp = document.getElementById('g' + i);
+    if (inp) { inp.value = ''; inp.className = 'gap-input'; }
+  });
+  document.getElementById('fb4').textContent = '';
+  document.getElementById('done-row').style.display = 'none';
+}
+/* ==============================
+   PAGE 5 – MEMORY
+   ============================== */
+const memoryPairs = [
+  { de: 'ich kaufe',        no: 'jeg kjøper' },
+  { de: 'du kaufst',        no: 'du kjøper' },
+  { de: 'wir kaufen',       no: 'vi kjøper' },
+  { de: 'er/sie verkauft',  no: 'han/hun selger' },
+  { de: 'der Verkäufer',    no: 'selgeren (m)' },
+  { de: 'die Verkäuferin',  no: 'selgeren (f)' },
+  { de: 'der Kunde',        no: 'kunden (m)' },
+  { de: 'die Kunden',       no: 'kundene' },
+];
+
+const MEM_KEY = 'memory_best_ms';
+let memCards = [];
+let memFlipped = [];   // indices of currently face-up (unmatched) cards
+let memMatched = new Set();
+let memLocked = false;
+let memStartTime = null;
+let memTimerInterval = null;
+let memRunning = false;
+
+function initBingoPage() { initMemoryPage(); }
+
+function initMemoryPage() {
+  const best = localStorage.getItem(MEM_KEY);
+  document.getElementById('mem-best').textContent = best ? memFmt(parseInt(best)) : '–';
+  document.getElementById('mem-timer').textContent = '0.0s';
+  document.getElementById('mem-pairs').textContent = '0 / 8';
+  document.getElementById('mem-win').style.display = 'none';
+  document.getElementById('mem-board').innerHTML = '';
+}
+
+function memFmt(ms) { return (ms / 1000).toFixed(1) + 's'; }
+
+function startMemory() {
+  clearInterval(memTimerInterval);
+  memRunning = false;
+  memFlipped = [];
+  memMatched = new Set();
+  memLocked = false;
+
+  document.getElementById('mem-win').style.display = 'none';
+  document.getElementById('mem-pairs').textContent = '0 / 8';
+  document.getElementById('mem-timer').textContent = '0.0s';
+
+  // Build 16 cards: 8 DE + 8 NO, shuffled
+  const raw = [];
+  memoryPairs.forEach((p, i) => {
+    raw.push({ pairId: i, lang: 'de', text: p.de });
+    raw.push({ pairId: i, lang: 'no', text: p.no });
+  });
+  raw.sort(() => Math.random() - .5);
+  memCards = raw;
+
+  const board = document.getElementById('mem-board');
+  board.innerHTML = '';
+
+  raw.forEach((c, pos) => {
+    const card = document.createElement('div');
+    card.id = 'mc' + pos;
+    card.style.cssText = 'height:72px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font-family:Fraunces,serif;font-size:13px;font-weight:500;line-height:1.3;user-select:none;transition:background .2s,border-color .2s;background:var(--green-dark);color:var(--cream);border:1px solid rgba(0,0,0,.1);font-size:22px;';
+    card.textContent = '?';
+    card.dataset.pos = pos;
+    card.addEventListener('click', () => onMemClick(pos));
+    board.appendChild(card);
+  });
+
+  memStartTime = null;
+  memRunning = false;
+}
+
+function cardEl(pos) { return document.getElementById('mc' + pos); }
+
+function showCard(pos) {
+  const c = memCards[pos];
+  const el = cardEl(pos);
+  if (!el) return;
+  if (c.lang === 'de') {
+    el.style.background = 'var(--green-pale)';
+    el.style.color = 'var(--green-dark)';
+    el.style.border = '1px solid var(--border-strong)';
+    el.style.fontSize = '13px';
+  } else {
+    el.style.background = 'var(--orange-pale)';
+    el.style.color = 'var(--brown)';
+    el.style.border = '1px solid rgba(107,76,59,.2)';
+    el.style.fontSize = '13px';
+  }
+  el.textContent = c.text;
+}
+
+function hideCard(pos) {
+  const el = cardEl(pos);
+  if (!el) return;
+  el.style.background = 'var(--green-dark)';
+  el.style.color = 'var(--cream)';
+  el.style.border = '1px solid rgba(0,0,0,.1)';
+  el.style.fontSize = '22px';
+  el.textContent = '?';
+}
+
+function lockCard(pos) {
+  const el = cardEl(pos);
+  if (!el) return;
+  el.style.opacity = '0.5';
+  el.style.cursor = 'default';
+}
+
+function onMemClick(pos) {
+  if (memLocked) return;
+  if (memMatched.has(pos)) return;
+  if (memFlipped.includes(pos)) return;
+
+  // Start timer on first flip
+  if (!memRunning) {
+    memRunning = true;
+    memStartTime = Date.now();
+    memTimerInterval = setInterval(() => {
+      document.getElementById('mem-timer').textContent = memFmt(Date.now() - memStartTime);
+    }, 100);
+  }
+
+  showCard(pos);
+  memFlipped.push(pos);
+
+  if (memFlipped.length === 2) {
+    memLocked = true;
+    const [p1, p2] = memFlipped;
+    const c1 = memCards[p1], c2 = memCards[p2];
+
+    if (c1.pairId === c2.pairId) {
+      // Match – keep face-up, mark matched
+      setTimeout(() => {
+        memMatched.add(p1);
+        memMatched.add(p2);
+        lockCard(p1);
+        lockCard(p2);
+        memFlipped = [];
+        memLocked = false;
+        const found = memMatched.size / 2;
+        document.getElementById('mem-pairs').textContent = found + ' / 8';
+        if (memMatched.size === 16) endMemory();
+      }, 400);
+    } else {
+      // No match – flip back
+      setTimeout(() => {
+        hideCard(p1);
+        hideCard(p2);
+        memFlipped = [];
+        memLocked = false;
+      }, 900);
+    }
+  }
+}
+
+function endMemory() {
+  clearInterval(memTimerInterval);
+  memRunning = false;
+  const elapsed = Date.now() - memStartTime;
+  document.getElementById('mem-timer').textContent = memFmt(elapsed);
+
+  const prev = localStorage.getItem(MEM_KEY);
+  let isRecord = false;
+  if (!prev || elapsed < parseInt(prev)) {
+    localStorage.setItem(MEM_KEY, elapsed);
+    document.getElementById('mem-best').textContent = memFmt(elapsed);
+    isRecord = true;
+  }
+
+  document.getElementById('mem-win').style.display = 'block';
+  const msg = document.getElementById('mem-win-msg');
+  if (isRecord) {
+    msg.textContent = 'Ny rekord! Tid: ' + memFmt(elapsed) + ' 🏆';
+  } else {
+    msg.textContent = 'Tid: ' + memFmt(elapsed) + ' – rekord er ' + memFmt(parseInt(prev));
+  }
+}
+</script>
+</body>
+</html>
