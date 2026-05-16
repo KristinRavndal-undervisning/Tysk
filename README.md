@@ -1,1 +1,1 @@
-# Tysk - diverse oppgaver, mest som et litt provisorisk arkiv
+# Tysk - diverse oppgaver - provisorisk arkiv
