@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KasusVeileder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root {
+    --blue-light: #dbeafe;
+    --blue-mid:   #3b82f6;
+    --blue-dark:  #1d4ed8;
+    --green-light:#d1fae5;
+    --green-mid:  #10b981;
+    --green-dark: #065f46;
+    --amber-light:#fef3c7;
+    --amber-mid:  #f59e0b;
+    --amber-dark: #92400e;
+    --red-light:  #fee2e2;
+    --red-mid:    #ef4444;
+    --red-dark:   #991b1b;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-400:   #9ca3af;
+    --gray-600:   #4b5563;
+    --gray-800:   #1f2937;
+    --gray-900:   #111827;
+    --font-main:  'Source Sans 3', sans-serif;
+    --font-serif: 'Source Serif 4', serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-main); background: var(--gray-50); color: var(--gray-800); min-height: 100vh; padding: 2rem 1rem 3rem; }
+  .app { max-width: 680px; margin: 0 auto; }
+  .header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--green-mid); }
+  h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 600; color: var(--gray-900); letter-spacing: -0.01em; display: inline-block; background: linear-gradient(135deg, #dbeafe 0%, #d1fae5 100%); padding: 0.15em 0.4em 0.15em 0.3em; border-radius: 6px; margin-bottom: 0.6rem; }
+  .module-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .module-bar label { font-size: 13px; color: var(--gray-600); font-weight: 500; white-space: nowrap; }
+  .module-bar select { font-family: var(--font-main); font-size: 14px; font-weight: 500; color: var(--gray-800); background: white; border: 1.5px solid var(--blue-mid); border-radius: 6px; padding: 5px 28px 5px 10px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; cursor: pointer; }
+  .module-bar select:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+  .subtitle { font-size: 14px; color: var(--gray-600); line-height: 1.6; margin-top: 0.4rem; }
+  .subtitle em { font-family: var(--font-serif); font-style: italic; font-weight: 600; color: var(--gray-800); }
+  .score-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .score-card { background: white; border: 1.5px solid var(--blue-light); border-radius: 8px; padding: 0.5rem 1rem; font-size: 13px; color: var(--gray-600); flex: 1; min-width: 120px; }
+  .score-card span { font-size: 20px; font-weight: 600; color: var(--blue-dark); display: block; font-family: var(--font-serif); }
+  .table-wrap { margin-bottom: 1.5rem; overflow-x: auto; border-radius: 8px; border: 1.5px solid var(--blue-mid); }
+  table.kasus-table { width: 100%; border-collapse: collapse; font-size: 15px; table-layout: fixed; }
+  table.kasus-table th { background: var(--blue-light); color: var(--blue-dark); font-weight: 600; font-size: 13px; padding: 9px 6px; text-align: center; border-bottom: 1.5px solid var(--blue-mid); border-right: 1px solid rgba(59,130,246,0.2); }
+  table.kasus-table th:last-child { border-right: none; }
+  table.kasus-table th.row-header { text-align: left; padding-left: 12px; width: 92px; background: var(--blue-light); color: var(--blue-dark); border-right: 1.5px solid var(--blue-mid); }
+  table.kasus-table td { padding: 0; border-top: 1px solid rgba(59,130,246,0.15); border-right: 1px solid rgba(59,130,246,0.15); text-align: center; }
+  table.kasus-table td:last-child { border-right: none; }
+  table.kasus-table td.kasus-label { font-size: 13px; font-weight: 600; color: var(--blue-dark); padding: 10px 12px; background: var(--blue-light); text-align: left; border-right: 1.5px solid var(--blue-mid); }
+  button.art-btn { width: 100%; padding: 11px 4px; background: transparent; border: none; cursor: pointer; font-size: 16px; font-weight: 600; font-family: var(--font-main); color: var(--gray-800); text-align: center; transition: background 0.12s; }
+  button.art-btn:hover { background: var(--blue-light); color: var(--blue-dark); }
+  button.art-btn.selected-wrong { background: var(--red-light); color: var(--red-dark); }
+  button.art-btn.correct-flash { background: var(--green-light); color: var(--green-dark); }
+  .exercise-box { background: white; border: 1.5px solid var(--blue-mid); border-radius: 10px; padding: 1.25rem 1.25rem 1rem; margin-bottom: 1rem; min-height: 130px; }
+  .sentence-area { font-size: 19px; color: var(--gray-900); line-height: 1.8; margin-bottom: 0.75rem; }
+  .blank { display: inline-block; min-width: 52px; border-bottom: 2.5px solid var(--blue-mid); color: var(--blue-dark); font-weight: 600; text-align: center; margin: 0 3px; padding: 0 4px; }
+  .progress { font-size: 13px; color: var(--gray-400); margin-bottom: 0.5rem; }
+  .feedback-area { min-height: 52px; margin-top: 0.5rem; }
+  .hint { background: var(--amber-light); border-left: 3px solid var(--amber-mid); padding: 0.65rem 0.9rem; font-size: 14px; color: var(--amber-dark); line-height: 1.7; border-radius: 0 4px 4px 0; }
+  .correct-msg { background: var(--green-light); border-left: 3px solid var(--green-mid); padding: 0.65rem 0.9rem; font-size: 14px; color: var(--green-dark); border-radius: 0 4px 4px 0; }
+  .wrong-msg { background: var(--red-light); border-left: 3px solid var(--red-mid); padding: 0.65rem 0.9rem; font-size: 14px; color: var(--red-dark); border-radius: 0 4px 4px 0; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem; }
+  button.next-btn { font-family: var(--font-main); background: var(--blue-mid); color: white; border: none; border-radius: 7px; padding: 8px 18px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.12s; }
+  button.next-btn:hover { background: var(--blue-dark); }
+  button.show-answer-btn { font-family: var(--font-main); background: transparent; border: 1.5px solid var(--gray-200); border-radius: 7px; padding: 8px 18px; font-size: 14px; color: var(--gray-600); cursor: pointer; transition: background 0.12s; }
+  button.show-answer-btn:hover { background: var(--gray-100); }
+  .bottom-bar { display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--green-mid); padding-top: 1rem; }
+  button.bottom-btn { font-family: var(--font-main); background: white; border: 1.5px solid var(--green-mid); border-radius: 7px; padding: 8px 16px; font-size: 13px; color: var(--green-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: background 0.12s; }
+  button.bottom-btn:hover { background: var(--green-light); }
+  .overview-modal { background: white; border: 1.5px solid var(--blue-mid); border-radius: 10px; padding: 1.25rem; margin-top: 1rem; max-height: 420px; overflow-y: auto; }
+  .overview-modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 0.75rem; color: var(--blue-dark); display: flex; align-items: center; gap: 6px; }
+  .overview-list { list-style: none; font-size: 14px; }
+  .overview-list li { padding: 7px 0; border-bottom: 1px solid var(--gray-100); color: var(--gray-800); display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .overview-list li:last-child { border-bottom: none; }
+  .overview-list li span.ov-ans { color: var(--gray-400); font-size: 13px; white-space: nowrap; }
+  .ov-underline { text-decoration: underline; text-underline-offset: 3px; }
+  .done-screen { text-align: center; padding: 2rem 1rem; }
+  .done-screen h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 600; margin-bottom: 0.5rem; }
+  .done-score { font-family: var(--font-serif); font-size: 44px; font-weight: 600; color: var(--blue-dark); margin: 1rem 0; }
+  button.restart-btn { font-family: var(--font-main); background: var(--blue-mid); color: white; border: none; border-radius: 7px; padding: 10px 24px; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; transition: background 0.12s; }
+  button.restart-btn:hover { background: var(--blue-dark); }
+  .result-table { width: 100%; max-width: 520px; margin: 0 auto 1.5rem; font-size: 13px; border-collapse: collapse; text-align: left; }
+  .result-table th { padding: 7px 10px; background: var(--blue-light); color: var(--blue-dark); font-weight: 600; border-bottom: 1.5px solid var(--blue-mid); }
+  .result-table td { padding: 6px 10px; border-bottom: 1px solid var(--gray-100); }
+
+  /* ── Possessive module ── */
+  .poss-layout { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.5rem; }
+  .poss-list-wrap { flex-shrink: 0; border: 1.5px solid var(--blue-mid); border-radius: 8px; overflow: hidden; }
+  table.poss-list { border-collapse: collapse; font-size: 14px; }
+  table.poss-list td { padding: 7px 12px; border-bottom: 1px solid rgba(59,130,246,0.15); white-space: nowrap; }
+  table.poss-list td:last-child { border-bottom: none; }
+  table.poss-list tr:last-child td { border-bottom: none; }
+  table.poss-list td.poss-pronoun { color: var(--gray-400); font-size: 13px; padding-right: 6px; background: var(--gray-50); border-right: 1px solid rgba(59,130,246,0.15); }
+  table.poss-list td.poss-word { font-weight: 600; }
+  table.poss-list td.poss-word.poss-correct { background: var(--green-light); color: var(--green-dark); }
+  .poss-table-wrap { flex: 1; border: 1.5px solid var(--blue-mid); border-radius: 8px; overflow: hidden; }
+  .poss-table-placeholder { color: var(--gray-400); font-size: 14px; padding: 1rem 0; font-style: italic; }
+  @media print { .bottom-bar, .btn-row button { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="header">
+    <h1>KasusVeileder</h1>
+    <div class="module-bar">
+      <label for="module-select">Øv på:</label>
+      <select id="module-select">
+        <option value="bestemt">Bestemt artikkel</option>
+        <option value="ubestemt">Ubestemt artikkel</option>
+        <option value="kein">kein</option>
+        <option value="poss">Eiendomsord</option>
+        <option value="pron">Personlige pronomen</option>
+      </select>
+    </div>
+    <p class="subtitle" id="subtitle-text"></p>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-card"><span id="sc-total">0</span>poeng totalt</div>
+    <div class="score-card"><span id="sc-first">0</span>riktige på første forsøk</div>
+    <div class="score-card"><span id="sc-done">0 / ?</span>fullført</div>
+  </div>
+
+  <div class="table-wrap" id="table-wrap"></div>
+
+  <div class="exercise-box">
+    <div class="progress" id="progress-lbl"></div>
+    <div class="sentence-area" id="sentence-area"></div>
+    <div class="feedback-area" id="feedback-area"></div>
+    <div class="btn-row" id="btn-row"></div>
+  </div>
+
+  <div id="overview-container"></div>
+
+  <div class="bottom-bar">
+    <button class="bottom-btn" id="overview-btn"><i class="ti ti-bulb"></i> Oversikt</button>
+    <button class="bottom-btn" id="print-btn"><i class="ti ti-printer"></i> Print til PDF</button>
+  </div>
+
+</div>
+<script>
+const SENTENCES_BESTEMT = [
+  {de:"Der Lehrer erklärt die Aufgabe.",no:"Læreren forklarer oppgaven.",blank:"Der",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Ich sehe den Hund.",no:"Jeg ser hunden.",blank:"den",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  {de:"Sie gibt dem Mann das Buch.",no:"Hun gir mannen boken.",blank:"dem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mann",genderHint:"«Mann» er hankjønn."},
+  {de:"Die Frau liest ein Buch.",no:"Kvinnen leser en bok.",blank:"Die",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Frau",genderHint:"«Frau» er hunkjønn."},
+  {de:"Er liebt die Musik.",no:"Han elsker musikken.",blank:"die",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Musik",genderHint:"«Musik» er hunkjønn."},
+  {de:"Das Kind spielt im Garten.",no:"Barnet leker i hagen.",blank:"Das",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Sie kauft das Brot.",no:"Hun kjøper brødet.",blank:"das",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Brot",genderHint:"«Brot» er intetkjønn."},
+  {de:"Er zeigt dem Kind den Weg.",no:"Han viser barnet veien.",blank:"dem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Die Schüler lernen fleißig.",no:"Elevene lærer flittig.",blank:"Die",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Schüler",genderHint:"«Schüler» er flertall."},
+  {de:"Ich kenne die Studenten.",no:"Jeg kjenner studentene.",blank:"die",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Studenten",genderHint:"«Studenten» er flertall."},
+  {de:"Er erklärt den Kindern die Regel.",no:"Han forklarer barna regelen.",blank:"den",gender:"pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kindern",genderHint:"«Kindern» er flertall."},
+  {de:"Der Vater kocht das Abendessen.",no:"Faren lager kveldsmat.",blank:"Der",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Er besucht den Großvater.",no:"Han besøker bestefaren.",blank:"den",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Großvater",genderHint:"«Großvater» er hankjønn."},
+  {de:"Sie schreibt dem Freund einen Brief.",no:"Hun skriver et brev til vennen.",blank:"dem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Freund",genderHint:"«Freund» er hankjønn."},
+  {de:"Die Katze schläft auf dem Sofa.",no:"Katten sover på sofaen.",blank:"Die",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Katze",genderHint:"«Katze» er hunkjønn."},
+  {de:"Er streichelt die Katze.",no:"Han klapper katten.",blank:"die",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Katze",genderHint:"«Katze» er hunkjønn."},
+  {de:"Er gibt der Schwester ein Geschenk.",no:"Han gir søsteren en gave.",blank:"der",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Schwester",genderHint:"«Schwester» er hunkjønn."},
+  {de:"Das Mädchen singt ein Lied.",no:"Jenta synger en sang.",blank:"Das",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Mädchen",genderHint:"«Mädchen» er intetkjønn."},
+  {de:"Er liest das Buch.",no:"Han leser boken.",blank:"das",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Buch",genderHint:"«Buch» er intetkjønn."},
+  {de:"Sie erklärt dem Mädchen die Aufgabe.",no:"Hun forklarer jenta oppgaven.",blank:"dem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mädchen",genderHint:"«Mädchen» er intetkjønn."},
+  {de:"Die Hunde bellen laut.",no:"Hundene bjeffer høyt.",blank:"Die",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Hunde",genderHint:"«Hunde» er flertall."},
+  {de:"Er füttert die Hunde.",no:"Han mater hundene.",blank:"die",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hunde",genderHint:"«Hunde» er flertall."},
+  {de:"Sie gibt den Hunden Futter.",no:"Hun gir hundene mat.",blank:"den",gender:"pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Hunden",genderHint:"«Hunden» er flertall."},
+  {de:"Der Arzt untersucht den Patienten.",no:"Legen undersøker pasienten.",blank:"Der",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Arzt",genderHint:"«Arzt» er hankjønn."},
+  {de:"Die Mutter ruft den Sohn zu sich.",no:"Moren kaller sønnen til seg.",blank:"den",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Sohn",genderHint:"«Sohn» er hankjønn."},
+  {de:"Das Mädchen zeigt der Mutter das Bild.",no:"Jenta viser moren bildet.",blank:"der",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  {de:"Das Auto fährt schnell.",no:"Bilen kjører fort.",blank:"Das",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  {de:"Er repariert das Auto.",no:"Han reparerer bilen.",blank:"das",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  {de:"Die Lehrerin erklärt den Schülern die Grammatik.",no:"Læreren forklarer elevene grammatikken.",blank:"den",gender:"pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Schülern",genderHint:"«Schülern» er flertall."},
+  {de:"Herr Müller ist der Mathelehrer in unserer Klasse.",no:"Herr Müller er matematikklæreren i klassen vår.",blank:"der",gender:"m",kasus:"nom",role:"predikativ",nounPhrase:"___ Mathelehrer",genderHint:"«Mathelehrer» er hankjønn."},
+  {de:"Morgen besuchen wir den Tiergarten.",no:"I morgen besøker vi dyrehagen.",blank:"den",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Tiergarten",genderHint:"«Tiergarten» er hankjønn."},
+  {de:"Nach der Schule machen wir oft die Hausaufgaben.",no:"Etter skolen gjør vi ofte leksene.",blank:"die",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hausaufgaben",genderHint:"«Hausaufgaben» er flertall."},
+  {de:"Warum erzählst du mir nicht das Geheimnis?",no:"Hvorfor forteller du meg ikke hemmeligheten?",blank:"das",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Geheimnis",genderHint:"«Geheimnis» er intetkjønn."},
+  {de:"Mein Opa liest jeden Tag die Zeitung.",no:"Bestefaren min leser avisen hver dag.",blank:"die",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Zeitung",genderHint:"«Zeitung» er hunkjønn."},
+  {de:"Die zwei Freundinnen feiern zusammen den Nationalfeiertag.",no:"De to venninnene feirer nasjonaldagen sammen.",blank:"den",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Nationalfeiertag",genderHint:"«Nationalfeiertag» er hankjønn."},
+];
+
+const SENTENCES_UBESTEMT = [
+  {de:"Ein Lehrer erklärt die Regel.",no:"En lærer forklarer regelen.",blank:"Ein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Ein Hund läuft durch den Park.",no:"En hund løper gjennom parken.",blank:"Ein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  {de:"Ein Arzt untersucht den Patienten.",no:"En lege undersøker pasienten.",blank:"Ein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Arzt",genderHint:"«Arzt» er hankjønn."},
+  {de:"Herr Müller ist ein guter Lehrer.",no:"Herr Müller er en god lærer.",blank:"ein",gender:"m",kasus:"nom",role:"predikativ",nounPhrase:"___ guter Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Sie hat einen Bruder.",no:"Hun har en bror.",blank:"einen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Bruder",genderHint:"«Bruder» er hankjønn."},
+  {de:"Ich sehe einen Vogel.",no:"Jeg ser en fugl.",blank:"einen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Vogel",genderHint:"«Vogel» er hankjønn."},
+  {de:"Er kauft einen Tisch.",no:"Han kjøper et bord.",blank:"einen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Tisch",genderHint:"«Tisch» er hankjønn."},
+  {de:"Wir brauchen einen neuen Computer.",no:"Vi trenger en ny datamaskin.",blank:"einen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ neuen Computer",genderHint:"«Computer» er hankjønn."},
+  {de:"Sie schreibt einem Freund einen Brief.",no:"Hun skriver et brev til en venn.",blank:"einem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Freund",genderHint:"«Freund» er hankjønn."},
+  {de:"Sie erklärt einem Schüler die Aufgabe.",no:"Hun forklarer en elev oppgaven.",blank:"einem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Schüler",genderHint:"«Schüler» er hankjønn."},
+  {de:"Heute Abend sehen wir einen Film.",no:"I kveld ser vi en film.",blank:"einen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Film",genderHint:"«Film» er hankjønn."},
+  {de:"Er gibt einem Briefträger das Paket.",no:"Han gir et postbud pakken.",blank:"einem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Briefträger",genderHint:"«Briefträger» er hankjønn."},
+  {de:"Eine Frau wartet an der Bushaltestelle.",no:"En kvinne venter ved bussholdeplassen.",blank:"Eine",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Frau",genderHint:"«Frau» er hunkjønn."},
+  {de:"Eine Katze schläft auf dem Sofa.",no:"En katt sover på sofaen.",blank:"Eine",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Katze",genderHint:"«Katze» er hunkjønn."},
+  {de:"Eine Schülerin stellt eine Frage.",no:"En elev stiller et spørsmål.",blank:"Eine",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Schülerin",genderHint:"«Schülerin» er hunkjønn."},
+  {de:"Das ist eine gute Idee.",no:"Det er en god idé.",blank:"eine",gender:"f",kasus:"nom",role:"predikativ",nounPhrase:"___ gute Idee",genderHint:"«Idee» er hunkjønn."},
+  {de:"Er liest eine Zeitung.",no:"Han leser en avis.",blank:"eine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Zeitung",genderHint:"«Zeitung» er hunkjønn."},
+  {de:"Sie kauft eine Tasche.",no:"Hun kjøper en veske.",blank:"eine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Tasche",genderHint:"«Tasche» er hunkjønn."},
+  {de:"Ich brauche eine Antwort.",no:"Jeg trenger et svar.",blank:"eine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Antwort",genderHint:"«Antwort» er hunkjønn."},
+  {de:"Er sucht eine Wohnung in der Stadt.",no:"Han leter etter en leilighet i byen.",blank:"eine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Wohnung",genderHint:"«Wohnung» er hunkjønn."},
+  {de:"Er schenkt einer Freundin Blumen.",no:"Han gir en venninne blomster.",blank:"einer",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Freundin",genderHint:"«Freundin» er hunkjønn."},
+  {de:"Sie gibt einer Kollegin den Bericht.",no:"Hun gir en kollega rapporten.",blank:"einer",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kollegin",genderHint:"«Kollegin» er hunkjønn."},
+  {de:"Ist das ein Tiger?",no:"Er det en tiger?",blank:"ein",gender:"m",kasus:"nom",role:"predikativ",nounPhrase:"___ Tiger",genderHint:"«Tiger» er hankjønn."},
+  {de:"Sie erklärt einer Touristin den Weg.",no:"Hun forklarer en turist veien.",blank:"einer",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Touristin",genderHint:"«Touristin» er hunkjønn."},
+  {de:"Ein Kind spielt im Garten.",no:"Et barn leker i hagen.",blank:"Ein",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Ein Auto steht vor dem Haus.",no:"En bil står foran huset.",blank:"Ein",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  {de:"Das ist ein interessantes Buch.",no:"Det er en interessant bok.",blank:"ein",gender:"n",kasus:"nom",role:"predikativ",nounPhrase:"___ interessantes Buch",genderHint:"«Buch» er intetkjønn."},
+  {de:"Er kauft ein Brot.",no:"Han kjøper et brød.",blank:"ein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Brot",genderHint:"«Brot» er intetkjønn."},
+  {de:"Wir suchen ein Hotel.",no:"Vi leter etter et hotell.",blank:"ein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hotel",genderHint:"«Hotel» er intetkjønn."},
+  {de:"Sie schreibt ein Gedicht.",no:"Hun skriver et dikt.",blank:"ein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Gedicht",genderHint:"«Gedicht» er intetkjønn."},
+  {de:"Er hat ein Fahrrad.",no:"Han har en sykkel.",blank:"ein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Fahrrad",genderHint:"«Fahrrad» er intetkjønn."},
+  {de:"Er zeigt einem Kind den Weg.",no:"Han viser et barn veien.",blank:"einem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Sie liest einem Mädchen eine Geschichte vor.",no:"Hun leser en historie til ei jente.",blank:"einem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mädchen",genderHint:"«Mädchen» er intetkjønn."},
+  {de:"Er schenkt einem Kind ein Buch.",no:"Han gir et barn en bok.",blank:"einem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Sie erklärt einem Mädchen die Aufgabe.",no:"Hun forklarer en jente oppgaven.",blank:"einem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mädchen",genderHint:"«Mädchen» er intetkjønn."},
+];
+
+
+const SENTENCES_KEIN = [
+  // Hankjønn nom (kein)
+  {de:"Kein Lehrer war heute in der Schule.",no:"Ingen lærer var på skolen i dag.",blank:"Kein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Das ist kein Fehler.",no:"Det er ikke en feil.",blank:"kein",gender:"m",kasus:"nom",role:"predikativ",nounPhrase:"___ Fehler",genderHint:"«Fehler» er hankjønn."},
+  {de:"Hier ist kein Arzt.",no:"Her er det ingen lege.",blank:"kein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Arzt",genderHint:"«Arzt» er hankjønn."},
+  {de:"Kein Hund bellt in dieser Straße.",no:"Ingen hund bjeffer i denne gaten.",blank:"Kein",gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  // Hankjønn akk (keinen)
+  {de:"Sie hat keinen Bruder.",no:"Hun har ingen bror.",blank:"keinen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Bruder",genderHint:"«Bruder» er hankjønn."},
+  {de:"Ich sehe keinen Defekt am Motor.",no:"Jeg ser ingen defekt på motoren.",blank:"keinen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Defekt",genderHint:"«Defekt» er hankjønn."},
+  {de:"Wir haben keinen Unterricht heute.",no:"Vi har ingen undervisning i dag.",blank:"keinen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Unterricht",genderHint:"«Unterricht» er hankjønn."},
+  {de:"Hast du keinen Hunger?",no:"Er du ikke sulten?",blank:"keinen",gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hunger",genderHint:"«Hunger» er hankjønn."},
+  // Hankjønn dat (keinem)
+  {de:"Sie schreibt keinem Freund mehr Briefe.",no:"Hun skriver ikke lenger brev til noen venn.",blank:"keinem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Freund",genderHint:"«Freund» er hankjønn."},
+  {de:"Er gibt keinem Schüler eine zweite Chance.",no:"Han gir ingen elev en ny sjanse.",blank:"keinem",gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Schüler",genderHint:"«Schüler» er hankjønn."},
+  // Hunkjønn nom (keine)
+  {de:"Keine Schülerin hat die Aufgabe vergessen.",no:"Ingen elev har glemt oppgaven.",blank:"Keine",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Schülerin",genderHint:"«Schülerin» er hunkjønn."},
+  {de:"Das ist keine gute Idee.",no:"Det er ikke en god idé.",blank:"keine",gender:"f",kasus:"nom",role:"predikativ",nounPhrase:"___ gute Idee",genderHint:"«Idee» er hunkjønn."},
+  {de:"Keine Katze schläft draußen.",no:"Ingen katt sover ute.",blank:"Keine",gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Katze",genderHint:"«Katze» er hunkjønn."},
+  // Hunkjønn akk (keine)
+  {de:"Er hat keine Schwester.",no:"Han har ingen søster.",blank:"keine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Schwester",genderHint:"«Schwester» er hunkjønn."},
+  {de:"Ich habe heute keine Zeit.",no:"Jeg har ikke tid i dag.",blank:"keine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Zeit",genderHint:"«Zeit» er hunkjønn."},
+  {de:"Siehst du keine Lösung?",no:"Ser du ingen løsning?",blank:"keine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Lösung",genderHint:"«Lösung» er hunkjønn."},
+  {de:"Sie kauft keine Zeitung mehr.",no:"Hun kjøper ikke avis lenger.",blank:"keine",gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Zeitung",genderHint:"«Zeitung» er hunkjønn."},
+  // Hunkjønn dat (keiner)
+  {de:"Die Kinder erzählen keinen Erwachsenen ihre Geheimnisse.",no:"Barna forteller ikke noen voksne hemmelighetene sine.",blank:"keinen",gender:"pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Erwachsenen",genderHint:"«Erwachsenen» er flertall."},
+  {de:"Sie erklärt keiner Touristin den Weg.",no:"Hun forklarer ikke veien til noen turist.",blank:"keiner",gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Touristin",genderHint:"«Touristin» er hunkjønn."},
+  // Intetkjønn nom (kein)
+  {de:"Kein Kind schläft noch.",no:"Ikke noe barn sover ennå.",blank:"Kein",gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Das ist kein Problem.",no:"Det er ikke noe problem.",blank:"kein",gender:"n",kasus:"nom",role:"predikativ",nounPhrase:"___ Problem",genderHint:"«Problem» er intetkjønn."},
+  {de:"Im Kühlschrank ist kein Brot.",no:"I kjøleskapet er det ikke noe brød.",blank:"kein",gender:"n",kasus:"nom",role:"predikativ",nounPhrase:"___ Brot",genderHint:"«Brot» er intetkjønn."},
+  // Intetkjønn akk (kein)
+  {de:"Er hat kein Fahrrad.",no:"Han har ingen sykkel.",blank:"kein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Fahrrad",genderHint:"«Fahrrad» er intetkjønn."},
+  {de:"Wir haben kein Auto.",no:"Vi har ingen bil.",blank:"kein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  {de:"Hast du kein Geld dabei?",no:"Har du ikke penger på deg?",blank:"kein",gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Geld",genderHint:"«Geld» er intetkjønn."},
+  // Intetkjønn dat (keinem)
+  {de:"Er schenkt keinem Kind Süßigkeiten.",no:"Han gir ikke noe barn godteri.",blank:"keinem",gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  {de:"Sie liest keinen Kindern gruselige Geschichten vor.",no:"Hun leser ikke skumle historier for noen barn.",blank:"keinen",gender:"pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kindern",genderHint:"«Kindern» er flertall."},
+  // Flertall nom (keine)
+  {de:"Keine Schüler kommen zu spät.",no:"Ingen elever kommer for sent.",blank:"Keine",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Schüler",genderHint:"«Schüler» er flertall."},
+  {de:"Heute kommen keine Gäste.",no:"I dag kommer det ingen gjester.",blank:"keine",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Gäste",genderHint:"«Gäste» er flertall."},
+  {de:"Keine Autos dürfen hier parken.",no:"Ingen biler har lov til å parkere her.",blank:"Keine",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Autos",genderHint:"«Autos» er flertall."},
+  // Flertall akk (keine)
+  {de:"Er hat keine Geschwister.",no:"Han har ingen søsken.",blank:"keine",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Geschwister",genderHint:"«Geschwister» er flertall."},
+  {de:"Wir haben keine Hausaufgaben heute.",no:"Vi har ingen lekser i dag.",blank:"keine",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hausaufgaben",genderHint:"«Hausaufgaben» er flertall."},
+  {de:"Ich sehe keine Wolken am Himmel.",no:"Jeg ser ingen skyer på himmelen.",blank:"keine",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Wolken",genderHint:"«Wolken» er flertall."},
+  {de:"Hat sie keine Freunde in der Stadt?",no:"Har hun ingen venner i byen?",blank:"keine",gender:"pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Freunde",genderHint:"«Freunde» er flertall."},
+  {de:"Keine Kinder wohnen in dieser Straße.",no:"Ingen barn bor i denne gaten.",blank:"Keine",gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Kinder",genderHint:"«Kinder» er flertall."},
+];
+
+
+// ── POSSESSIVES DATA ──────────────────────────────────────────────────────────
+
+const POSSESSIVE_ROWS = [
+  {pronoun:"ich",    word:"mein",  stem:"mein"},
+  {pronoun:"du",     word:"dein",  stem:"dein"},
+  {pronoun:"er",     word:"sein",  stem:"sein"},
+  {pronoun:"sie\u00a0(sg.)", word:"ihr", stem:"ihr"},
+  {pronoun:"es",     word:"sein",  stem:"sein"},
+  {pronoun:"wir",    word:"unser", stem:"unser"},
+  {pronoun:"ihr",    word:"euer",  stem:"eu"},
+  {pronoun:"sie\u00a0(pl.)", word:"ihr", stem:"ihr"},
+  {pronoun:"Sie",    word:"Ihr",   stem:"Ihr"},
+];
+
+// For each row: endings by [kasus][gender]
+// nom: m="", f="e", n="", pl="e"
+// akk: m="en", f="e", n="", pl="e"
+// dat: m="em", f="er", n="em", pl="en"
+// Special: euer stem="eu", so nom-m = "euer", nom-f = "eure" etc.
+function getPossForm(stem, kasus, gender) {
+  const endings = {
+    nom: {m:"",   f:"e",  n:"",   pl:"e"},
+    akk: {m:"en", f:"e",  n:"",   pl:"e"},
+    dat: {m:"em", f:"er", n:"em", pl:"en"},
+  };
+  const ending = endings[kasus][gender];
+  // euer special: stem "eu" + "er" for base, drop the e before consonant endings
+  if (stem === "eu") {
+    // euer, eure, euer, eure / euren, eure, euer, eure / eurem, eurer, eurem, euren
+    const euForms = {
+      nom: {m:"euer", f:"eure",  n:"euer",  pl:"eure"},
+      akk: {m:"euren",f:"eure",  n:"euer",  pl:"eure"},
+      dat: {m:"eurem",f:"eurer", n:"eurem", pl:"euren"},
+    };
+    return euForms[kasus][gender];
+  }
+  return stem + ending;
+}
+
+const SENTENCES_POSS = [
+  // mein
+  {de:"Mein Vater kocht heute Abend.",no:"Faren min lager mat i kveld.",blank:"Mein",poss_stem:"mein",poss_pronoun_idx:0,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Ich vermisse meinen Hund.",no:"Jeg savner hunden min.",blank:"meinen",poss_stem:"mein",poss_pronoun_idx:0,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  {de:"Er schreibt meinem Bruder einen Brief.",no:"Han skriver et brev til broren min.",blank:"meinem",poss_stem:"mein",poss_pronoun_idx:0,gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Bruder",genderHint:"«Bruder» er hankjønn."},
+  {de:"Meine Mutter arbeitet in der Stadt.",no:"Moren min jobber i byen.",blank:"Meine",poss_stem:"mein",poss_pronoun_idx:0,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  {de:"Ich liebe meine Schwester.",no:"Jeg elsker søsteren min.",blank:"meine",poss_stem:"mein",poss_pronoun_idx:0,gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Schwester",genderHint:"«Schwester» er hunkjønn."},
+  {de:"Er gibt meiner Lehrerin ein Geschenk.",no:"Han gir læreren min en gave.",blank:"meiner",poss_stem:"mein",poss_pronoun_idx:0,gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Lehrerin",genderHint:"«Lehrerin» er hunkjønn."},
+  {de:"Mein Fahrrad steht vor der Schule.",no:"Sykkelen min står foran skolen.",blank:"Mein",poss_stem:"mein",poss_pronoun_idx:0,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Fahrrad",genderHint:"«Fahrrad» er intetkjønn."},
+  {de:"Hast du mein Buch gesehen?",no:"Har du sett boken min?",blank:"mein",poss_stem:"mein",poss_pronoun_idx:0,gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Buch",genderHint:"«Buch» er intetkjønn."},
+  {de:"Meine Eltern wohnen in Oslo.",no:"Foreldrene mine bor i Oslo.",blank:"Meine",poss_stem:"mein",poss_pronoun_idx:0,gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Eltern",genderHint:"«Eltern» er flertall."},
+  // dein
+  {de:"Dein Vater wartet draußen.",no:"Faren din venter ute.",blank:"Dein",poss_stem:"dein",poss_pronoun_idx:1,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Ich sehe deinen Hund.",no:"Jeg ser hunden din.",blank:"deinen",poss_stem:"dein",poss_pronoun_idx:1,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  {de:"Deine Schwester ist sehr nett.",no:"Søsteren din er veldig snill.",blank:"Deine",poss_stem:"dein",poss_pronoun_idx:1,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Schwester",genderHint:"«Schwester» er hunkjønn."},
+  {de:"Ich mag deine Idee.",no:"Jeg liker ideen din.",blank:"deine",poss_stem:"dein",poss_pronoun_idx:1,gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Idee",genderHint:"«Idee» er hunkjønn."},
+  {de:"Er erklärt deiner Mutter den Plan.",no:"Han forklarer planen for moren din.",blank:"deiner",poss_stem:"dein",poss_pronoun_idx:1,gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  {de:"Dein Zimmer ist sehr groß.",no:"Rommet ditt er veldig stort.",blank:"Dein",poss_stem:"dein",poss_pronoun_idx:1,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Zimmer",genderHint:"«Zimmer» er intetkjønn."},
+  {de:"Hast du dein Heft vergessen?",no:"Har du glemt heftet ditt?",blank:"dein",poss_stem:"dein",poss_pronoun_idx:1,gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Heft",genderHint:"«Heft» er intetkjønn."},
+  // sein (er)
+  {de:"Sein Bruder studiert in Berlin.",no:"Broren hans studerer i Berlin.",blank:"Sein",poss_stem:"sein",poss_pronoun_idx:2,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Bruder",genderHint:"«Bruder» er hankjønn."},
+  {de:"Er besucht seinen Großvater.",no:"Han besøker bestefaren sin.",blank:"seinen",poss_stem:"sein",poss_pronoun_idx:2,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Großvater",genderHint:"«Großvater» er hankjønn."},
+  {de:"Seine Mutter ist Ärztin.",no:"Moren hans er lege.",blank:"Seine",poss_stem:"sein",poss_pronoun_idx:2,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  {de:"Er liebt seine Katze.",no:"Han elsker katten sin.",blank:"seine",poss_stem:"sein",poss_pronoun_idx:2,gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Katze",genderHint:"«Katze» er hunkjønn."},
+  {de:"Er zeigt seinem Kind den Weg.",no:"Han viser barnet sitt veien.",blank:"seinem",poss_stem:"sein",poss_pronoun_idx:2,gender:"n",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Kind",genderHint:"«Kind» er intetkjønn."},
+  // ihr (sie sg.)
+  {de:"Ihr Vater ist Lehrer.",no:"Faren hennes er lærer.",blank:"Ihr",poss_stem:"ihr",poss_pronoun_idx:3,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Sie besucht ihren Bruder.",no:"Hun besøker broren sin.",blank:"ihren",poss_stem:"ihr",poss_pronoun_idx:3,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Bruder",genderHint:"«Bruder» er hankjønn."},
+  {de:"Ihre Schwester singt sehr gut.",no:"Søsteren hennes synger veldig bra.",blank:"Ihre",poss_stem:"ihr",poss_pronoun_idx:3,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Schwester",genderHint:"«Schwester» er hunkjønn."},
+  {de:"Sie gibt ihrer Freundin ein Buch.",no:"Hun gir venninnen sin en bok.",blank:"ihrer",poss_stem:"ihr",poss_pronoun_idx:3,gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Freundin",genderHint:"«Freundin» er hunkjønn."},
+  {de:"Ihr Auto steht in der Garage.",no:"Bilen hennes står i garasjen.",blank:"Ihr",poss_stem:"ihr",poss_pronoun_idx:3,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  // sein (es)
+  {de:"Das Baby weint, sein Schnuller ist weg.",no:"Babyen gråter, smokken dens er borte.",blank:"sein",poss_stem:"sein",poss_pronoun_idx:4,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Schnuller",genderHint:"«Schnuller» er hankjønn."},
+  {de:"Das Kätzchen sucht seine Mutter.",no:"Kattungen leter etter moren sin.",blank:"seine",poss_stem:"sein",poss_pronoun_idx:4,gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  // unser
+  {de:"Unser Lehrer ist sehr streng.",no:"Læreren vår er veldig streng.",blank:"Unser",poss_stem:"unser",poss_pronoun_idx:5,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Wir besuchen unseren Großvater.",no:"Vi besøker bestefaren vår.",blank:"unseren",poss_stem:"unser",poss_pronoun_idx:5,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Großvater",genderHint:"«Großvater» er hankjønn."},
+  {de:"Er erklärt unserem Vater den Plan.",no:"Han forklarer faren vår planen.",blank:"unserem",poss_stem:"unser",poss_pronoun_idx:5,gender:"m",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Unsere Schule ist sehr alt.",no:"Skolen vår er veldig gammel.",blank:"Unsere",poss_stem:"unser",poss_pronoun_idx:5,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Schule",genderHint:"«Schule» er hunkjønn."},
+  {de:"Wir lieben unsere Stadt.",no:"Vi elsker byen vår.",blank:"unsere",poss_stem:"unser",poss_pronoun_idx:5,gender:"f",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Stadt",genderHint:"«Stadt» er hunkjønn."},
+  {de:"Unser Haus ist sehr groß.",no:"Huset vårt er veldig stort.",blank:"Unser",poss_stem:"unser",poss_pronoun_idx:5,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Haus",genderHint:"«Haus» er intetkjønn."},
+  {de:"Wir verkaufen unser Auto.",no:"Vi selger bilen vår.",blank:"unser",poss_stem:"unser",poss_pronoun_idx:5,gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+  {de:"Unsere Eltern arbeiten viel.",no:"Foreldrene våre jobber mye.",blank:"Unsere",poss_stem:"unser",poss_pronoun_idx:5,gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Eltern",genderHint:"«Eltern» er flertall."},
+  // euer
+  {de:"Euer Hund ist sehr groß.",no:"Hunden deres er veldig stor.",blank:"Euer",poss_stem:"eu",poss_pronoun_idx:6,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Hund",genderHint:"«Hund» er hankjønn."},
+  {de:"Habt ihr euren Vater angerufen?",no:"Har dere ringt til faren deres?",blank:"euren",poss_stem:"eu",poss_pronoun_idx:6,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Eure Mutter wartet auf euch.",no:"Moren deres venter på dere.",blank:"Eure",poss_stem:"eu",poss_pronoun_idx:6,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Mutter",genderHint:"«Mutter» er hunkjønn."},
+  {de:"Euer Haus ist wunderschön.",no:"Huset deres er nydelig.",blank:"Euer",poss_stem:"eu",poss_pronoun_idx:6,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Haus",genderHint:"«Haus» er intetkjønn."},
+  {de:"Habt ihr euer Zimmer aufgeräumt?",no:"Har dere ryddet rommet deres?",blank:"euer",poss_stem:"eu",poss_pronoun_idx:6,gender:"n",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Zimmer",genderHint:"«Zimmer» er intetkjønn."},
+  {de:"Eure Freunde sind sehr lustig.",no:"Vennene deres er veldig morsomme.",blank:"Eure",poss_stem:"eu",poss_pronoun_idx:6,gender:"pl",kasus:"nom",role:"subjekt",nounPhrase:"___ Freunde",genderHint:"«Freunde» er flertall."},
+  // ihr (sie pl.)
+  {de:"Ihr Lehrer ist sehr beliebt.",no:"Læreren deres er veldig populær.",blank:"Ihr",poss_stem:"ihr",poss_pronoun_idx:7,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Lehrer",genderHint:"«Lehrer» er hankjønn."},
+  {de:"Die Kinder vermissen ihren Vater.",no:"Barna savner faren sin.",blank:"ihren",poss_stem:"ihr",poss_pronoun_idx:7,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Vater",genderHint:"«Vater» er hankjønn."},
+  {de:"Sie zeigen ihrer Lehrerin die Aufgaben.",no:"De viser læreren sin oppgavene.",blank:"ihrer",poss_stem:"ihr",poss_pronoun_idx:7,gender:"f",kasus:"dat",role:"indirekte objekt",nounPhrase:"___ Lehrerin",genderHint:"«Lehrerin» er hunkjønn."},
+  {de:"Ihre Wohnung ist sehr klein.",no:"Leiligheten deres er veldig liten.",blank:"Ihre",poss_stem:"ihr",poss_pronoun_idx:7,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Wohnung",genderHint:"«Wohnung» er hunkjønn."},
+  // Ihr (Sie)
+  {de:"Ist das Ihr Mantel?",no:"Er det frakken Deres?",blank:"Ihr",poss_stem:"Ihr",poss_pronoun_idx:8,gender:"m",kasus:"nom",role:"subjekt",nounPhrase:"___ Mantel",genderHint:"«Mantel» er hankjønn."},
+  {de:"Haben Sie Ihren Schlüssel dabei?",no:"Har De nøkkelen Deres på seg?",blank:"Ihren",poss_stem:"Ihr",poss_pronoun_idx:8,gender:"m",kasus:"akk",role:"direkte objekt",nounPhrase:"___ Schlüssel",genderHint:"«Schlüssel» er hankjønn."},
+  {de:"Ist das Ihre Tasche?",no:"Er det vesken Deres?",blank:"Ihre",poss_stem:"Ihr",poss_pronoun_idx:8,gender:"f",kasus:"nom",role:"subjekt",nounPhrase:"___ Tasche",genderHint:"«Tasche» er hunkjønn."},
+  {de:"Ist das Ihr Auto?",no:"Er det bilen Deres?",blank:"Ihr",poss_stem:"Ihr",poss_pronoun_idx:8,gender:"n",kasus:"nom",role:"subjekt",nounPhrase:"___ Auto",genderHint:"«Auto» er intetkjønn."},
+];
+
+
+// ── PRONOUN DATA ──────────────────────────────────────────────────────────────
+
+const PRONOUN_TABLE = {
+  nom: {ich:"ich", du:"du", er:"er", sie_sg:"sie", es:"es", wir:"wir", ihr_pl:"ihr", sie_pl:"sie", Sie:"Sie"},
+  akk: {ich:"mich", du:"dich", er:"ihn", sie_sg:"sie", es:"es", wir:"uns", ihr_pl:"euch", sie_pl:"sie", Sie:"Sie"},
+  dat: {ich:"mir", du:"dir", er:"ihm", sie_sg:"ihr", es:"ihm", wir:"uns", ihr_pl:"euch", sie_pl:"ihnen", Sie:"Ihnen"},
+};
+
+const PRONOUN_ROWS = [
+  {label:"ich",    key:"ich"},
+  {label:"du",     key:"du"},
+  {label:"er",     key:"er"},
+  {label:"sie (sg.)",  key:"sie_sg"},
+  {label:"es",     key:"es"},
+  {label:"wir",    key:"wir"},
+  {label:"ihr",    key:"ihr_pl"},
+  {label:"sie (pl.)", key:"sie_pl"},
+  {label:"Sie",    key:"Sie"},
+];
+
+const SENTENCES_PRON = [
+  // Nominativ – 1 per pronomen
+  {de:"Ich lerne jeden Tag Deutsch.",no:"Jeg lærer tysk hver dag.",blank:"Ich",pronKey:"ich",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Morgen kommst du zu uns.",no:"I morgen kommer du til oss.",blank:"du",pronKey:"du",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Er spielt sehr gut Fußball.",no:"Han spiller fotball veldig bra.",blank:"Er",pronKey:"er",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Sie arbeitet als Ärztin.",no:"Hun jobber som lege.",blank:"Sie",pronKey:"sie_sg",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Es regnet den ganzen Tag.",no:"Det regner hele dagen.",blank:"Es",pronKey:"es",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Heute kochen wir zusammen.",no:"I dag lager vi mat sammen.",blank:"wir",pronKey:"wir",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Habt ihr die Hausaufgaben gemacht?",no:"Har dere gjort leksene?",blank:"ihr",pronKey:"ihr_pl",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Sie kommen aus Norwegen.",no:"De kommer fra Norge.",blank:"Sie",pronKey:"sie_pl",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  {de:"Haben Sie einen Moment Zeit?",no:"Har De et øyeblikk?",blank:"Sie",pronKey:"Sie",kasus:"nom",role:"subjekt",nounPhrase:"___",genderHint:""},
+  // Akkusativ
+  {de:"Er liebt mich sehr.",no:"Han elsker meg veldig.",blank:"mich",pronKey:"ich",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich vermisse dich.",no:"Jeg savner deg.",blank:"dich",pronKey:"du",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Siehst du ihn?",no:"Ser du ham?",blank:"ihn",pronKey:"er",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich kenne sie gut.",no:"Jeg kjenner henne godt.",blank:"sie",pronKey:"sie_sg",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Wir kaufen es morgen.",no:"Vi kjøper det i morgen.",blank:"es",pronKey:"es",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Der Lehrer lobt uns.",no:"Læreren roser oss.",blank:"uns",pronKey:"wir",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Die Lehrerin fragt euch.",no:"Læreren spør dere.",blank:"euch",pronKey:"ihr_pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich sehe sie jeden Tag.",no:"Jeg ser dem hver dag.",blank:"sie",pronKey:"sie_pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Kennen Sie Frau Müller?",no:"Kjenner De fru Müller?",blank:"Sie",pronKey:"Sie",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Warum rufst du mich nicht an?",no:"Hvorfor ringer du meg ikke?",blank:"mich",pronKey:"ich",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er besucht sie am Wochenende.",no:"Han besøker henne i helgen.",blank:"sie",pronKey:"sie_sg",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Das macht mich glücklich.",no:"Det gjør meg glad.",blank:"mich",pronKey:"ich",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich höre dich nicht.",no:"Jeg hører deg ikke.",blank:"dich",pronKey:"du",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Wir treffen ihn um drei Uhr.",no:"Vi møter ham klokka tre.",blank:"ihn",pronKey:"er",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Hast du es vergessen?",no:"Har du glemt det?",blank:"es",pronKey:"es",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Sie vermissen uns sehr.",no:"De savner oss veldig.",blank:"uns",pronKey:"wir",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich brauche euch jetzt.",no:"Jeg trenger dere nå.",blank:"euch",pronKey:"ihr_pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Kennt ihr sie alle?",no:"Kjenner dere dem alle?",blank:"sie",pronKey:"sie_pl",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Wir bewundern Sie, Frau Müller.",no:"Vi beundrer Dem, fru Müller.",blank:"Sie",pronKey:"Sie",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Das Buch interessiert mich sehr.",no:"Boken interesserer meg veldig.",blank:"mich",pronKey:"ich",kasus:"akk",role:"direkte objekt",nounPhrase:"___",genderHint:""},
+  // Dativ
+  {de:"Sie zeigt ihm den Weg.",no:"Hun viser ham veien.",blank:"ihm",pronKey:"er",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er schickt ihr eine Nachricht.",no:"Han sender henne en melding.",blank:"ihr",pronKey:"sie_sg",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er schreibt mir einen Brief.",no:"Han skriver et brev til meg.",blank:"mir",pronKey:"ich",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich zeige dir die Stadt.",no:"Jeg viser deg byen.",blank:"dir",pronKey:"du",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Sie schreibt ihm einen langen Brief.",no:"Hun skriver et langt brev til ham.",blank:"ihm",pronKey:"er",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er gibt ihr ein Geschenk.",no:"Han gir henne en gave.",blank:"ihr",pronKey:"sie_sg",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Die Mutter gibt ihm ein Stück Kuchen.",no:"Moren gir ham et stykke kake.",blank:"ihm",pronKey:"es",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er erklärt mir die Aufgabe.",no:"Han forklarer meg oppgaven.",blank:"mir",pronKey:"ich",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich gebe dir das Buch.",no:"Jeg gir deg boken.",blank:"dir",pronKey:"du",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Wir zeigen ihm das neue Haus.",no:"Vi viser ham det nye huset.",blank:"ihm",pronKey:"er",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Wir schicken ihr eine Karte.",no:"Vi sender henne et kort.",blank:"ihr",pronKey:"sie_sg",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Die Lehrerin erklärt uns die Grammatik.",no:"Læreren forklarer oss grammatikken.",blank:"uns",pronKey:"wir",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er schickt euch die Einladung.",no:"Han sender dere invitasjonen.",blank:"euch",pronKey:"ihr_pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich bringe ihnen das Essen.",no:"Jeg bringer dem maten.",blank:"ihnen",pronKey:"sie_pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Kannst du mir das erklären?",no:"Kan du forklare meg det?",blank:"mir",pronKey:"ich",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Schreibt er Ihnen oft Briefe?",no:"Skriver han ofte brev til Dem?",blank:"Ihnen",pronKey:"Sie",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Sie gibt dir die Antwort.",no:"Hun gir deg svaret.",blank:"dir",pronKey:"du",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Er zeigt uns den Plan.",no:"Han viser oss planen.",blank:"uns",pronKey:"wir",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Ich gebe euch die Aufgabe.",no:"Jeg gir dere oppgaven.",blank:"euch",pronKey:"ihr_pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Die Ärztin erklärt ihnen den Befund.",no:"Legen forklarer dem diagnosen.",blank:"ihnen",pronKey:"sie_pl",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+  {de:"Der Kellner bringt Ihnen den Kaffee, Frau Müller.",no:"Kellneren bringer Dem kaffen, fru Müller.",blank:"Ihnen",pronKey:"Sie",kasus:"dat",role:"indirekte objekt",nounPhrase:"___",genderHint:""},
+];
+
+const MODULES = {
+  bestemt: {
+    sentences: SENTENCES_BESTEMT,
+    subtitleHTML: '<em>Bestemt artikkel</em> \u2013 velg riktig form ved \u00e5 klikke i tabellen.<br>Merk at du m\u00e5 trykke p\u00e5 riktig knapp ogs\u00e5 der samme artikkel finnes flere steder i tabellen.',
+    tableHTML: function() {
+      return '<table class="kasus-table" id="kasus-table"><thead><tr>' +
+        '<th class="row-header"></th><th>Hankj\u00f8nn</th><th>Hunkj\u00f8nn</th><th>Intetkj\u00f8nn</th><th>Flertall</th>' +
+        '</tr></thead><tbody>' +
+        '<tr><td class="kasus-label">Nominativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="nom">der</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="nom">die</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="nom">das</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="nom">die</button></td></tr>' +
+        '<tr><td class="kasus-label">Akkusativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="akk">den</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="akk">die</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="akk">das</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="akk">die</button></td></tr>' +
+        '<tr><td class="kasus-label">Dativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="dat">dem</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="dat">der</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="dat">dem</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="dat">den</button></td></tr>' +
+        '</tbody></table>';
+    }
+  },
+  ubestemt: {
+    sentences: SENTENCES_UBESTEMT,
+    subtitleHTML: '<em>Ubestemt artikkel</em> \u2013 velg riktig form ved \u00e5 klikke i tabellen.<br>Merk at du m\u00e5 trykke p\u00e5 riktig knapp ogs\u00e5 der samme artikkel finnes flere steder i tabellen.',
+    tableHTML: function() {
+      return '<table class="kasus-table" id="kasus-table"><thead><tr>' +
+        '<th class="row-header"></th><th>Hankj\u00f8nn</th><th>Hunkj\u00f8nn</th><th>Intetkj\u00f8nn</th>' +
+        '</tr></thead><tbody>' +
+        '<tr><td class="kasus-label">Nominativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="nom">ein</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="nom">eine</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="nom">ein</button></td></tr>' +
+        '<tr><td class="kasus-label">Akkusativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="akk">einen</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="akk">eine</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="akk">ein</button></td></tr>' +
+        '<tr><td class="kasus-label">Dativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="dat">einem</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="dat">einer</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="dat">einem</button></td></tr>' +
+        '</tbody></table>';
+    }
+  },
+  kein: {
+    sentences: SENTENCES_KEIN,
+    subtitleHTML: '<em>kein</em> \u2013 velg riktig form ved \u00e5 klikke i tabellen.<br>Merk at du m\u00e5 trykke p\u00e5 riktig knapp ogs\u00e5 der samme artikkel finnes flere steder i tabellen.',
+    tableHTML: function() {
+      return '<table class="kasus-table" id="kasus-table"><thead><tr>' +
+        '<th class="row-header"></th><th>Hankj\u00f8nn</th><th>Hunkj\u00f8nn</th><th>Intetkj\u00f8nn</th><th>Flertall</th>' +
+        '</tr></thead><tbody>' +
+        '<tr><td class="kasus-label">Nominativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="nom">kein</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="nom">keine</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="nom">kein</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="nom">keine</button></td></tr>' +
+        '<tr><td class="kasus-label">Akkusativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="akk">keinen</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="akk">keine</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="akk">kein</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="akk">keine</button></td></tr>' +
+        '<tr><td class="kasus-label">Dativ</td>' +
+        '<td><button class="art-btn" data-gender="m" data-kasus="dat">keinem</button></td>' +
+        '<td><button class="art-btn" data-gender="f" data-kasus="dat">keiner</button></td>' +
+        '<td><button class="art-btn" data-gender="n" data-kasus="dat">keinem</button></td>' +
+        '<td><button class="art-btn" data-gender="pl" data-kasus="dat">keinen</button></td></tr>' +
+        '</tbody></table>';
+    }
+  },
+  poss: {
+    sentences: SENTENCES_POSS,
+    subtitleHTML: '<em>Eiendomsord</em> \u2013 velg riktig form ved \u00e5 klikke i tabellen.<br>Merk at du m\u00e5 trykke p\u00e5 riktig knapp ogs\u00e5 der samme form finnes flere steder i tabellen.',
+    tableHTML: function() { return ''; }
+  },
+  pron: {
+    sentences: SENTENCES_PRON,
+    subtitleHTML: '<em>Personlige pronomen</em> \u2013 velg riktig form ved \u00e5 klikke i tabellen.<br>Merk at du m\u00e5 trykke p\u00e5 riktig knapp ogs\u00e5 der samme form finnes flere steder i tabellen.',
+    tableHTML: function() {
+      const rows = [
+        {kasus:'nom', label:'Nominativ'},
+        {kasus:'akk', label:'Akkusativ'},
+        {kasus:'dat', label:'Dativ'},
+      ];
+      const cols = PRONOUN_ROWS;
+      let html = '<table class="kasus-table" id="kasus-table"><thead><tr><th class="row-header"></th>';
+      cols.forEach(c => { html += '<th style="font-size:12px">'+c.label+'</th>'; });
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr><td class="kasus-label">'+r.label+'</td>';
+        cols.forEach(c => {
+          const form = PRONOUN_TABLE[r.kasus][c.key];
+          html += '<td><button class="art-btn" style="font-size:14px" data-pronkey="'+c.key+'" data-kasus="'+r.kasus+'">'+form+'</button></td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+  }
+};
+
+const KASUS_LABEL  = {nom:"nominativ", akk:"akkusativ", dat:"dativ"};
+const GENDER_LABEL = {m:"hankj\u00f8nn", f:"hunkj\u00f8nn", n:"intetkj\u00f8nn", pl:"flertall"};
+
+let currentModule = 'bestemt';
+let queue=[], qi=0, totalPoints=0, firstTryCount=0, doneCount=0, sentencePoints=[];
+let hintShown=false, usedShowAnswer=false, answered=false, overviewVisible=false;
+
+function shuffle(arr) {
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function fmtPts(p){const s=p.toFixed(1);if(s.endsWith('.0'))return s.slice(0,-2);if(s==='0.5')return '\u00bd';if(s.endsWith('.5'))return s.slice(0,-2)+'\u00bd';return s;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function sentenceWithUnderline(s){
+  const bl=s.blank.toLowerCase(); let done=false;
+  return s.de.split(' ').map(w=>{
+    if(!done){const punct=w.match(/[.,!?]$/)?w.slice(-1):'';const core=punct?w.slice(0,-1):w;
+      if(core.toLowerCase()===bl){done=true;return '<span class="ov-underline">'+esc(core)+'</span>'+esc(punct);}}
+    return esc(w);
+  }).join(' ');
+}
+
+function updateScorebar(){
+  const TOTAL=MODULES[currentModule].sentences.length;
+  document.getElementById('sc-total').textContent=fmtPts(totalPoints);
+  document.getElementById('sc-first').textContent=firstTryCount;
+  document.getElementById('sc-done').textContent=doneCount+' / '+TOTAL;
+}
+
+function clearTableHighlights(){document.querySelectorAll('.art-btn').forEach(b=>b.classList.remove('selected-wrong','correct-flash'));}
+function getBtn(g,k,pronKey){
+  if(currentModule==='pron')
+    return document.querySelector('.art-btn[data-pronkey="'+pronKey+'"][data-kasus="'+k+'"]');
+  return document.querySelector('.art-btn[data-gender="'+g+'"][data-kasus="'+k+'"]');
+}
+
+function showFeedback(type,html){
+  const cls=type==='correct'?'correct-msg':type==='hint'?'hint':'wrong-msg';
+  document.getElementById('feedback-area').innerHTML='<div class="'+cls+'">'+html+'</div>';
+}
+
+function attachTableListeners(){
+  document.querySelectorAll('.art-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{if(answered)return;handleAnswer(btn.dataset.gender,btn.dataset.kasus,btn,queue[qi]);});
+  });
+}
+
+
+// ── POSSESSIVE MODULE LOGIC ───────────────────────────────────────────────────
+
+function buildPossTable(stem) {
+  const rows = ['nom','akk','dat'];
+  const cols = ['m','f','n','pl'];
+  const colLabels = ['Hankjønn','Hunkjønn','Intetkjønn','Flertall'];
+  let html = '<table class="kasus-table" id="kasus-table"><thead><tr>' +
+    '<th class="row-header"></th>';
+  colLabels.forEach(l => html += '<th>'+l+'</th>');
+  html += '</tr></thead><tbody>';
+  rows.forEach(k => {
+    const kLabel = {nom:'Nominativ',akk:'Akkusativ',dat:'Dativ'}[k];
+    html += '<tr><td class="kasus-label">'+kLabel+'</td>';
+    cols.forEach(g => {
+      const form = getPossForm(stem, k, g);
+      html += '<td><button class="art-btn" data-gender="'+g+'" data-kasus="'+k+'">'+form+'</button></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildPossList(activeIdx) {
+  let html = '<table class="poss-list">';
+  POSSESSIVE_ROWS.forEach((row, i) => {
+    const isActive = i === activeIdx;
+    const wordClass = isActive ? ' poss-correct' : '';
+    html += '<tr>' +
+      '<td class="poss-pronoun">'+row.pronoun+'</td>' +
+      '<td class="poss-word'+wordClass+'">'+row.word+'</td>' +
+      '</tr>';
+  });
+  html += '</table>';
+  return html;
+}
+
+function renderPossQuestion(s, reveal) {
+  const parts = s.de.split(s.blank);
+  // Longest match first to avoid partial hits (e.g. 'vår' inside 'våre')
+  const noPosForms = ['Deres','deres','våre','vårt','vår','sine','dine','mine','hans','hennes','dens','sitt','ditt','mitt','sin','din','min'];
+  let noHtml = esc(s.no);
+  for (const form of noPosForms) {
+    if (s.no.indexOf(form) !== -1) {
+      // Replace only if it appears as a standalone word (surrounded by non-letters)
+      const escaped = form.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp('(?<![a-zA-Z\u00c0-\u017e])(' + escaped + ')(?![a-zA-Z\u00c0-\u017e])', 'u');
+      if (re.test(s.no)) {
+        noHtml = esc(s.no).replace(re, '<em><strong>$1</strong></em>');
+        break;
+      }
+    }
+  }
+  document.getElementById('sentence-area').innerHTML =
+    '<span style="color:#6b7280;font-size:14px;display:block;margin-bottom:4px">'+noHtml+'</span>' +
+    esc(parts[0]) + '<span class="blank">' + (reveal ? s.blank : '&nbsp;&nbsp;&nbsp;&nbsp;') + '</span>' +
+    esc(parts.slice(1).join(s.blank));
+}
+
+function attachPossTableListeners(s) {
+  document.querySelectorAll('.art-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      handleAnswer(btn.dataset.gender, btn.dataset.kasus, btn, s);
+    });
+  });
+}
+
+
+
+function generatePDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const modLabel = currentModule==='bestemt'?'Bestemt artikkel'
+    :currentModule==='ubestemt'?'Ubestemt artikkel'
+    :currentModule==='kein'?'kein'
+    :currentModule==='poss'?'Eiendomsord'
+    :'Personlige pronomen';
+  const TOTAL = MODULES[currentModule].sentences.length;
+  // Header
+  doc.setFontSize(20);
+  doc.setFont('helvetica','bold');
+  doc.text('KasusVeileder', 14, 20);
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica','normal');
+  doc.text('Modul: ' + modLabel, 14, 30);
+  doc.text('Dato: ' + new Date().toLocaleDateString('no-NO'), 14, 38);
+
+  // Score box
+  doc.setFontSize(11);
+  doc.setFont('helvetica','bold');
+  doc.text('Resultat', 14, 50);
+  doc.setFont('helvetica','normal');
+  doc.text('Poeng totalt: ' + fmtPts(totalPoints) + ' / ' + TOTAL, 14, 58);
+  doc.text('Riktige p\u00e5 f\u00f8rste fors\u00f8k: ' + firstTryCount + ' av ' + doneCount, 14, 66);
+  doc.text('Fullf\u00f8rt: ' + doneCount + ' av ' + TOTAL, 14, 74);
+
+  // Table of sentences
+  const rows = queue.slice(0, doneCount).map(s => [
+    s.no,
+    currentModule==='pron' ? '' : (GENDER_LABEL[s.gender] || ''),
+    KASUS_LABEL[s.kasus],
+    s.role,
+  ]);
+
+  const cols = currentModule==='pron'
+    ? ['Setning', 'Kasus', 'Setningsledd', 'Poeng']
+    : ['Setning', 'Kj\u00f8nn', 'Kasus', 'Setningsledd', 'Poeng'];
+
+  const tableRows = currentModule==='pron'
+    ? queue.slice(0,doneCount).map((s,i)=>[s.no, KASUS_LABEL[s.kasus], s.role, fmtPts(sentencePoints[i]||0)])
+    : queue.slice(0,doneCount).map((s,i)=>[s.no, GENDER_LABEL[s.gender]||'', KASUS_LABEL[s.kasus], s.role, fmtPts(sentencePoints[i]||0)]);
+
+  doc.autoTable({
+    startY: 82,
+    head: [cols],
+    body: tableRows,
+    styles: { fontSize: 9, cellPadding: 3 },
+    headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [245, 247, 255] },
+    columnStyles: currentModule==='pron'
+      ? { 0: {cellWidth: 90}, 1: {cellWidth: 28}, 2: {cellWidth: 44}, 3: {cellWidth: 18} }
+      : { 0: {cellWidth: 72}, 1: {cellWidth: 24}, 2: {cellWidth: 24}, 3: {cellWidth: 42}, 4: {cellWidth: 18} },
+    margin: { left: 14, right: 14 },
+  });
+
+  doc.save('KasusVeileder_' + modLabel.replace(/ /g,'_') + '.pdf');
+}
+
+function loadModule(modKey){
+  currentModule=modKey;
+  const mod=MODULES[modKey];
+  overviewVisible=false;
+  document.getElementById('overview-container').innerHTML='';
+  document.getElementById('subtitle-text').innerHTML=mod.subtitleHTML;
+  if(modKey !== 'poss'){
+    document.getElementById('table-wrap').innerHTML=mod.tableHTML();
+    attachTableListeners();
+  } else {
+    document.getElementById('table-wrap').innerHTML='';
+  }
+  queue=shuffle(mod.sentences);
+  qi=0; totalPoints=0; firstTryCount=0; doneCount=0; sentencePoints=[];
+  updateScorebar();
+  loadQuestion();
+}
+
+function loadQuestion(){
+  if(qi>=queue.length){showDone();return;}
+  const s=queue[qi];
+  hintShown=false; usedShowAnswer=false; answered=false;
+  clearTableHighlights();
+  document.getElementById('progress-lbl').textContent='Setning '+(qi+1)+' av '+MODULES[currentModule].sentences.length;
+  document.getElementById('feedback-area').innerHTML='';
+  document.getElementById('btn-row').innerHTML='';
+  if(currentModule==='poss'){
+    renderPossQuestion(s,false);
+    document.getElementById('table-wrap').innerHTML=
+      '<div class="poss-layout">'+
+        '<div class="poss-list-wrap">'+buildPossList(s.poss_pronoun_idx)+'</div>'+
+        '<div class="poss-table-wrap">'+buildPossTable(s.poss_stem)+'</div>'+
+      '</div>';
+    attachPossTableListeners(s);
+  } else {
+    renderSentence(s,false);
+  }
+}
+
+function renderSentence(s,reveal){
+  const parts=s.de.split(s.blank);
+  let noHtml = esc(s.no);
+  if(currentModule==='pron'){
+    // Highlight the Norwegian pronoun corresponding to the blank
+    const noPronMap = {
+      ich:{nom:'jeg',akk:'meg',dat:'meg'},
+      du:{nom:'du',akk:'deg',dat:'deg'},
+      er:{nom:'han',akk:'ham',dat:'ham'},
+      sie_sg:{nom:'hun',akk:'henne',dat:'henne'},
+      es:{nom:'det',akk:'det',dat:'ham'},
+      wir:{nom:'vi',akk:'oss',dat:'oss'},
+      ihr_pl:{nom:'dere',akk:'dere',dat:'dere'},
+      sie_pl:{nom:'de',akk:'dem',dat:'dem'},
+      Sie:{nom:'De',akk:'Dem',dat:'Dem'},
+    };
+    const noForm = noPronMap[s.pronKey] && noPronMap[s.pronKey][s.kasus];
+    if(noForm){
+      const re = new RegExp('(?<![a-zA-Z\u00c0-\u017e])('+noForm+')(?![a-zA-Z\u00c0-\u017e])','u');
+      noHtml = esc(s.no).replace(re,'<em><strong>$1</strong></em>');
+    }
+  }
+  document.getElementById('sentence-area').innerHTML=
+    '<span style="color:#6b7280;font-size:14px;display:block;margin-bottom:4px">'+noHtml+'</span>'
+    +esc(parts[0])+'<span class="blank">'+(reveal?s.blank:'&nbsp;&nbsp;&nbsp;&nbsp;')+'</span>'+esc(parts.slice(1).join(s.blank));
+}
+
+function handleAnswer(g,k,btn,s){
+  const correct = currentModule==='pron'
+    ? (btn.dataset.pronkey===s.pronKey && k===s.kasus)
+    : (g===s.gender && k===s.kasus);
+  if(correct){markCorrect(btn,s,false);return;}
+  btn.classList.add('selected-wrong');
+  if(!hintShown){
+    if(currentModule==='pron'){
+      showFeedback('hint',
+        '\u00ab' + s.blank + '\u00bb er ' + s.role + ' i setningen \u2192 ' + KASUS_LABEL[s.kasus] + '.'
+      );
+    } else {
+      showFeedback('hint',s.genderHint+'<br>\u00ab'+s.nounPhrase+'\u00bb er '+s.role+' \u2192 '+KASUS_LABEL[s.kasus]+'.');
+    }
+    hintShown=true; maybeShowAnswerBtn(s);
+  }
+}
+
+function maybeShowAnswerBtn(s){
+  if(!document.getElementById('show-ans-btn')){
+    const b=document.createElement('button');
+    b.className='show-answer-btn'; b.id='show-ans-btn'; b.textContent='Se svar';
+    b.addEventListener('click',()=>{usedShowAnswer=true; markCorrect(getBtn(s.gender,s.kasus,s.pronKey),s,true);});
+    document.getElementById('btn-row').appendChild(b);
+  }
+}
+
+function markCorrect(btn,s,forced){
+  answered=true; clearTableHighlights(); btn.classList.add('correct-flash');
+  const firstTry=!forced&&!usedShowAnswer&&!hintShown;
+  const pts=forced||usedShowAnswer?0:hintShown?0.5:1;
+  totalPoints+=pts; if(firstTry)firstTryCount++; doneCount++; sentencePoints.push(pts);
+  updateScorebar();
+  if(currentModule==='poss') renderPossQuestion(s,true); else renderSentence(s,true);
+  let feedMsg, feedMsgOk;
+  if(currentModule==='pron'){
+    feedMsg = '<strong>Svaret er:</strong> <em>'+s.blank+'</em> \u2013 '+s.role+' \u2192 '+KASUS_LABEL[s.kasus]+'.';
+    feedMsgOk = '\u2713 '+s.role+' \u2192 '+KASUS_LABEL[s.kasus]+'. <strong>+'+(pts===1?'1':'0,5')+' poeng</strong>';
+  } else {
+    const gl=GENDER_LABEL[s.gender]; const glCap=gl[0].toUpperCase()+gl.slice(1);
+    feedMsg = '<strong>Svaret er:</strong> <em>'+s.blank+'</em> \u2013 '+gl+', '+s.role+' \u2192 '+KASUS_LABEL[s.kasus]+'.';
+    feedMsgOk = '\u2713 '+glCap+', '+s.role+' \u2192 '+KASUS_LABEL[s.kasus]+'. <strong>+'+(pts===1?'1':'0,5')+' poeng</strong>';
+  }
+  if(forced){showFeedback('wrong',feedMsg);}
+  else{showFeedback('correct',feedMsgOk);}
+  const br=document.getElementById('btn-row'); br.innerHTML='';
+  const nb=document.createElement('button'); nb.className='next-btn';
+  if(qi<queue.length-1){
+    nb.innerHTML='Neste setning <i class="ti ti-arrow-right" style="font-size:15px;vertical-align:-2px"></i>';
+    nb.addEventListener('click',()=>{qi++;loadQuestion();});
+  } else {nb.textContent='Se resultat'; nb.addEventListener('click',showDone);}
+  br.appendChild(nb);
+}
+
+function showDone(){
+  const TOTAL=MODULES[currentModule].sentences.length;
+  const pct=doneCount>0?Math.round((totalPoints/doneCount)*100):0;
+  const modLabel=currentModule==='bestemt'?'Bestemt artikkel':currentModule==='ubestemt'?'Ubestemt artikkel':currentModule==='kein'?'kein':currentModule==='poss'?'Eiendomsord':'Personlige pronomen';
+  document.getElementById('app').innerHTML=
+    '<div class="header"><h1>KasusVeileder</h1></div>'+
+    '<div class="done-screen">'+
+    '<h2>Oppgaven er fullf\u00f8rt!</h2>'+
+    '<p style="color:#6b7280;font-size:14px;margin-bottom:0.25rem">'+modLabel+'</p>'+
+    '<div class="done-score">'+fmtPts(totalPoints)+' / '+TOTAL+'</div>'+
+    '<p style="color:#4b5563;font-size:15px;margin-bottom:0.25rem">'+doneCount+' setninger gjennomg\u00e5tt \u00b7 '+pct+'% av poeng oppn\u00e5dd</p>'+
+    '<p style="color:#4b5563;font-size:15px;margin-bottom:1.5rem">Riktige p\u00e5 f\u00f8rste fors\u00f8k: '+firstTryCount+' av '+doneCount+'</p>'+
+    '<table class="result-table"><thead><tr><th>Setning</th><th>Kj\u00f8nn</th><th>Kasus</th></tr></thead><tbody id="result-body"></tbody></table>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="restart-btn" id="restart-btn"><i class="ti ti-refresh"></i> Start p\u00e5 nytt</button>'+
+    '<button class="bottom-btn" id="print-btn2"><i class="ti ti-printer"></i> Print til PDF</button>'+
+    '</div></div>';
+  const tbody=document.getElementById('result-body');
+  queue.slice(0,doneCount).forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+sentenceWithUnderline(s)+'</td><td>'+GENDER_LABEL[s.gender]+'</td><td>'+KASUS_LABEL[s.kasus]+'</td>';
+    tbody.appendChild(tr);
+  });
+  document.getElementById('restart-btn').addEventListener('click',()=>loadModule(currentModule));
+  document.getElementById('print-btn2').addEventListener('click',generatePDF);
+}
+
+document.getElementById('module-select').addEventListener('change',function(){loadModule(this.value);});
+
+document.getElementById('overview-btn').addEventListener('click',()=>{
+  overviewVisible=!overviewVisible;
+  const c=document.getElementById('overview-container');
+  if(!overviewVisible){c.innerHTML='';return;}
+  const sorted=[...MODULES[currentModule].sentences].sort((a,b)=>a.de.localeCompare(b.de));
+  c.innerHTML='<div class="overview-modal"><h3><i class="ti ti-bulb" style="font-size:16px"></i> Alle setninger, alfabetisk</h3><ul class="overview-list">'
+    +sorted.map(s=>'<li><span>'+sentenceWithUnderline(s)+'</span><span class="ov-ans">'+(currentModule==='pron'?'':GENDER_LABEL[s.gender]+' \u00b7 ')+s.role+' \u00b7 '+KASUS_LABEL[s.kasus]+'</span></li>').join('')
+    +'</ul></div>';
+});
+
+document.getElementById('print-btn').addEventListener('click',()=>{ if(doneCount>0){ generatePDF(); } else { alert('Fullfør minst én setning før du lagrer resultatet.'); } });
+
+loadModule('bestemt');
+</script>
+</body>
+</html>
