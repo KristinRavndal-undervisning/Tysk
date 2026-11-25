@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Der Stammbaum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, clear, patient – a language teacher's wall chart.
+   IDEA: a printed genealogical chart (Stammbaum) that grows generation by generation.
+   PICTURE: the tree itself, large, unfolding from the oldest couple downward.
+   COLOUR and TYPE: forest green dominant, paper white, marigold accent for person 2; Fraunces titles, Atkinson Hyperlegible body.
+   LAYOUT: slim green title band; panel left (sticky) + tree right on wide screens; stacked panel → tree on phones. */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbfaf6,#0f1712);--ink:light-dark(#17221b,#e7eee8);--mute:light-dark(#5b6b60,#9db0a3);
+--green:light-dark(#1f4d33,#1d3d2a);--leaf:light-dark(#1f7a4a,#79c995);--gold:light-dark(#c47f00,#f0b43a);
+--card:light-dark(#ffffff,#18241c);--line:light-dark(#a9b8ad,#3e5446);--soft:light-dark(#eef3ef,#16211a);
+--ok:light-dark(#1c7c45,#6fd197);--bad:light-dark(#b3261e,#ff8a80);
+--m:light-dark(#2f6fa3,#86b9e6);--mbg:light-dark(#e6f0f8,#1b2a36);--msil:light-dark(#9fbcd6,#3f5d78);
+--f:light-dark(#b23f68,#f09ab8);--fbg:light-dark(#f9e9ef,#33202a);--fsil:light-dark(#dba5b9,#7a4c5e);--hair:light-dark(#c38aa0,#5e3747);
+--tree:light-dark(#7f9887,#6d8a77);--ring:light-dark(#b39248,#d6b866);
+--g0:light-dark(#dfe9e1,#1b2b20);--g1:light-dark(#e6eee5,#18271d);--g2:light-dark(#ecf2e8,#16231a);--g3:light-dark(#f1f5ec,#142017);--g4:light-dark(#f5f8f0,#121c15)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+header{position:relative;overflow:hidden;background:var(--green);color:#f3f7f2;padding:22px max(4vw,16px) 20px;padding-right:max(4vw,170px)}
+header .deco{position:absolute;right:max(3vw,10px);bottom:0;height:94%;width:auto;pointer-events:none}
+h1{font:700 clamp(30px,4vw,46px)/1.05 Fraunces,Georgia,serif;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;opacity:.85;max-width:68ch}
+main{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:0;align-items:start}
+aside{position:sticky;top:0;padding:20px max(2vw,16px);border-right:1px solid var(--line);min-height:calc(100vh - 100px);background:var(--bg)}
+.tabs{display:flex;gap:6px;background:var(--soft);padding:5px;border-radius:12px}
+.tabs button{flex:1;min-height:44px;border:0;border-radius:9px;background:transparent;color:var(--ink);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--card);box-shadow:0 1px 3px #0002;color:var(--leaf)}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0 8px}
+.chip{border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--card)}
+.chip small{display:block;color:var(--mute);font-size:13px}
+.chip b{font-size:17px}
+.chip.c1{border-color:var(--leaf)}.chip.c2{border-color:var(--gold)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.btn:hover{border-color:var(--leaf)}
+.btn.main{background:var(--leaf);border-color:var(--leaf);color:var(--bg);font-weight:700}
+button:focus-visible,.node:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.out{margin-top:16px;padding:16px;border-radius:14px;background:var(--soft);min-height:150px}
+.say{display:flex;gap:10px;align-items:flex-start}
+.sent{font:600 clamp(22px,2.4vw,27px)/1.2 Fraunces,Georgia,serif;margin:0;flex:1}
+.sent.small{font-size:18px}
+.spk{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--leaf);color:var(--bg);cursor:pointer;display:grid;place-items:center}
+.spk.alt{background:var(--card);color:var(--leaf);border:1px solid var(--line)}
+.spk svg{width:22px;height:22px}
+.no{color:var(--mute);margin:6px 0 0}
+.meta{font-size:14px;color:var(--mute);margin:10px 0 0}
+.gap{display:inline-block;min-width:4.5em;border-bottom:3px solid var(--gold);text-align:center;color:var(--gold)}
+.gap.done{color:var(--ok);border-color:var(--ok)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.opts button{min-height:48px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;padding:4px 8px}
+.opts button.right{border-color:var(--ok);color:var(--ok)}
+.opts button.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through;opacity:.8}
+.typed{display:flex;gap:8px;margin-top:14px}
+.typed input{flex:1;min-height:46px;font-family:inherit;font-size:16px;padding:0 12px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.rep{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.rep .nm{display:block;font-weight:700;font-size:15px;margin-bottom:4px}
+.rep input{width:100%;min-height:44px;font-family:inherit;font-size:16px;padding:0 12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin-bottom:10px}
+.keys{display:flex;gap:6px;margin-top:8px}.key{width:48px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:19px;cursor:pointer}.key:hover{border-color:var(--leaf)}
+.fb{font-weight:700;margin:10px 0 0}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.score{display:flex;justify-content:space-between;margin-top:14px;font-size:15px;color:var(--mute)}
+.score b{color:var(--ink)}
+label.ck{display:flex;gap:8px;align-items:center;min-height:36px;font-size:15px;cursor:pointer}
+label.ck input{width:20px;height:20px;accent-color:var(--leaf)}
+.settings{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.treebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px 12px 38px}
+.treebar .hint{color:var(--mute);font-size:14px;margin-right:auto}
+.zoom{width:44px;padding:0;font-size:20px}
+.tree{overflow:auto;margin-left:22px;border-radius:16px 0 0 0;height:calc(100vh - 170px);min-height:420px;background:
+ radial-gradient(circle at 20% 0%,light-dark(#e6efe8,#142219) 0,transparent 55%),var(--bg)}
+.tree svg{display:block}
+.node{cursor:pointer;outline:none}
+.node .in{transform-box:fill-box;transform-origin:center;animation:pop .55s cubic-bezier(.2,.9,.3,1.3) both;animation-delay:var(--d)}
+.node rect.c{fill:var(--card);stroke:var(--line);stroke-width:1.5;transition:stroke .2s}
+.node:hover rect.c{stroke:var(--leaf)}
+.node text{fill:var(--ink);font-family:"Atkinson Hyperlegible",sans-serif}
+.node .nm{font-size:19px;font-weight:700}
+.node .yr{font-size:16px;font-weight:700;fill:var(--mute)}
+.node .sx{font-size:17px}
+.node.m .sx,.node.m .fr{fill:var(--m)}.node.f .sx,.node.f .fr{fill:var(--f)}
+.node.m .fb{fill:var(--mbg)}.node.f .fb{fill:var(--fbg)}
+.node.m .sil{fill:var(--msil)}.node.f .sil{fill:var(--fsil)}.hair{fill:var(--hair)}
+.node .fi{fill:none;stroke:var(--card);stroke-width:2}
+.gb{rx:18}.gb0{fill:var(--g0)}.gb1{fill:var(--g1)}.gb2{fill:var(--g2)}.gb3{fill:var(--g3)}.gb4{fill:var(--g4)}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:12px}
+.seg button{flex:1;padding:0 6px;min-height:40px;border:0;border-radius:999px;background:transparent;color:var(--ink);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.seg button[aria-checked=true]{background:var(--leaf);color:var(--bg)}
+.node.s1 rect.c{stroke:var(--leaf);stroke-width:4}
+.node.s2 rect.c{stroke:var(--gold);stroke-width:4}
+.node.dim{opacity:.38}
+.node.tgt rect.c{stroke:var(--gold);stroke-width:4}
+.node.pk rect.c,.node.okk rect.c{stroke:var(--leaf);stroke-width:4;fill:light-dark(#e4f3e9,#1d3426)}
+.node.okk rect.c{stroke:var(--ok)}
+.node.bad rect.c{stroke:var(--bad);stroke-width:4}
+.node .badge{display:none}.node.s1 .b1,.node.s2 .b2{display:inline}
+.b1 circle{fill:var(--leaf)}.b2 circle{fill:var(--gold)}
+.badge text{fill:var(--bg);font-size:14px;font-weight:700}
+.lnk{fill:none;stroke:var(--tree);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .7s ease-out forwards;animation-delay:var(--d)}
+.rings{pointer-events:none;animation:fade .5s both;animation-delay:var(--d)}
+.rings circle.r{fill:none;stroke:var(--ring);stroke-width:2}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:translateY(-18px) scale(.85)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.node .in,.lnk,.rings{animation:none;stroke-dashoffset:0}}
+.btn.ord{background:var(--gold);border-color:var(--gold);color:light-dark(#fff,#1a1406);font-weight:700;margin-right:22px}.btn.ord:hover{filter:brightness(1.08)}
+.zl{font-size:15px;color:var(--mute);font-weight:700}
+dialog{border:0;border-radius:18px;padding:0;width:min(720px,94vw);max-height:88vh;background:var(--bg);color:var(--ink);box-shadow:0 20px 60px #0006}
+dialog::backdrop{background:#0b140e99}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;background:var(--green);color:#f3f7f2;position:sticky;top:0}
+.dh h2{font:700 28px/1.1 Fraunces,Georgia,serif;margin:0}
+.dh button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #ffffff55;background:transparent;color:#fff;font:inherit;cursor:pointer}
+.db{padding:6px 22px 22px}
+.db h3{font:600 18px Fraunces,Georgia,serif;margin:20px 0 6px;color:var(--leaf)}
+.wl{width:100%;border-collapse:collapse;table-layout:fixed}
+.wl th{text-align:left;font-size:13px;color:var(--mute);font-weight:700;padding:4px 6px;border-bottom:1px solid var(--line)}
+.wl td{padding:4px 6px;border-bottom:1px solid var(--soft);vertical-align:middle}
+.w{display:inline-flex;align-items:center;gap:8px;min-height:40px;border:0;background:none;color:var(--ink);font:inherit;font-size:17px;cursor:pointer;padding:0 4px;border-radius:8px;text-align:left}
+.w:hover{background:var(--soft)}.w .a{font-weight:700}.w .a.m{color:var(--m)}.w .a.f{color:var(--f)}
+.w svg{width:16px;height:16px;color:var(--mute);flex:none}
+.wl .nb{color:var(--mute)}
+.alt{font-size:14px;color:var(--mute);padding:0 4px 6px}.w.sm{font-size:14px;min-height:28px;padding:0 2px;color:var(--mute);text-decoration:underline dotted}
+.dnote{font-size:14px;color:var(--mute);margin:16px 0 0}
+.sample{font-size:13px;color:var(--mute);margin:12px 0 0}
+@media(max-width:900px){.tree{margin:0 8px}.treebar{padding-left:16px}header{padding-right:130px}main{grid-template-columns:minmax(0,1fr)}aside{position:static;border-right:0;border-bottom:1px solid var(--line);min-height:0}.tree{height:65vh}}
+@media(max-width:400px){.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Der Stammbaum</h1>
+  <svg class="deco" viewBox="0 0 160 130" aria-hidden="true">
+    <path d="M74 130 C76 108 74 96 70 84 L78 84 C80 92 82 98 86 100 C88 90 92 84 98 80 L100 84 C94 92 90 104 90 130Z" fill="#6b4a2e"/>
+    <path d="M78 96 C70 90 62 88 54 88" stroke="#6b4a2e" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <g fill="#3f8a57"><circle cx="80" cy="46" r="34"/><circle cx="48" cy="62" r="26"/><circle cx="112" cy="60" r="27"/><circle cx="62" cy="30" r="22"/><circle cx="102" cy="28" r="22"/></g>
+    <g fill="#5fae73"><circle cx="72" cy="36" r="18"/><circle cx="108" cy="50" r="14"/><circle cx="46" cy="56" r="12"/><circle cx="92" cy="20" r="11"/></g>
+    <g fill="#e9b949"><circle cx="58" cy="48" r="4"/><circle cx="96" cy="40" r="4"/><circle cx="118" cy="66" r="4"/><circle cx="76" cy="66" r="4"/><circle cx="84" cy="26" r="3.5"/><circle cx="40" cy="70" r="3.5"/></g>
+  </svg>
+  <p>Trykk på en person (1), så på en til (2). Du får relasjonen på tysk, med norsk oversettelse og opplesning. Under «Øving» kan du velge riktig ord, skrive det selv eller finne svaret i treet.</p>
+</header>
+<main>
+<aside>
+  <div class="tabs" role="group" aria-label="Modus">
+    <button id="mOver" aria-pressed="true">Oversikt</button>
+    <button id="mPrac" aria-pressed="false">Øving</button>
+  </div>
+  <div id="segWrap"></div>
+  <div class="chips" id="chips">
+    <div class="chip c1"><small>Person 1</small><b id="n1">–</b></div>
+    <div class="chip c2"><small>Person 2</small><b id="n2">–</b></div>
+  </div>
+  <div class="row" id="pairRow">
+    <button class="btn" id="swap">Bytt om 1 og 2</button>
+    <button class="btn" id="clear">Nullstill</button>
+    <button class="btn main" id="rand">Tilfeldig par</button>
+  </div>
+  <div class="out" id="out" aria-live="polite"></div>
+  <div class="settings">
+    <label class="ck"><input type="checkbox" id="auto" checked> Les opp automatisk</label>
+    <label class="ck"><input type="checkbox" id="slow"> Langsom opplesning</label>
+    <p class="meta" id="voiceInfo"></p>
+  </div>
+  <div class="rep" id="rep" hidden>
+    <label class="nm" for="rName">Navnet ditt</label>
+    <input id="rName" autocomplete="name" placeholder="Fornavn og etternavn">
+    <div class="row">
+      <button class="btn main" id="rPdf">Lagre som PDF</button>
+      <button class="btn" id="rNew">Start ny økt</button>
+    </div>
+    <p class="meta" id="rMsg" aria-live="polite"></p>
+  </div>
+  <p class="sample">Familien er en eksempelfamilie med 24 personer i fem generasjoner.</p>
+</aside>
+<section>
+  <div class="treebar">
+    <span class="hint" id="hint">Grønn ramme = person 1, gul ramme = person 2.</span>
+    <button class="btn ord" id="ordOpen">Ordliste</button>
+    <span class="zl">Zoom:</span>
+    <button class="btn zoom" id="zOut" aria-label="Zoom ut">−</button>
+    <button class="btn zoom" id="zIn" aria-label="Zoom inn">+</button>
+  </div>
+  <div class="tree" id="tree"></div>
+</section>
+</main>
+<dialog id="ord" aria-labelledby="ordT">
+  <div class="dh"><h2 id="ordT">Familienwörter</h2><button id="ordClose">Lukk</button></div>
+  <div class="db" id="ordBody"></div>
+</dialog>
+<script>
+{
+/* ---------- Data ---------- */
+const P=[
+ ['w','Wilhelm','m',0,4.8,1910,[],'h'],['h','Hildegard','f',0,5.8,1913,[],'w'],
+ ['he','Heinrich','m',1,2.65,1938,['w','h'],'ge'],['ge','Gertrud','f',1,3.65,1940,[],'he'],
+ ['er','Erika','f',1,8.25,1942,['w','h'],'ot'],['ot','Otto','m',1,9.25,1939,[],'er'],
+ ['th','Thomas','m',2,0,1964,['he','ge'],'sa'],['sa','Sabine','f',2,1,1966,[],'th'],
+ ['ma','Maria','f',2,3.9,1968,['he','ge'],'st'],['st','Stefan','m',2,4.9,1965,[],'ma'],
+ ['kl','Klaus','m',2,6.5,1971,['he','ge'],'pe'],['pe','Petra','f',2,7.5,1973,[],'kl'],
+ ['ju','Jürgen','m',2,8.75,1970,['er','ot'],'an'],['an','Anja','f',2,9.75,1972,[],'ju'],
+ ['li','Liam','m',3,0,1995,['th','sa'],null],['em','Emma','f',3,1.3,1992,['th','sa'],'da'],['da','David','m',3,2.3,1990,[],'em'],
+ ['jo','Jonas','m',3,3.7,1997,['ma','st'],null],['so','Sophie','f',3,4.7,2000,['ma','st'],null],['le','Lena','f',3,5.7,2003,['ma','st'],null],
+ ['mx','Max','m',3,7.0,2004,['kl','pe'],null],['pa','Paul','m',3,9.25,2001,['ju','an'],null],
+ ['mi','Mia','f',4,1.3,2018,['em','da'],null],['be','Ben','m',4,2.3,2021,['em','da'],null]
+].map(([id,name,g,gen,x,y,parents,sp])=>({id,name,g,gen,x,y,parents,sp}));
+const by=Object.fromEntries(P.map(p=>[p.id,p]));
+
+const T={
+ parent:{de:['Vater','Mutter'],no:['far','mor'],rev:'child'},
+ gp:{de:['Großvater','Großmutter'],no:['bestefar','bestemor'],rev:'gc'},
+ ggp:{de:['Urgroßvater','Urgroßmutter'],no:['oldefar','oldemor'],rev:'ggc'},
+ gggp:{de:['Ururgroßvater','Ururgroßmutter'],no:['tippoldefar','tippoldemor'],rev:'gggc'},
+ child:{de:['Sohn','Tochter'],no:['sønn','datter'],rev:'parent'},
+ gc:{de:['Enkel','Enkelin'],no:['barnebarn','barnebarn'],rev:'gp'},
+ ggc:{de:['Urenkel','Urenkelin'],no:['oldebarn','oldebarn'],rev:'ggp'},
+ gggc:{de:['Ururenkel','Ururenkelin'],no:['tippoldebarn','tippoldebarn'],rev:'gggp'},
+ sib:{de:['Bruder','Schwester'],no:['bror','søster'],rev:'sib'},
+ pib:{de:['Onkel','Tante'],no:['onkel','tante'],rev:'nib'},
+ gpib:{de:['Großonkel','Großtante'],no:['grandonkel','grandtante'],rev:'gnib'},
+ nib:{de:['Neffe','Nichte'],no:['nevø','niese'],rev:'pib'},
+ gnib:{de:['Großneffe','Großnichte'],no:['grandnevø','grandniese'],rev:'gpib'},
+ cous:{de:['Cousin','Cousine'],no:['fetter','kusine'],rev:'cous'},
+ cous2:{de:['Cousin zweiten Grades','Cousine zweiten Grades'],no:['tremenning','tremenning'],rev:'cous2'},
+ spouse:{de:['Ehemann','Ehefrau'],no:['ektemann','kone'],rev:'spouse'},
+ pil:{de:['Schwiegervater','Schwiegermutter'],no:['svigerfar','svigermor'],rev:'cil'},
+ cil:{de:['Schwiegersohn','Schwiegertochter'],no:['svigersønn','svigerdatter'],rev:'pil'},
+ sil:{de:['Schwager','Schwägerin'],no:['svoger','svigerinne'],rev:'sil'}
+};
+/* Godtatte synonymer i skriveoppgaven (vises også i ordlisten) */
+const ALT={
+ gp:[['der Opa'],['die Oma']],
+ ggp:[['der Uropa'],['die Uroma']],
+ gggp:[['der Ururopa'],['die Ururoma']],
+ gc:[['der Enkelsohn','das Enkelkind'],['die Enkeltochter','das Enkelkind']],
+ ggc:[['das Urenkelkind'],['das Urenkelkind']],
+ gggc:[['das Ururenkelkind'],['das Ururenkelkind']],
+ cous:[['der Vetter'],['die Kusine']],
+ cous2:[['der Großcousin','der Vetter zweiten Grades'],['die Großcousine','die Kusine zweiten Grades']],
+ spouse:[['der Mann'],['die Frau']]};
+const PL={parent:['Väter','Mütter'],gp:['Großväter','Großmütter'],ggp:['Urgroßväter','Urgroßmütter'],gggp:['Ururgroßväter','Ururgroßmütter'],
+ child:['Söhne','Töchter'],gc:['Enkel','Enkelinnen'],ggc:['Urenkel','Urenkelinnen'],gggc:['Ururenkel','Ururenkelinnen'],
+ sib:['Brüder','Schwestern'],pib:['Onkel','Tanten'],nib:['Neffen','Nichten'],cous:['Cousins','Cousinen'],
+ pil:['Schwiegerväter','Schwiegermütter'],cil:['Schwiegersöhne','Schwiegertöchter'],sil:['Schwäger','Schwägerinnen']};
+const GRP=[['Eltern','foreldre',['parent']],['Großeltern','besteforeldre',['gp']],['Urgroßeltern','oldeforeldre',['ggp']],
+ ['Schwiegereltern','svigerforeldre',['pil']],['Geschwister','søsken',['sib']],['Enkelkinder','barnebarn',['gc']]];
+const bare=a=>a.replace(/^(der|die|das)\s+/,'');
+const RARE=new Set(['gpib','gnib','cous2']);
+const gi=p=>p.g==='m'?0:1;
+const de=(k,p)=>T[k].de[gi(p)], no=(k,p)=>T[k].no[gi(p)];
+const gen=n=>/([sßxz]|ce)$/i.test(n)?n+'’':n+'s';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- Relasjoner ---------- */
+function anc(id){const m=new Map([[id,0]]),q=[id];while(q.length){const c=q.shift();for(const pa of by[c].parents)if(!m.has(pa)){m.set(pa,m.get(c)+1);q.push(pa)}}return m}
+function blood(a,b){const A=anc(a),B=anc(b);let best=null;
+ for(const [id,da] of A)if(B.has(id)){const db=B.get(id),s=da+db;
+  if(!best||s<best.s)best={s,dA:da,dB:db,c:[id]};else if(s===best.s&&da===best.dA)best.c.push(id)}
+ return best}
+function bloodKey(dA,dB){
+ if(dA===0)return [null,'parent','gp','ggp','gggp'][dB]||null;
+ if(dB===0)return [null,'child','gc','ggc','gggc'][dA]||null;
+ return {'1,1':'sib','1,2':'pib','1,3':'gpib','2,1':'nib','3,1':'gnib','2,2':'cous','3,3':'cous2'}[dA+','+dB]||null}
+function rel(a,b){
+ if(!a||!b||a===b)return null;
+ const bl=blood(a,b);
+ if(bl){const k=bloodKey(bl.dA,bl.dB);if(k)return{key:k,how:'blood',c:bl.c,dA:bl.dA,dB:bl.dB};return{key:null,how:'far',c:bl.c}}
+ const pa=by[a],pb=by[b];
+ if(pa.sp===b)return{key:'spouse',how:'spouse'};
+ if(pb.sp){const x=blood(a,pb.sp);if(x){const k={'0,1':'pil','1,1':'sil','2,1':'nib','3,1':'gnib'}[x.dA+','+x.dB];if(k)return{key:k,how:'viaB',s:pb.sp}}}
+ if(pa.sp){const x=blood(pa.sp,b);if(x){const k={'1,0':'cil','1,1':'sil','1,2':'pib','1,3':'gpib'}[x.dA+','+x.dB];if(k)return{key:k,how:'viaA',s:pa.sp}}}
+ return null}
+const names=ids=>ids.map(i=>by[i].name).join(' og ');
+function why(a,b,r){
+ const A=by[a],B=by[b];
+ if(r.how==='spouse')return `${A.name} og ${B.name} er gift.`;
+ if(r.how==='blood')return '';
+ if(r.how==='viaA'){const x=rel(r.s,b);return `Via ekteskap: ${A.name} er gift med ${by[r.s].name}, som er ${gen(B.name)} ${no(x.key,by[r.s])}.`}
+ if(r.how==='viaB'){const x=rel(a,r.s);return `Via ekteskap: ${B.name} er gift med ${by[r.s].name}, og ${A.name} er ${gen(by[r.s].name)} ${no(x.key,A)}.`}
+ return ''}
+
+/* ---------- Tale ---------- */
+const synth=window.speechSynthesis;let voice=null;
+function pickVoice(){if(!synth)return;const v=synth.getVoices();voice=v.find(x=>/^de[-_]DE/i.test(x.lang))||v.find(x=>/^de/i.test(x.lang))||null;
+ document.getElementById('voiceInfo').textContent=voice?`Stemme: ${voice.name}`:(v.length?'Fant ingen tysk stemme på enheten – prøver likevel med tysk uttale.':'')}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}else document.getElementById('voiceInfo').textContent='Nettleseren støtter ikke opplesning.';
+function speak(t){if(!synth)return;try{synth.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';if(voice)u.voice=voice;u.rate=$('slow').checked?.7:.95;synth.speak(u)}catch(e){}}
+const SPK='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+/* ---------- Tilstand ---------- */
+const $=id=>document.getElementById(id);
+const S={mode:'over',s1:null,s2:null,q:null,streak:0,zoom:1};
+/* Øvingslogg for rapporten – lagres i elevens nettleser */
+const RS={log:[],start:Date.now(),name:''};
+try{Object.assign(RS,JSON.parse(localStorage.getItem('stammbaum-rapport')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('stammbaum-rapport',JSON.stringify(RS))}catch(e){}};
+const okCount=()=>RS.log.filter(e=>e.att.length&&e.att[0].ok).length;
+
+/* ---------- Tre ---------- */
+const U=124,W=104,H=152,OX=56,OY=40,GY=204,BW=OX*2+9.75*U+W,BH=OY+4*GY+H+30;
+const cx=p=>OX+p.x*U+W/2, ty=p=>OY+p.gen*GY;
+function drawTree(){
+ let s=`<svg id="svg" viewBox="0 0 ${BW} ${BH}" width="${BW*S.zoom}" height="${BH*S.zoom}" role="img" aria-label="Familietre"><defs><clipPath id="clipF"><ellipse cx="54" cy="50" rx="37" ry="43"/></clipPath></defs>`;
+ for(let g=0;g<5;g++)s+=`<rect class="gb gb${g}" x="0" y="${OY+g*GY-26}" width="${BW}" height="${GY-6}" rx="18"/>`;
+ const done=new Set();let rings='';
+ for(const p of P){ if(p.sp&&!done.has(p.id)){done.add(p.id);done.add(p.sp);const q=by[p.sp];
+   const y=ty(p)+H/2,x1=Math.min(cx(p),cx(q))+W/2,x2=Math.max(cx(p),cx(q))-W/2;
+   s+=`<path class="lnk" pathLength="1" style="--d:${p.gen*.55+.35}s" d="M${x1} ${y}H${x2}"/>`;
+   const rx=(x1+x2)/2;
+   rings+=`<g class="rings" style="--d:${p.gen*.55+.6}s" transform="translate(${rx},${y})"><ellipse class="gb${p.gen}" rx="10" ry="8"/><circle class="r" cx="-3.4" r="5"/><circle class="r" cx="3.4" r="5"/></g>`;
+   const kids=P.filter(k=>k.parents.includes(p.id));
+   if(kids.length){const mx=(cx(p)+cx(q))/2,bar=ty(p)+H+(GY-H)/2,xs=kids.map(cx).concat(mx);
+     s+=`<path class="lnk" pathLength="1" style="--d:${p.gen*.55+.55}s" d="M${mx} ${y}V${bar}M${Math.min(...xs)} ${bar}H${Math.max(...xs)}${kids.map(k=>`M${cx(k)} ${bar}V${ty(k)}`).join('')}"/>`}}}
+ for(const p of P){const x=cx(p)-W/2,y=ty(p);
+  const sil=p.g==='m'
+   ?`<path class="sil" d="M18 100C18 76 34 66 54 66S90 76 90 100Z"/><circle class="sil" cx="54" cy="42" r="15"/>`
+   :`<path class="hair" d="M36 46C33 20 75 20 72 46C73 58 78 66 82 72H26C30 66 35 58 36 46Z"/><path class="sil" d="M22 100C22 78 36 68 54 68S86 78 86 100Z"/><circle class="sil" cx="54" cy="43" r="13.5"/>`;
+  s+=`<g class="node ${p.g}" id="n-${p.id}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.name)}, ${p.g==='m'?'männlich':'weiblich'}, geboren ${p.y}" transform="translate(${x},${y})"><g class="in" style="--d:${p.gen*.55}s">
+  <rect class="c" width="${W}" height="${H}" rx="14"/>
+  <g transform="translate(${W/2-54} 0)"><ellipse class="fr" cx="54" cy="50" rx="43" ry="49"/><ellipse class="fb" cx="54" cy="50" rx="37" ry="43"/>
+  <g clip-path="url(#clipF)">${sil}</g>
+  <ellipse class="fi" cx="54" cy="50" rx="40" ry="46"/></g>
+  <text class="nm" x="${W/2}" y="120" text-anchor="middle">${esc(p.name)}</text>
+  <text class="yr" x="${W/2}" y="141" text-anchor="middle"><tspan class="sx">${p.g==='m'?'♂':'♀'}</tspan> geb. ${p.y}</text>
+  <g class="badge b1"><circle cx="2" cy="2" r="12"/><text x="2" y="7" text-anchor="middle">1</text></g>
+  <g class="badge b2"><circle cx="2" cy="2" r="12"/><text x="2" y="7" text-anchor="middle">2</text></g></g></g>`}
+ $('tree').innerHTML=s+rings+'</svg>';
+ paintNodes()}
+function setZoom(z){S.zoom=Math.max(.45,Math.min(1.6,z));const v=$('svg');v.setAttribute('width',BW*S.zoom);v.setAttribute('height',BH*S.zoom)}
+function paintNodes(){
+ const r=rel(S.s1,S.s2);
+ const inv=new Set([S.s1,S.s2,r&&r.s].filter(Boolean));
+ const fm=S.mode==='prac'&&S.find&&S.F,F=S.F;
+ for(const p of P){const el=$('n-'+p.id);if(!el)continue;
+  el.classList.toggle('s1',!fm&&p.id===S.s1);el.classList.toggle('s2',!fm&&p.id===S.s2);
+  el.classList.toggle('dim',S.mode==='over'&&!!S.s2&&!inv.has(p.id));
+  el.classList.toggle('tgt',!!fm&&p.id===F.b);
+  el.classList.toggle('pk',!!fm&&!F.done&&F.picks.has(p.id));
+  el.classList.toggle('okk',!!fm&&F.done&&F.ids.includes(p.id));
+  el.classList.toggle('bad',!!fm&&F.done&&F.picks.has(p.id)&&!F.ids.includes(p.id))}}
+
+/* ---------- Panel ---------- */
+const norm=s=>s.replace(/\s+/g,' ').trim();
+const low=s=>norm(s).toLowerCase();
+const exact=s=>s.replace(/\s+/g,' ').trim();
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function makeQ(){
+ const A=by[S.s1],B=by[S.s2],r=rel(S.s1,S.s2);if(!r||!r.key)return null;
+ const right=de(r.key,A),near=de(T[r.key].rev,A);
+ const pool=shuffle(Object.keys(T).filter(k=>k!=='cous2'||r.key==='cous2').map(k=>de(k,A)).filter(t=>t!==right&&t!==near));
+ const opts=shuffle([right,...(near!==right?[near]:[]),...pool].slice(0,4));
+ if(!opts.includes(right))opts[0]=right;
+ return{right,opts:shuffle(opts),wrong:[],done:false,counted:false,key:r.key}}
+function sentence(a,b,k){return `${by[a].name} ist ${gen(by[b].name)} ${de(k,by[a])}.`}
+function render(){
+ $('n1').textContent=S.s1?by[S.s1].name:'–';$('n2').textContent=S.s2?by[S.s2].name:'–';
+ $('mOver').setAttribute('aria-pressed',S.mode==='over');$('mPrac').setAttribute('aria-pressed',S.mode==='prac');
+ paintNodes();
+ const o=$('out'),fm=S.mode==='prac'&&S.find;
+ $('chips').hidden=fm;$('pairRow').hidden=fm;
+ $('hint').textContent=fm?'Gul ramme = personen spørsmålet gjelder. Svar ved å trykke i treet.':'Grønn ramme = person 1, gul ramme = person 2.';
+ const seg=S.mode==='prac'?`<div class="seg" role="radiogroup" aria-label="Svarmåte"><button role="radio" data-seg="0" aria-checked="${!S.typed&&!S.find}">Flervalg</button><button role="radio" data-seg="1" aria-checked="${!!S.typed&&!S.find}">Skriv selv</button><button role="radio" data-seg="2" aria-checked="${!!S.find}">Finn i treet</button></div>`:'';
+ $('segWrap').innerHTML=seg;
+ const html=h=>{o.innerHTML=h};
+ if(fm){html(findHtml());return}
+ if(!S.s1){html(`<p class="no">Trykk på en person i treet for å velge <b>person 1</b>${S.mode==='prac'?' – eller trykk «Tilfeldig par».':'.'}</p>`);return}
+ if(!S.s2){html(`<p class="no"><b>${esc(by[S.s1].name)}</b> er valgt. Trykk nå på <b>person 2</b>.</p>`);return}
+ const A=by[S.s1],B=by[S.s2],r=rel(S.s1,S.s2);
+ if(!r||!r.key){html(`<p class="sent small">${esc(A.name)} und ${esc(B.name)}</p><p class="no">Det finnes ingen enkel tysk betegnelse for denne relasjonen. Velg en annen person 2.</p>`);return}
+ const s=sentence(S.s1,S.s2,r.key),art=(A.g==='m'?'der ':'die ')+de(r.key,A);
+ if(S.mode==='over'){
+  const rr=rel(S.s2,S.s1),rs=rr&&rr.key?sentence(S.s2,S.s1,rr.key):'';
+  o.innerHTML=`<div class="say"><p class="sent">${esc(s)}</p><button class="spk" data-say="${esc(s)}" aria-label="Les opp">${SPK}</button></div>
+  <p class="meta"><b>${esc(art)}</b> · norsk: ${esc(A.name)} er ${esc(gen(B.name))} ${esc(no(r.key,A))}.</p>
+  <p class="meta">${esc(why(S.s1,S.s2,r))}</p>
+  ${rs?`<div class="say" style="margin-top:14px"><p class="sent small">Und umgekehrt: ${esc(rs)}</p><button class="spk alt" data-say="${esc(rs)}" aria-label="Les opp omvendt">${SPK}</button></div>`:''}`;
+  return}
+ const q=S.q||(S.q=makeQ());
+ const gap=q.done?`<span class="gap done">${esc(q.shown||q.right)}</span>`:`<span class="gap">&nbsp;</span>`;
+ const typed=!!S.typed;
+ html(`<div class="say"><p class="sent">${esc(A.name)} ist ${esc(gen(B.name))} ${gap}.</p>${q.done?`<button class="spk" data-say="${esc(q.shown?`${A.name} ist ${gen(B.name)} ${q.shown}.`:s)}" aria-label="Les opp">${SPK}</button>`:''}</div>
+ ${typed?(q.done?'':`<form class="typed" id="tf"><input id="ti" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Skriv ordet …" aria-label="Svar"><button class="btn main">Sjekk</button></form><div class="keys">${['ä','ö','ü','ß'].map(k=>`<button type="button" class="key" data-key="${k}" aria-label="Sett inn ${k}">${k}</button>`).join('')}</div>`):
+  `<div class="opts">${q.opts.map(t=>`<button data-opt="${esc(t)}" class="${q.done&&t===q.right?'right':''}${q.wrong.includes(t)?'wrong':''}" ${q.done||q.wrong.includes(t)?'disabled':''}>${esc(t)}</button>`).join('')}</div>`}
+ ${q.fb?`<p class="fb ${q.fb[0]}">${esc(q.fb[1])}</p>`:''}${q.done&&q.also?`<p class="meta">${esc(q.also)}</p>`:''}
+ ${q.done?`<p class="meta"><b>${esc(art)}</b> · norsk: ${esc(no(r.key,A))}. ${esc(why(S.s1,S.s2,r))}</p><div class="row" style="margin-top:10px"><button class="btn main" id="next">Neste oppgave</button></div>`:''}
+ <div class="score"><span>Riktig første gang: <b>${okCount()}</b> av <b>${RS.log.length}</b></span><span>På rad: <b>${S.streak}</b></span></div>`);
+ if(typed&&!q.done){const ti=$('ti');ti.focus({preventScroll:true});
+  $('tf').onsubmit=e=>{e.preventDefault();if(ti.value.trim())answer(ti.value)}}}
+function answer(t){
+ const q=S.q;if(!q||q.done)return;
+ const all=[q.right,...((ALT[q.key]||[[],[]])[gi(by[S.s1])]).map(bare)];
+ const hit=all.find(a=>norm(a)===norm(t));
+ const okk=!!hit;
+ if(!q.entry){q.entry={s:sentence(S.s1,S.s2,q.key),mode:S.typed?'skriv selv':'flervalg',att:[],done:false};RS.log.push(q.entry);if(okk)S.streak++;else S.streak=0}
+ q.entry.att.push({t:exact(t),ok:okk});
+ if(okk){q.done=true;
+  q.shown=hit;
+  const others=all.filter(a=>a!==hit);
+  q.fb=['ok',q.wrong.length?'Riktig nå!':'Richtig! Riktig!'];
+  q.also=others.length?`Også riktig: ${others.join(' / ')}.`:'';
+  if($('auto').checked)speak(`${by[S.s1].name} ist ${gen(by[S.s2].name)} ${q.shown||q.right}.`)}
+ else{if(q.opts.includes(t))q.wrong.push(t);
+  const caseOnly=all.some(a=>low(a)===low(t));
+  q.fb=['bad',caseOnly?`Nesten! Substantiv skrives med stor forbokstav på tysk. Prøv igjen.`:`«${t}» stemmer ikke. Prøv igjen.`];
+  if((q.tries||0)>=1){q.done=true;q.fb=['bad',`Riktig svar: ${q.right}.`];if($('auto').checked)speak(sentence(S.s1,S.s2,q.key))}
+  q.tries=(q.tries||0)+1}
+ q.entry.done=!!q.done;save();
+ render();updRep()}
+
+/* ---------- Finn i treet ---------- */
+let POOL=null;
+function findPool(){if(POOL)return POOL;POOL=[];
+ for(const B of P){const rs=P.filter(a=>a.id!==B.id).map(a=>[a,rel(a.id,B.id)]).filter(([a,x])=>x&&x.key&&!RARE.has(x.key));
+  for(const key of new Set(rs.map(([a,x])=>x.key)))for(const g of ['m','f']){
+   const ids=rs.filter(([a,x])=>x.key===key&&a.g===g).map(([a])=>a.id);
+   /* «Enkel», «Urenkel» og «Cousins» i flertall kan også bety blandet kjønn – derfor ikke spurt om */
+   if(ids.length>1&&g==='m'&&['gc','ggc','gggc','cous'].includes(key))continue;
+   if(ids.length&&(ids.length===1||PL[key]))POOL.push({b:B.id,ids,key,g})}
+  for(const [w,n,ks] of GRP){const ids=rs.filter(([a,x])=>ks.includes(x.key)).map(([a])=>a.id);if(ids.length>=2)POOL.push({b:B.id,ids,w,n})}}
+ return POOL}
+const multi=F=>F.ids.length>1;
+const fWord=F=>F.w||(multi(F)?PL[F.key][F.g==='m'?0:1]:T[F.key].de[F.g==='m'?0:1]);
+const fQ=F=>`Wer ${multi(F)?'sind':'ist'} ${gen(by[F.b].name)} ${fWord(F)}?`;
+const andList=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' und '+a[a.length-1];
+const fS=F=>`${andList(F.ids.map(i=>by[i].name))} ${multi(F)?'sind':'ist'} ${gen(by[F.b].name)} ${fWord(F)}.`;
+function newFind(){const pool=findPool();let q;
+ do{q=pool[Math.random()*pool.length|0]}while(pool.length>1&&S.F&&q.b===S.F.b&&fWord(q)===fWord(S.F));
+ S.F={...q,picks:new Set(),tries:0,done:false,fb:null,entry:null};render();
+ if($('auto').checked)speak(fQ(S.F));
+ try{$('n-'+q.b).scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'})}catch(e){}}
+function findClick(id){const F=S.F;if(!F||F.done)return;
+ if(!multi(F)){F.picks=new Set([id]);checkFind()}else{F.picks.has(id)?F.picks.delete(id):F.picks.add(id);F.fb=null;render()}}
+function checkFind(){const F=S.F;if(!F||F.done||!F.picks.size)return;
+ const picks=[...F.picks],ok=picks.length===F.ids.length&&F.ids.every(i=>F.picks.has(i));
+ if(!F.entry){F.entry={s:fS(F),mode:'finn i treet',att:[],done:false};RS.log.push(F.entry);S.streak=ok?S.streak+1:0}
+ F.entry.att.push({t:andList(picks.map(i=>by[i].name)),ok});
+ if(ok){F.done=true;F.fb=['ok',F.tries?'Riktig nå!':'Richtig! Riktig!']}
+ else{F.tries++;
+  if(multi(F)){const nR=picks.filter(i=>F.ids.includes(i)).length,nW=picks.length-nR;
+   F.fb=['bad',`Ikke helt: ${nR} av ${F.ids.length} riktige${nW?`, ${nW} som ikke passer`:''}. Prøv igjen.`]}
+  else{F.fb=['bad',`Nei, ikke ${by[picks[0]].name}. Prøv igjen.`];F.picks=new Set()}
+  if(F.tries>=2){F.done=true;F.fb=['bad','Her er svaret:']}}
+ if(F.done&&$('auto').checked)speak(fS(F));
+ F.entry.done=F.done;save();render();updRep()}
+function findHtml(){
+ if(!S.F)return '<p class="no">Laster oppgave …</p>';
+ const F=S.F,m=multi(F),q=fQ(F),a=fS(F);
+ const meta=F.w?`<b>die ${esc(F.w)}</b> · norsk: ${esc(F.n)}`:`<b>${F.g==='m'?'der':'die'} ${esc(T[F.key].de[F.g==='m'?0:1])}</b> · flertall: die ${esc(PL[F.key]?PL[F.key][F.g==='m'?0:1]:'–')} · norsk: ${esc(T[F.key].no[F.g==='m'?0:1])}`;
+ const names=andList([...F.picks].map(i=>by[i].name));
+ return `<div class="say"><p class="sent">${esc(q)}</p><button class="spk alt" data-say="${esc(q)}" aria-label="Les opp spørsmålet">${SPK}</button></div>
+ ${F.done?'':`<p class="no">${m?'Trykk på <b>alle</b> som passer i treet, og trykk «Sjekk». Bare personene i treet teller.':'Trykk på riktig person i treet.'}</p>`}
+ ${m&&!F.done?`<p class="meta">Valgt: <b>${esc(names||'ingen ennå')}</b></p><div class="row" style="margin-top:8px"><button class="btn main" id="fCheck" ${F.picks.size?'':'disabled'}>Sjekk</button></div>`:''}
+ ${F.fb?`<p class="fb ${F.fb[0]}">${esc(F.fb[1])}</p>`:''}
+ ${F.done?`<div class="say" style="margin-top:6px"><p class="sent small">${esc(a)}</p><button class="spk" data-say="${esc(a)}" aria-label="Les opp svaret">${SPK}</button></div>
+  <p class="meta">${meta}</p><div class="row" style="margin-top:10px"><button class="btn main" id="next">Neste oppgave</button></div>`:''}
+ <div class="score"><span>Riktig første gang: <b>${okCount()}</b> av <b>${RS.log.length}</b></span><span>På rad: <b>${S.streak}</b></span></div>`}
+
+/* ---------- Ordliste ---------- */
+const GROUPS=[['Eltern und Großeltern – foreldre og besteforeldre',['parent','gp','ggp','gggp']],
+ ['Kinder und Enkel – barn og barnebarn',['child','gc','ggc','gggc']],
+ ['Geschwister – søsken',['sib']],
+ ['Onkel, Tante, Neffe, Nichte',['pib','gpib','nib','gnib']],
+ ['Cousins und Cousinen – søskenbarn og tremenninger',['cous','cous2']],
+ ['Ehe und Schwiegerfamilie – ekteskap og svigerfamilie',['spouse','pil','cil','sil']]];
+const SPK2='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const wbtn=(art,w,g,alts)=>`<button class="w" data-say="${esc(art+' '+w)}"><span><span class="a ${g}">${art}</span> ${esc(w)}</span>${SPK2}</button>${alts&&alts.length?`<div class="alt">auch: ${alts.map(a=>`<button class="w sm" data-say="${esc(a)}">${esc(a)}</button>`).join(', ')}</div>`:''}`;
+const noPair=k=>T[k].no[0]===T[k].no[1]?T[k].no[0]:T[k].no[0]+' / '+T[k].no[1];
+$('ordBody').innerHTML=GROUPS.map(([h,ks])=>`<h3>${esc(h)}</h3><table class="wl stack"><thead><tr><th>Maskulin</th><th>Feminin</th><th>Norsk</th></tr></thead><tbody>${
+ ks.map(k=>`<tr><td>${wbtn('der',T[k].de[0],'m',ALT[k]&&ALT[k][0])}</td><td>${wbtn('die',T[k].de[1],'f',ALT[k]&&ALT[k][1])}</td><td class="nb">${esc(noPair(k))}</td></tr>`).join('')}</tbody></table>`).join('')
+ +`<h3>Mehrzahl – flertall</h3><table class="wl"><thead><tr><th>Tysk</th><th>Norsk</th></tr></thead><tbody>${
+ GRP
+ .map(([w,n])=>`<tr><td><button class="w" data-say="${esc('die '+w)}"><span><span class="a">die</span> ${esc(w)}</span>${SPK2}</button></td><td class="nb">${esc(n)}</td></tr>`).join('')}</tbody></table>`;
+$('ordBody').addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say)});
+$('ordOpen').onclick=()=>{const d=$('ord');try{d.showModal()}catch(e){d.setAttribute('open','')}};
+$('ordClose').onclick=()=>$('ord').close();
+$('ord').addEventListener('click',e=>{if(e.target===$('ord'))$('ord').close()});
+
+/* ---------- Rapport (PDF) ---------- */
+$('rName').value=RS.name||'';
+$('rName').oninput=()=>{RS.name=$('rName').value;save()};
+function updRep(){$('rep').hidden=S.mode!=='prac';const n=RS.log.length;
+ $('rMsg').textContent=n?`${n} oppgave${n===1?'':'r'} i denne økta.`:'Ingen oppgaver i denne økta ennå.'}
+let jsLoad=null;
+function loadPdfLib(){if(window.jspdf)return Promise.resolve();if(jsLoad)return jsLoad;
+ jsLoad=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=res;sc.onerror=()=>{jsLoad=null;rej()};document.head.appendChild(sc)});return jsLoad}
+const fmt=d=>new Date(d).toLocaleString('nb-NO',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+async function makePdf(){
+ const name=$('rName').value.trim();
+ if(!name){$('rMsg').textContent='Skriv navnet ditt først.';$('rName').focus();return}
+ if(!RS.log.length){$('rMsg').textContent='Gjør minst én oppgave før du lagrer.';return}
+ $('rMsg').textContent='Lager PDF …';
+ try{await loadPdfLib()}catch(e){$('rMsg').textContent='Klarte ikke å laste PDF-verktøyet. Sjekk nettforbindelsen og prøv igjen.';return}
+ const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});
+ const L=20,R=190;let y=22;
+ const line=(t,size=11,style='normal',col=[23,34,27],gap=6)=>{if(y>275){doc.addPage();y=20}
+  doc.setFont('helvetica',style);doc.setFontSize(size);doc.setTextColor(...col);
+  for(const l of doc.splitTextToSize(t,R-L)){doc.text(l,L,y);y+=gap}};
+ const ok=okCount(),tot=RS.log.length,done=RS.log.filter(e=>e.done).length;
+ const cnt=m=>RS.log.filter(e=>e.mode===m).length;
+ line('Der Stammbaum – øvingsrapport',20,'bold',[31,77,51],10);
+ line(`Navn: ${name}`,12,'bold',undefined,7);
+ line(`Lagret: ${fmt(Date.now())}`,11);
+ line(`Økta startet: ${fmt(RS.start)}`,11);
+ y+=2;
+ line(`Oppgaver: ${tot}   ·   Riktig første gang: ${ok} av ${tot} (${Math.round(ok/tot*100)} %)`,12,'bold',undefined,7);
+ line(`Flervalg: ${cnt('flervalg')}   ·   Skriv selv: ${cnt('skriv selv')}   ·   Finn i treet: ${cnt('finn i treet')}${done<tot?`   ·   Ikke fullført: ${tot-done}`:''}`,11);
+ y+=2;doc.setDrawColor(169,184,173);doc.line(L,y,R,y);y+=8;
+ RS.log.forEach((e,i)=>{
+  if(y>262){doc.addPage();y=20}
+  const first=e.att.length&&e.att[0].ok;
+  line(`${i+1}. ${e.s||`${e.a} ist ${e.b} ${e.right}.`}`,12,'bold',undefined,6);
+  const svar=e.att.map(a=>`${a.t} (${a.ok?'riktig':'feil'})`).join(', ');
+  line(`Svar: ${svar}${e.done?'':' – ikke fullført'}   ·   ${e.mode}`,10,'normal',first?[28,124,69]:[179,38,30],5);
+  y+=3});
+ const pages=doc.getNumberOfPages();
+ for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,130,124);doc.text(`${name} · side ${i} av ${pages}`,R,290,{align:'right'})}
+ const d=new Date(),ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+ const fn=`Stammbaum_${name.replace(/[^\p{L}\p{N}]+/gu,'_')}_${ds}.pdf`;
+ try{doc.save(fn);$('rMsg').textContent=`Lagret som ${fn} i Nedlastinger.`}catch(e){$('rMsg').textContent='Nettleseren stoppet nedlastingen.'}}
+$('rPdf').onclick=makePdf;
+let confirmT=null;
+$('rNew').onclick=()=>{const b=$('rNew');
+ if(!confirmT){b.textContent='Trykk igjen for å slette resultatene';confirmT=setTimeout(()=>{b.textContent='Start ny økt';confirmT=null},4000);return}
+ clearTimeout(confirmT);confirmT=null;b.textContent='Start ny økt';
+ RS.log=[];RS.start=Date.now();S.streak=0;S.q=null;if(S.F){S.F=null;if(S.find){newFind();}}save();render();updRep();$('rMsg').textContent='Ny økt startet.'};
+
+/* ---------- Hendelser ---------- */
+function pick(id){
+ if(!S.s1||S.s2){S.s1=id;S.s2=null}else if(id===S.s1){S.s1=null}else S.s2=id;
+ S.q=null;render();
+ if(S.mode==='over'&&S.s2&&$('auto').checked){const r=rel(S.s1,S.s2);if(r&&r.key)speak(sentence(S.s1,S.s2,r.key))}}
+const tap=id=>S.mode==='prac'&&S.find?findClick(id):pick(id);
+$('tree').addEventListener('click',e=>{const n=e.target.closest('.node');if(n)tap(n.dataset.id)});
+$('tree').addEventListener('keydown',e=>{const n=e.target.closest('.node');if(n&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tap(n.dataset.id)}});
+$('out').addEventListener('mousedown',e=>{if(e.target.closest('[data-key]'))e.preventDefault()});
+$('out').addEventListener('click',e=>{const k=e.target.closest('[data-key]');if(k){const i=$('ti');if(i){const a=i.selectionStart??i.value.length,b=i.selectionEnd??a;i.value=i.value.slice(0,a)+k.dataset.key+i.value.slice(b);i.focus();i.setSelectionRange(a+1,a+1)}return}const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say);
+ const o=e.target.closest('[data-opt]');if(o)answer(o.dataset.opt);if(e.target.id==='next'){S.find?newFind():randomPair()}
+ if(e.target.id==='fCheck')checkFind();
+ });
+$('segWrap').addEventListener('click',e=>{const sg=e.target.closest('[data-seg]');if(sg){const v=sg.dataset.seg;S.typed=v==='1';S.find=v==='2';if(S.find&&!S.F)newFind();else render()}});
+function randomPair(){
+ const pairs=[];for(const a of P)for(const b of P){const r=rel(a.id,b.id);if(r&&r.key&&!RARE.has(r.key))pairs.push([a.id,b.id])}
+ let pr;do{pr=pairs[Math.random()*pairs.length|0]}while(pairs.length>1&&pr[0]===S.s1&&pr[1]===S.s2);
+ S.s1=pr[0];S.s2=pr[1];S.q=null;render();
+ try{$('n-'+pr[0]).scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})}catch(e){}
+ if(S.mode==='over'&&$('auto').checked){const r=rel(S.s1,S.s2);speak(sentence(S.s1,S.s2,r.key))}}
+$('rand').onclick=randomPair;
+$('swap').onclick=()=>{[S.s1,S.s2]=[S.s2,S.s1];if(!S.s1){S.s1=S.s2;S.s2=null}S.q=null;render();
+ if(S.mode==='over'&&S.s2&&$('auto').checked){const r=rel(S.s1,S.s2);if(r&&r.key)speak(sentence(S.s1,S.s2,r.key))}};
+$('clear').onclick=()=>{S.s1=S.s2=null;S.q=null;render()};
+$('mOver').onclick=()=>{S.mode='over';render();updRep()};
+$('mPrac').onclick=()=>{S.mode='prac';S.typed=false;S.find=false;S.q=null;render();updRep()};
+$('zIn').onclick=()=>setZoom(S.zoom+.15);$('zOut').onclick=()=>setZoom(S.zoom-.15);
+const fit=Math.max(.82,Math.min(1,($('tree').clientWidth-8)/BW));S.zoom=fit;
+drawTree();render();updRep();
+}
+</script>
+</body>
+</html>
